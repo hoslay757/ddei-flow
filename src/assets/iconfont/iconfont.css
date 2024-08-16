@@ -1,0 +1,383 @@
+@font-face {
+  font-family: "icon-ddei-flow"; /* Project id 4654254 */
+  src: url('iconfont.woff2?t=1723793142628') format('woff2'),
+       url('iconfont.woff?t=1723793142628') format('woff'),
+       url('iconfont.ttf?t=1723793142628') format('truetype');
+}
+
+.icon-ddei-flow {
+  font-family: "icon-ddei-flow" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-ddei-flow-start-event-non-inte:before {
+  content: "\e7a8";
+}
+
+.icon-ddei-flow-service-task:before {
+  content: "\e7a9";
+}
+
+.icon-ddei-flow-start-event-signal:before {
+  content: "\e7aa";
+}
+
+.icon-ddei-flow-send-task:before {
+  content: "\e7ab";
+}
+
+.icon-ddei-flow-sub-process-marker:before {
+  content: "\e7ac";
+}
+
+.icon-ddei-flow-start-event-multiple:before {
+  content: "\e7ad";
+}
+
+.icon-ddei-flow-start-event-non-inte1:before {
+  content: "\e7ae";
+}
+
+.icon-ddei-flow-intermediate-event-c9:before {
+  content: "\e7af";
+}
+
+.icon-ddei-flow-business-rule:before {
+  content: "\e7b0";
+}
+
+.icon-ddei-flow-subprocess-expanded:before {
+  content: "\e7b1";
+}
+
+.icon-ddei-flow-intermediate-event-c10:before {
+  content: "\e7b2";
+}
+
+.icon-ddei-flow-intermediate-event-c11:before {
+  content: "\e7b3";
+}
+
+.icon-ddei-flow-start-event-conditio:before {
+  content: "\e7b4";
+}
+
+.icon-ddei-flow-intermediate-event-c12:before {
+  content: "\e7b9";
+}
+
+.icon-ddei-flow-intermediate-event-t5:before {
+  content: "\e7ba";
+}
+
+.icon-ddei-flow-start-event-none:before {
+  content: "\e7bb";
+}
+
+.icon-ddei-flow-send:before {
+  content: "\e7bc";
+}
+
+.icon-ddei-flow-start-event-escalati:before {
+  content: "\e7bd";
+}
+
+.icon-ddei-flow-lane-insert-above:before {
+  content: "\e7be";
+}
+
+.icon-ddei-flow-start-event-message:before {
+  content: "\e7bf";
+}
+
+.icon-ddei-flow-ad-hoc-marker:before {
+  content: "\e7c0";
+}
+
+.icon-ddei-flow-intermediate-event-c13:before {
+  content: "\e7c1";
+}
+
+.icon-ddei-flow-start-event-parallel:before {
+  content: "\e7c2";
+}
+
+.icon-ddei-flow-intermediate-event-c14:before {
+  content: "\e7c3";
+}
+
+.icon-ddei-flow-start-event-non-inte2:before {
+  content: "\e7c4";
+}
+
+.icon-ddei-flow-start-event-timer:before {
+  content: "\e7c5";
+}
+
+.icon-ddei-flow-start-event-non-inte3:before {
+  content: "\e7c6";
+}
+
+.icon-ddei-flow-user:before {
+  content: "\e7c7";
+}
+
+.icon-ddei-flow-start-event-non-inte4:before {
+  content: "\e7c8";
+}
+
+.icon-ddei-flow-lane-divide-two:before {
+  content: "\e7c9";
+}
+
+.icon-ddei-flow-intermediate-event-c15:before {
+  content: "\e7ca";
+}
+
+.icon-ddei-flow-start-event-non-inte5:before {
+  content: "\e7cb";
+}
+
+.icon-ddei-flow-service:before {
+  content: "\e7cc";
+}
+
+.icon-ddei-flow-intermediate-event-c16:before {
+  content: "\e7cd";
+}
+
+.icon-ddei-flow-start-event-non-inte6:before {
+  content: "\e7ce";
+}
+
+.icon-ddei-flow-subprocess-collapsed:before {
+  content: "\e7cf";
+}
+
+.icon-ddei-flow-transaction:before {
+  content: "\e7d0";
+}
+
+.icon-ddei-flow-user-task:before {
+  content: "\e7d1";
+}
+
+.icon-ddei-flow-intermediate-event-c17:before {
+  content: "\e7d2";
+}
+
+.icon-ddei-flow-end-event-message:before {
+  content: "\e773";
+}
+
+.icon-ddei-flow-call-activity:before {
+  content: "\e774";
+}
+
+.icon-ddei-flow-business-rule-task:before {
+  content: "\e775";
+}
+
+.icon-ddei-flow-compensation-marker:before {
+  content: "\e776";
+}
+
+.icon-ddei-flow-data-object:before {
+  content: "\e777";
+}
+
+.icon-ddei-flow-data-input:before {
+  content: "\e778";
+}
+
+.icon-ddei-flow-end-event-compensati:before {
+  content: "\e779";
+}
+
+.icon-ddei-flow-data-output:before {
+  content: "\e77a";
+}
+
+.icon-ddei-flow-end-event-link:before {
+  content: "\e77b";
+}
+
+.icon-ddei-flow-end-event-cancel:before {
+  content: "\e77c";
+}
+
+.icon-ddei-flow-end-event-error:before {
+  content: "\e77d";
+}
+
+.icon-ddei-flow-data-store:before {
+  content: "\e77e";
+}
+
+.icon-ddei-flow-end-event-escalation:before {
+  content: "\e77f";
+}
+
+.icon-ddei-flow-gateway-xor:before {
+  content: "\e780";
+}
+
+.icon-ddei-flow-intermediate-event-c:before {
+  content: "\e781";
+}
+
+.icon-ddei-flow-end-event-none:before {
+  content: "\e782";
+}
+
+.icon-ddei-flow-end-event-message1:before {
+  content: "\e783";
+}
+
+.icon-ddei-flow-intermediate-event-c1:before {
+  content: "\e784";
+}
+
+.icon-ddei-flow-intermediate-event-c2:before {
+  content: "\e785";
+}
+
+.icon-ddei-flow-intermediate-event-c3:before {
+  content: "\e786";
+}
+
+.icon-ddei-flow-gateway-none:before {
+  content: "\e787";
+}
+
+.icon-ddei-flow-end-event-terminate:before {
+  content: "\e788";
+}
+
+.icon-ddei-flow-end-event-multiple:before {
+  content: "\e789";
+}
+
+.icon-ddei-flow-intermediate-event-t:before {
+  content: "\e78a";
+}
+
+.icon-ddei-flow-intermediate-event-t1:before {
+  content: "\e78b";
+}
+
+.icon-ddei-flow-intermediate-event-c4:before {
+  content: "\e78c";
+}
+
+.icon-ddei-flow-gateway-parallel:before {
+  content: "\e78d";
+}
+
+.icon-ddei-flow-event-subprocess-exp:before {
+  content: "\e78e";
+}
+
+.icon-ddei-flow-gateway-or:before {
+  content: "\e78f";
+}
+
+.icon-ddei-flow-lane:before {
+  content: "\e790";
+}
+
+.icon-ddei-flow-intermediate-event-c5:before {
+  content: "\e791";
+}
+
+.icon-ddei-flow-intermediate-event-c6:before {
+  content: "\e792";
+}
+
+.icon-ddei-flow-end-event-signal:before {
+  content: "\e793";
+}
+
+.icon-ddei-flow-lane-divide-three:before {
+  content: "\e794";
+}
+
+.icon-ddei-flow-intermediate-event-t2:before {
+  content: "\e795";
+}
+
+.icon-ddei-flow-lane-insert-below:before {
+  content: "\e796";
+}
+
+.icon-ddei-flow-intermediate-event-t3:before {
+  content: "\e797";
+}
+
+.icon-ddei-flow-parallel-mi-marker:before {
+  content: "\e798";
+}
+
+.icon-ddei-flow-sequential-mi-marker:before {
+  content: "\e799";
+}
+
+.icon-ddei-flow-gateway-eventbased:before {
+  content: "\e79a";
+}
+
+.icon-ddei-flow-intermediate-event-c7:before {
+  content: "\e79b";
+}
+
+.icon-ddei-flow-receive:before {
+  content: "\e79c";
+}
+
+.icon-ddei-flow-intermediate-event-c8:before {
+  content: "\e79d";
+}
+
+.icon-ddei-flow-manual:before {
+  content: "\e79e";
+}
+
+.icon-ddei-flow-script:before {
+  content: "\e79f";
+}
+
+.icon-ddei-flow-receive-task:before {
+  content: "\e7a0";
+}
+
+.icon-ddei-flow-start-event-compensa:before {
+  content: "\e7a1";
+}
+
+.icon-ddei-flow-loop-marker:before {
+  content: "\e7a2";
+}
+
+.icon-ddei-flow-gateway-complex:before {
+  content: "\e7a3";
+}
+
+.icon-ddei-flow-intermediate-event-t4:before {
+  content: "\e7a4";
+}
+
+.icon-ddei-flow-participant:before {
+  content: "\e7a5";
+}
+
+.icon-ddei-flow-intermediate-event-n:before {
+  content: "\e7a6";
+}
+
+.icon-ddei-flow-start-event-error:before {
+  content: "\e7a7";
+}
+

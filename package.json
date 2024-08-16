@@ -1,0 +1,67 @@
+{
+  "name": "ddei-flow",
+  "version": "0.0.1",
+  "private": false,
+  "type": "module",
+  "author": "hoslay <3697355039@qq.com>",
+  "license": "Apache License 2.0",
+  "description": "ddei在线设计器的流程设计器插件，用于绘制流程图和显示流转过程。",
+  "keywords": [
+    "ddei-flow",
+    "Apache",
+    "流程图",
+    "BPMN",
+    "流程监控",
+    "流程图设计",
+    "ddei",
+    "ddei-editor"
+  ],
+  "homepage": "http://docs.ddei.top",
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/hoslay/ddei-flow.git"
+  },
+  "files": [
+    "dist/*",
+    "README.md",
+    "package.json"
+  ],
+  "bugs": {
+    "url": "https://gitee.com/hoslay/ddei-flow",
+    "email": "3697355039@qq.com"
+  },
+  "main": "./dist/ddei-flow.umd.cjs",
+  "module": "./dist/ddei-flow.umd.cjs",
+  "exports": {
+    ".": {
+      "import": "./dist/ddei-flow.umd.cjs",
+      "require": "./dist/ddei-flow.umd.cjs"
+    }
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "scripts": {
+    "dev": "vite --host=0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
+  },
+  "dependencies": {
+    "ddei-editor": "file:../ddei-editor/ddei-editor-1.2.41-22.tgz"
+  },
+  "devDependencies": {
+    "@tsconfig/node18": "^18.2.0",
+    "@types/lodash": "^4.14.197",
+    "@types/node": "^18.17.6",
+    "@vitejs/plugin-vue": "^4.2.3",
+    "@vue/tsconfig": "^0.4.0",
+    "less": "^4.2.0",
+    "npm-run-all": "^4.1.5",
+    "typescript": "~5.1.6",
+    "vite": "^4.4.6",
+    "vite-plugin-compression": "^0.5.1",
+    "vue-tsc": "^1.8.6"
+  }
+}
