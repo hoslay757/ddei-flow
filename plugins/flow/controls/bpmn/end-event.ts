@@ -10,5 +10,8 @@ export default {
     width: 40,
     height: 40
   },
-  viewer: BpmnEndEventViewer
+  viewer: BpmnEndEventViewer,
+  icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-end-event-none"></use>
+      </svg>`
 }

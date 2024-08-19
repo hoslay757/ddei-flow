@@ -16,5 +16,8 @@ export default {
       }
     }
   },
-  viewer: BpmnInclusiveGatewayViewer
+  viewer: BpmnInclusiveGatewayViewer,
+  icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-gateway-or"></use>
+      </svg>`
 }

@@ -14,5 +14,8 @@ export default {
       round:5
     }
   },
-  viewer: BpmnCallActivityTaskViewer
+  viewer: BpmnCallActivityTaskViewer,
+  icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-call-activity"></use>
+      </svg>`
 }

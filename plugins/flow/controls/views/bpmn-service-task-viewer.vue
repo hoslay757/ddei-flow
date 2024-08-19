@@ -34,9 +34,6 @@ export default {
         {{ model.name ? model.name : "服务任务" }}
       </div>
     </div>
-    <div class="desc">
-      {{ model.text }}
-    </div>
   </div>
 </template>
 
@@ -53,7 +50,7 @@ export default {
   user-select: none;
 
   .title{
-    height:24px;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;

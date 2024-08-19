@@ -14,5 +14,8 @@ export default {
       round:5
     }
   },
-  viewer: BpmnSubProcessViewer
+  viewer: BpmnSubProcessViewer,
+  icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-sub-process-marker"></use>
+      </svg>`
 }

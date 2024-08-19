@@ -33,9 +33,6 @@ export default {
         {{ model.name ? model.name : "业务规则" }}
       </div>
     </div>
-    <div class="desc">
-      {{ model.text }}
-    </div>
   </div>
 </template>
 
@@ -52,10 +49,16 @@ export default {
   user-select: none;
 
   .title{
-    height:24px;
+    height:100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    color: var(--fontColor);
+    font-family: var(--fontFamily);
+    font-size: var(--fontSize);
+    font-style: var(--fontStyle);
+    font-weight: var(--fontWeight);
+    text-decoration: var(--textDecoration);
     .icon-ddei-flow {
       position: absolute;
       left:0px;
@@ -72,18 +75,6 @@ export default {
       text-overflow: ellipsis;
     }
 
-  }
-  .desc {
-    font-size: 13px;
-    height:calc(100% - 24px);
-    display:flex;
-    border-top: var(--borderWidth) var(--borderType) var(--borderColor);
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    padding:0 2px;
-    word-break: break-word;
-    text-overflow: ellipsis;
   }
 }
 </style>
