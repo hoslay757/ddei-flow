@@ -26,7 +26,23 @@ export default {
 <template>
   <div ref="divElement" class="ddei-flow-bpmn-viewer-start-event" title="开始事件">
     <svg class="icon-ddei-flow" aria-hidden="true">
-      <use xlink:href="#icon-ddei-flow-start-event-none"></use>
+      <use v-if="!model.bpmnSubType || model.bpmnSubType == 1" xlink:href="#icon-ddei-flow-start-event-none"></use>
+      <use v-if="model.bpmnSubType == 2" xlink:href="#icon-ddei-flow-start-event-message"></use>
+      <use v-if="model.bpmnSubType == 3" xlink:href="#icon-ddei-flow-start-event-non-inte3"></use>
+      <use v-if="model.bpmnSubType == 4" xlink:href="#icon-ddei-flow-start-event-timer"></use>
+      <use v-if="model.bpmnSubType == 5" xlink:href="#icon-ddei-flow-start-event-non-inte2"></use>
+      <use v-if="model.bpmnSubType == 6" xlink:href="#icon-ddei-flow-start-event-conditio"></use>
+      <use v-if="model.bpmnSubType == 7" xlink:href="#icon-ddei-flow-start-event-non-inte4"></use>
+      <use v-if="model.bpmnSubType == 8" xlink:href="#icon-ddei-flow-start-event-signal"></use>
+      <use v-if="model.bpmnSubType == 9" xlink:href="#icon-ddei-flow-start-event-non-inte1"></use>
+      <use v-if="model.bpmnSubType == 10" xlink:href="#icon-ddei-flow-start-event-multiple"></use>
+      <use v-if="model.bpmnSubType == 11" xlink:href="#icon-ddei-flow-start-event-non-inte6"></use>
+      <use v-if="model.bpmnSubType == 12" xlink:href="#icon-ddei-flow-start-event-parallel"></use>
+      <use v-if="model.bpmnSubType == 13" xlink:href="#icon-ddei-flow-start-event-non-inte5"></use>
+      <use v-if="model.bpmnSubType == 14" xlink:href="#icon-ddei-flow-start-event-escalati"></use>
+      <use v-if="model.bpmnSubType == 15" xlink:href="#icon-ddei-flow-start-event-non-inte"></use>
+      <use v-if="model.bpmnSubType == 16" xlink:href="#icon-ddei-flow-start-event-error"></use>
+      <use v-if="model.bpmnSubType == 17" xlink:href="#icon-ddei-flow-start-event-compensa"></use>
     </svg>
   </div>
 </template>

@@ -7,9 +7,10 @@ export default {
   code: 'subprocess',
   desc: 'bpmn中的SubProcess',
   from: '100002',
+  subject: 'bpmn',
   define: {
-    width: 130,
-    height: 80,
+    width: 110,
+    height: 70,
     border:{
       round:5
     }

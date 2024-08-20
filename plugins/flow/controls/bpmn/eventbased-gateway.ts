@@ -7,6 +7,7 @@ export default {
   code: 'eventbased_gateway',
   desc: 'bpmn中的EventBasedGateway',
   from: '100040',
+  subject: 'bpmn',
   define: {
     width: 50,
     height: 50,

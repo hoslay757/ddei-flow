@@ -69,6 +69,7 @@ export default {
 
     .text {
       flex: 1;
+      text-align: center;
       white-space: nowrap;
       padding:2px;
       overflow: hidden;

@@ -7,6 +7,7 @@ export default {
   code: 'exclusive_gateway',
   desc: 'bpmn中的ExclusiveGateway',
   from: '100040',
+  subject: 'bpmn',
   define: {
     width: 50,
     height: 50,

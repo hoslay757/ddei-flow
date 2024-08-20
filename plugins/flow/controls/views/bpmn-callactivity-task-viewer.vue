@@ -53,6 +53,12 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    color: var(--fontColor);
+    font-family: var(--fontFamily);
+    font-size: var(--fontSize);
+    font-style: var(--fontStyle);
+    font-weight: var(--fontWeight);
+    text-decoration: var(--textDecoration);
     .icon-ddei-flow {
       position: absolute;
       left:0px;

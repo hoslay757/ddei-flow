@@ -7,6 +7,7 @@ export default {
   code: 'complex_gateway',
   desc: 'bpmn中的ComplexGateway',
   from: '100040',
+  subject: 'bpmn',
   define: {
     width: 50,
     height: 50,

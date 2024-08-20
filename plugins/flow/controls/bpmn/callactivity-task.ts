@@ -7,6 +7,7 @@ export default {
   code: 'callactivity_task',
   desc: 'bpmn中的CallaAtivityTask',
   from: '100002',
+  subject: 'bpmn',
   define: {
     width: 130,
     height: 80,

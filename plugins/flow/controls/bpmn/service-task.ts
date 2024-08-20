@@ -7,6 +7,7 @@ export default {
   code: 'service_task',
   desc: 'bpmn中的ServiceTask',
   from: '100002',
+  subject: 'bpmn',
   define: {
     width: 110,
     height: 70,
@@ -16,6 +17,6 @@ export default {
   },
   viewer: BpmnServiceTaskViewer,
   icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
-        <use xlink:href="#icon-ddei-flow-send"></use>
+        <use xlink:href="#icon-ddei-flow-service-task"></use>
       </svg>`
 }

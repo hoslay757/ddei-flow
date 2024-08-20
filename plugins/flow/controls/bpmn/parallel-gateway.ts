@@ -7,6 +7,7 @@ export default {
   code: 'parallel_gateway',
   desc: 'bpmn中的ParallelGateway',
   from: '100040',
+  subject: 'bpmn',
   define: {
     width: 50,
     height: 50,

@@ -7,6 +7,7 @@ export default {
   code: 'inclusive_gateway',
   desc: 'bpmn中的InclusiveGateway',
   from: '100040',
+  subject: 'bpmn',
   define: {
     width: 50,
     height: 50,

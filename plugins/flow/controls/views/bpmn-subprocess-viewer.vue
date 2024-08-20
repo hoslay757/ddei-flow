@@ -72,6 +72,12 @@ export default {
     padding:0 2px;
     word-break: break-word;
     text-overflow: ellipsis;
+    color: var(--fontColor);
+    font-family: var(--fontFamily);
+    font-size: var(--fontSize);
+    font-style: var(--fontStyle);
+    font-weight: var(--fontWeight);
+    text-decoration: var(--textDecoration);
   }
 }
 </style>

@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "397549",
+      "name": "trash",
+      "font_class": "trash",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "432053",
+      "name": "tab",
+      "font_class": "tab",
+      "unicode": "e807",
+      "unicode_decimal": 59399
+    },
+    {
       "icon_id": "7123694",
       "name": "start-event-non-inte",
       "font_class": "start-event-non-inte",
@@ -69,13 +83,6 @@
       "unicode_decimal": 59312
     },
     {
-      "icon_id": "7123703",
-      "name": "subprocess-expanded",
-      "font_class": "subprocess-expanded",
-      "unicode": "e7b1",
-      "unicode_decimal": 59313
-    },
-    {
       "icon_id": "7123705",
       "name": "intermediate-event-c",
       "font_class": "intermediate-event-c10",
@@ -95,6 +102,20 @@
       "font_class": "start-event-conditio",
       "unicode": "e7b4",
       "unicode_decimal": 59316
+    },
+    {
+      "icon_id": "7123709",
+      "name": "script-task",
+      "font_class": "script-task",
+      "unicode": "e7b6",
+      "unicode_decimal": 59318
+    },
+    {
+      "icon_id": "7123712",
+      "name": "manual-task",
+      "font_class": "manual-task",
+      "unicode": "e7b8",
+      "unicode_decimal": 59320
     },
     {
       "icon_id": "7123713",
@@ -249,13 +270,6 @@
       "font_class": "start-event-non-inte6",
       "unicode": "e7ce",
       "unicode_decimal": 59342
-    },
-    {
-      "icon_id": "7123737",
-      "name": "subprocess-collapsed",
-      "font_class": "subprocess-collapsed",
-      "unicode": "e7cf",
-      "unicode_decimal": 59343
     },
     {
       "icon_id": "7123738",
@@ -466,13 +480,6 @@
       "font_class": "gateway-parallel",
       "unicode": "e78d",
       "unicode_decimal": 59277
-    },
-    {
-      "icon_id": "7123665",
-      "name": "event-subprocess-exp",
-      "font_class": "event-subprocess-exp",
-      "unicode": "e78e",
-      "unicode_decimal": 59278
     },
     {
       "icon_id": "7123666",

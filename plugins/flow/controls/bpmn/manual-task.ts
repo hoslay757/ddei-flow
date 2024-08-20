@@ -7,6 +7,7 @@ export default {
   code: 'manual_task',
   desc: 'bpmn中的ManualTask',
   from: '100002',
+  subject: 'bpmn',
   define: {
     width: 110,
     height: 70,
@@ -16,6 +17,6 @@ export default {
   },
   viewer: BpmnManualTaskViewer,
   icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
-        <use xlink:href="#icon-ddei-flow-manual"></use>
+        <use xlink:href="#icon-ddei-flow-manual-task"></use>
       </svg>`
 }

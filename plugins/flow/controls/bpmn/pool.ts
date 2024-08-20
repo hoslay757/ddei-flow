@@ -7,6 +7,7 @@ export default {
   code: 'pool',
   desc: 'bpmn中的Pool',
   from: '100002',
+  subject: 'bpmn',
   define: {
     width: 130,
     height: 80,

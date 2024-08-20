@@ -7,15 +7,16 @@ export default {
   code: 'businessrule_task',
   desc: 'bpmn中的BusinessRuleTask',
   from: '100002',
+  subject: 'bpmn',
   define: {
-    width: 130,
-    height: 80,
+    width: 110,
+    height: 70,
     border:{
       round:5
     }
   },
   viewer: BpmnBusinessRuleTaskViewer,
   icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
-        <use xlink:href="#icon-ddei-flow-business-rule"></use>
+        <use xlink:href="#icon-ddei-flow-business-rule-task"></use>
       </svg>`
 }
