@@ -1,6 +1,7 @@
 import DDeiFlowControls from "./controls";
 import { DDeiPluginBase } from "ddei-editor";
 import DDeiFlowLifeCycles from "./lifecycle"
+import DDeiFlowDialogs from "./dialogs"
 
 class DDeiFlow extends DDeiPluginBase {
   type: string = "package"
@@ -15,9 +16,11 @@ class DDeiFlow extends DDeiPluginBase {
 
   lifecycles: object = DDeiFlowLifeCycles;
 
+  dialogs: object = DDeiFlowDialogs;
+
   getOptions(): object {
     let options = {}
-    let array = [this.controls]
+    let array = [this.controls, this.lifecycles,this.dialogs]
     array.forEach(plugin => {
       if (DDeiPluginBase.isSubclass(plugin, DDeiPluginBase)) {
         options = Object.assign({}, options, plugin.defaultIns.getOptions())
@@ -53,12 +56,20 @@ class DDeiFlow extends DDeiPluginBase {
     }
   }
 
+  getDialogs(editor) {
+    if (DDeiPluginBase.isSubclass(this.dialogs, DDeiPluginBase)) {
+      return this.dialogs.defaultIns.getDialogs(editor);
+    } else if (this.dialogs instanceof DDeiPluginBase) {
+      return this.dialogs.getDialogs(editor);
+    }
+  }
   
 
   static configuration(options) {
     let core = new DDeiFlow(options);
     core.controls = core.controls.configuration(options, true)
     core.lifecycles = core.lifecycles.configuration(options, true)
+    core.dialogs = core.dialogs.configuration(options, true)
     return core;
   }
 }

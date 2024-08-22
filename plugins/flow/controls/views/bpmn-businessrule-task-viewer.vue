@@ -33,6 +33,17 @@ export default {
         {{ model.name ? model.name : "业务规则" }}
       </div>
     </div>
+    <div class="markers">
+      <svg class="icon-ddei-flow" v-if="model.isLoop == 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-loop-marker"></use>
+      </svg>
+      <svg class="icon-ddei-flow" v-if="model.multiInstance == 1 && model.isParallel != 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-sequential-mi-marker"></use>
+      </svg>
+      <svg class="icon-ddei-flow" v-if="model.multiInstance == 1 && model.isParallel == 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-parallel-mi-marker"></use>
+      </svg>
+    </div>
   </div>
 </template>
 
@@ -76,6 +87,22 @@ export default {
       text-overflow: ellipsis;
     }
 
+  }
+
+  .markers {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    width: 100%;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .icon-ddei-flow {
+      width: 18px;
+      height: 18px;
+    }
   }
 }
 </style>

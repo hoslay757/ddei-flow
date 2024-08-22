@@ -1,4 +1,4 @@
-import { showExchangeEventTypeButton } from "../util"
+import { showSettingButton } from "../util"
 import BpmnIntermediateEventViewer from "../views/bpmn-intermediate-event-viewer.vue"
 
 export default {
@@ -12,6 +12,7 @@ export default {
   'define': {
     width: 40,
     height: 40,
+    bpmnBaseType: 'Event',
     bpmnSubType: 1,
     bpmntype: 'IntermediateEvent',
     ext: {
@@ -73,5 +74,5 @@ export default {
   icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-intermediate-event-n"></use>
       </svg>`,
-  EVENT_MOUSE_MOVE_IN_CONTROL: showExchangeEventTypeButton
+  EVENT_MOUSE_MOVE_IN_CONTROL: showSettingButton
 }

@@ -1,4 +1,4 @@
-import { showExchangeEventTypeButton } from "../util"
+import { showSettingButton } from "../util"
 import BpmnStartEventViewer from "../views/bpmn-start-event-viewer.vue"
 
 export default {
@@ -12,8 +12,9 @@ export default {
   'define': {
     width: 40,
     height: 40,
+    bpmnBaseType: 'Event',
     bpmnType: 'StartEvent',
-    bpmnSubType:1,
+    bpmnSubType: 1,
     ext: {
       attrs: [
         {
@@ -36,7 +37,7 @@ export default {
         },
         {
           'code': 'bpmnSubType',
-          'name': '文本1',
+          'name': '类型',
           'desc': '控件的主体显示文本',
           'controlType': 'combox',
           'dataType': 'integer',
@@ -82,5 +83,5 @@ export default {
   icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-start-event-none"></use>
       </svg>`,
-  EVENT_MOUSE_MOVE_IN_CONTROL: showExchangeEventTypeButton
+  EVENT_MOUSE_MOVE_IN_CONTROL: showSettingButton
 }
