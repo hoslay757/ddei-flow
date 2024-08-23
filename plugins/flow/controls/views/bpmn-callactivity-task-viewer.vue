@@ -47,7 +47,7 @@ export default {
   border-radius: var(--borderRound);
   pointer-events:none;
   user-select: none;
-
+  display: none;
   .title{
     height:100%;
     display: flex;

@@ -28,10 +28,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
       let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
       
       if (operateType == "SCROLL_WORKING" || operateType == "CHANGE_RATIO" || operateType == "CHANGE_WPV" || operateType == "CHANGE_BOUNDS" || operateType == "CHANGE_ROTATE") {
-        let settingBtnEle = document.getElementById(editor.id + "_flow_setting_btn");
-        if (settingBtnEle){
-          settingBtnEle.style.display = "none"
-        }
+        DDeiEditorUtil.hiddenDialog(editor, 'ddei-flow-setting-button-dialog')
         DDeiEditorUtil.hiddenDialog(editor, 'ddei-flow-element-setting-dialog')
       }
     }
@@ -75,15 +72,15 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
     //循环每个models，验证是否为本插件的控件，只有本插件的控件才响应
     let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
     if (editor) {
-      let settingBtnEle = document.getElementById(editor.id + "_flow_setting_btn");
+      let settingBtnEle = document.getElementById(editor.id + "_ddei-flow-setting-button-dialog");
       let settingDialogEle = document.getElementById(editor.id + "_ddei-flow-element-setting-dialog");
-      if (settingBtnEle && !settingDialogEle && !(evt.target == settingBtnEle || evt.target?.parentElement == settingBtnEle || evt.target.parentElement?.parentElement == settingBtnEle)) {
-        settingBtnEle.style.display = "none"
+      if (settingBtnEle && !settingDialogEle && !(evt.target == settingBtnEle || evt.target?.parentElement == settingBtnEle || evt.target.parentElement?.parentElement == settingBtnEle || evt.target.parentElement?.parentElement?.parentElement == settingBtnEle)) {
+        DDeiEditorUtil.closeDialog(editor, 'ddei-flow-setting-button-dialog')
       } else if (settingDialogEle && !settingBtnEle && !(evt.target == settingDialogEle || evt.target?.parentElement == settingDialogEle || evt.target.parentElement?.parentElement == settingDialogEle)) {
-        settingDialogEle.style.display = "none"
-      } else if (settingBtnEle && settingDialogEle && !(evt.target == settingBtnEle || evt.target?.parentElement == settingBtnEle || evt.target.parentElement?.parentElement == settingBtnEle) && !(evt.target == settingDialogEle || evt.target?.parentElement == settingDialogEle || evt.target.parentElement?.parentElement == settingDialogEle)){
-        settingBtnEle.style.display = "none"
-        settingDialogEle.style.display = "none"
+        DDeiEditorUtil.closeDialog(editor, 'ddei-flow-element-setting-dialog')
+      } else if (settingBtnEle && settingDialogEle && !(evt.target == settingBtnEle || evt.target?.parentElement == settingBtnEle || evt.target.parentElement?.parentElement == settingBtnEle || evt.target.parentElement?.parentElement?.parentElement == settingBtnEle) && !(evt.target == settingDialogEle || evt.target?.parentElement == settingDialogEle || evt.target.parentElement?.parentElement == settingDialogEle)){
+        DDeiEditorUtil.closeDialog(editor, 'ddei-flow-setting-button-dialog')
+        DDeiEditorUtil.closeDialog(editor, 'ddei-flow-element-setting-dialog')
       }
     }
   }

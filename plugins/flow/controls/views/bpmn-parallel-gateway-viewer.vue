@@ -36,6 +36,7 @@ export default {
   position: absolute;
   pointer-events:none;
   user-select: none;
+  display: none;
   .icon-ddei-flow {
     margin-left: 2px;
     margin-top: 2px;

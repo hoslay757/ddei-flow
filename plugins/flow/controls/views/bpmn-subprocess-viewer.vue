@@ -28,9 +28,24 @@ export default {
     <div class="title">
       {{ model.name ? model.name : "嵌入子流程" }}
     </div>
-    <div class="icon">
+    <div class="markers">
+      <svg class="icon-ddei-flow" v-if="model.isLoop == 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-loop-marker"></use>
+      </svg>
+      <svg class="icon-ddei-flow" v-if="model.multiInstance == 1 && model.isParallel != 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-sequential-mi-marker"></use>
+      </svg>
+      <svg class="icon-ddei-flow" v-if="model.multiInstance == 1 && model.isParallel == 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-parallel-mi-marker"></use>
+      </svg>
+      <svg class="icon-ddei-flow" v-if="model.isCompensation == 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-compensation-marker"></use>
+      </svg>
       <svg class="icon-ddei-flow" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-sub-process-marker"></use>
+      </svg>
+      <svg class="icon-ddei-flow" v-if="model.isAdHoc == 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-ad-hoc-marker"></use>
       </svg>
     </div>
 
@@ -48,16 +63,16 @@ export default {
   border-radius: var(--borderRound);
   pointer-events:none;
   user-select: none;
-
-  .icon{
+  display: none;
+  .markers{
     height:24px;
     width:100%;
     display: flex;
     justify-content: center;
     align-items: center;
     .icon-ddei-flow {
-      width: 24px;
-      height: 24px;
+      width: 18px;
+      height: 18px;
     }
   }
   

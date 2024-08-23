@@ -44,6 +44,9 @@ export default {
       <svg class="icon-ddei-flow" v-if="model.multiInstance == 1 && model.isParallel == 1" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-parallel-mi-marker"></use>
       </svg>
+      <svg class="icon-ddei-flow" v-if="model.isCompensation == 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-compensation-marker"></use>
+      </svg>
     </div>
   </div>
 </template>
@@ -59,7 +62,7 @@ export default {
   border-radius: var(--borderRound);
   pointer-events:none;
   user-select: none;
-
+  display: none;
   .title{
     height: 100%;
     display: flex;

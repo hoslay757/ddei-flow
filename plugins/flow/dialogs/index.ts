@@ -1,5 +1,6 @@
 import {DDeiPluginBase} from "ddei-editor";
 import ElementSettingDialog from "./elementsettingdialog"
+import SettingButtonDialog from "./settingbuttondialog"
 
 class DDeiFlowDialogs extends DDeiPluginBase {
 
@@ -9,11 +10,10 @@ class DDeiFlowDialogs extends DDeiPluginBase {
    */
   static defaultIns: DDeiFlowDialogs = new DDeiFlowDialogs(null);
 
-  plugins: object[] = [ElementSettingDialog
-  ]
+  plugins: object[] = [ElementSettingDialog, SettingButtonDialog]
 
   getDialogs(editor) {
-    let panels = []
+    let dialogs = []
     this.plugins?.forEach(plugin => {
       let ls
       if (DDeiPluginBase.isSubclass(plugin, DDeiPluginBase)) {
@@ -22,10 +22,10 @@ class DDeiFlowDialogs extends DDeiPluginBase {
         ls = plugin.getDialogs(editor);
       }
       if (ls?.length > 0) {
-        panels = panels.concat(ls);
+        dialogs = dialogs.concat(ls);
       }
     })
-    return panels
+    return dialogs
   }
 
 
@@ -33,17 +33,16 @@ class DDeiFlowDialogs extends DDeiPluginBase {
   static configuration(options) {
     if (options) {
       //解析options，只使用自己相关的
-      let panels = new DDeiFlowDialogs(options);
-      for (let i = 0; i < panels.plugins?.length; i++) {
-        panels.plugins[i] = panels.plugins[i].configuration(options, true)
+      let dialogs = new DDeiFlowDialogs(options);
+      for (let i = 0; i < dialogs.plugins?.length; i++) {
+        dialogs.plugins[i] = dialogs.plugins[i].configuration(options, true)
       }
-      return panels;
+      return dialogs;
     }
     return DDeiFlowDialogs;
   }
 }
 
 
-export {DDeiFlowDialogs
-}
+export { DDeiFlowDialogs, ElementSettingDialog, SettingButtonDialog }
 export default DDeiFlowDialogs

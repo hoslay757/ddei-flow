@@ -38,6 +38,22 @@
           并行
         </div>
       </div>
+      <div class="row" v-if="model?.bpmnBaseType == 'Activity'">
+        <div class="change-bpmn-marker" @click="changeBpmnLabel('isCompensation')">
+          <div :class="{ 'chk_state': model?.isCompensation != 1, 'chk_state_checked': model?.isCompensation == 1 }">
+            <span>{{ model?.isCompensation == 1 ? '✓' : '' }}</span>
+          </div>
+          补偿
+        </div>
+      </div>
+      <div class="row" v-if="model?.bpmnBaseType == 'Activity' && model?.bpmnType == 'SubProcess'">
+        <div class="change-bpmn-marker" @click="changeBpmnLabel('isAdHoc')">
+          <div :class="{ 'chk_state': model?.isAdHoc != 1, 'chk_state_checked': model?.isAdHoc == 1 }">
+            <span>{{ model?.isAdHoc == 1 ? '✓' : '' }}</span>
+          </div>
+          自定义
+        </div>
+      </div>
     </div>
   </div>
 </template>

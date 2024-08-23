@@ -72,6 +72,17 @@ export default {
           'type': [1, 2], //类别，1图形，2业务，3事件
         },
         {
+          'code': 'isCompensation',
+          'name': '补偿',
+          'desc': '是否为补偿',
+          'controlType': 'switch-checkbox',
+          'dataType': 'integer',
+          'display': 'column',
+          'hiddenTitle': true,
+          'defaultValue': 0,
+          'type': [1, 2], //类别，1图形，2业务，3事件
+        },
+        {
           'code': 'desc',
           'name': '备注',
           'desc': '备注说明',
@@ -89,7 +100,7 @@ export default {
           subGroups: [
             {
               name: "基本信息",
-              attrs: ["code", "name", "isLoop", "multiInstance", "isParallel", "desc"]
+              attrs: ["code", "name", "isLoop", "multiInstance", "isParallel","isCompensation", "desc"]
             }
           ]
         },
