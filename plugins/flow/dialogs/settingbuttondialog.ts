@@ -1,6 +1,7 @@
 import {DDeiPluginBase} from "ddei-editor";
 import SettingButtonDialog from "./SettingButtonDialog.vue";
 
+
 class DDeiFlowSettingButtonDialog extends DDeiPluginBase{
   name: string = SettingButtonDialog.name
   /**

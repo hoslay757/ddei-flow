@@ -6,6 +6,41 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "39182011",
+      "name": "资源 415",
+      "font_class": "lock",
+      "unicode": "e695",
+      "unicode_decimal": 59029
+    },
+    {
+      "icon_id": "39331784",
+      "name": "资源 499",
+      "font_class": "unlock",
+      "unicode": "e6d9",
+      "unicode_decimal": 59097
+    },
+    {
+      "icon_id": "39182005",
+      "name": "edit",
+      "font_class": "edit",
+      "unicode": "e68f",
+      "unicode_decimal": 59023
+    },
+    {
+      "icon_id": "39182013",
+      "name": "cancel",
+      "font_class": "cancel",
+      "unicode": "e697",
+      "unicode_decimal": 59031
+    },
+    {
+      "icon_id": "39182015",
+      "name": "ok",
+      "font_class": "ok",
+      "unicode": "e699",
+      "unicode_decimal": 59033
+    },
+    {
       "icon_id": "39182081",
       "name": "left",
       "font_class": "left",

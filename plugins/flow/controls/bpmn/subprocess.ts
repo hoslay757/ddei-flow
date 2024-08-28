@@ -7,7 +7,7 @@ export default {
   name: '嵌入子流程',
   code: 'subprocess',
   desc: 'bpmn中的SubProcess',
-  from: '1000011',
+  from: '100203',
   subject: 'bpmn',
   define: {
     bpmnBaseType: 'Activity',
@@ -19,6 +19,7 @@ export default {
     },
     ext: {
       attrs: [
+       
         {
           'code': 'code',
           'name': '编码',
