@@ -48,7 +48,9 @@ export default {
         </svg>
       </div>
       <div class="content-elements">
-
+        <component v-if="forceRefreshRenderViewers" :editor="editor" v-for="(item, index) in editor?.renderViewers"
+          :is="item.viewer" :options="item" v-bind="item">
+        </component>
       </div>
     </div>
     <div class="markers">
