@@ -5,7 +5,7 @@ import { DDeiUtil, DDeiConfig,DDeiEditor, DDeiEditorUtil, DDeiEnumOperateType, D
  */
 const showSettingButton = function (operate: DDeiEnumOperateType, data: object | null, ddInstance: DDei, evt: Event): DDeiFuncCallResult {
   let rs = new DDeiFuncCallResult();
-  rs.state = 1;
+  rs.state = 2;
   let model = data.model
   //计算位置，显示按钮div
   let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
@@ -22,7 +22,7 @@ const showSettingButton = function (operate: DDeiEnumOperateType, data: object |
       left = modelPos.left + modelPos.width + (12 * (stageRatio - 1))
     }
     let settingBtnEle = document.getElementById(editor.id + "_ddei-flow-setting-button-dialog");
-    if (!settingBtnEle || settingBtnEle.style.display == "none") {
+    if (!settingBtnEle || settingBtnEle.style.display == "none" || (editor.tempPopData && editor.tempPopData['ddei-flow-setting-button-dialog'] && editor.tempPopData['ddei-flow-setting-button-dialog'].model != model)) {
       DDeiEditorUtil.showDialog(editor, 'ddei-flow-setting-button-dialog', {
         group: "ddei-flow-setting-button",
         model: model
@@ -36,9 +36,32 @@ const showSettingButton = function (operate: DDeiEnumOperateType, data: object |
   return rs;
 }
 
+const getIncludeModels = function(subProcessModel){
+    let stage = subProcessModel.stage;
+    let models = []
+    if (!subProcessModel.includeModels) {
+      subProcessModel.includeModels = []
+    }else{
+      
+      subProcessModel.includeModels.forEach(subModelId => {
+        if (subProcessModel.isShadowControl){
+          subModelId+="_shadow"
+        }
+        let subModel = stage.getModelById(subModelId)
+        if (subModel){
+          models.push(subModel)
+          if (subModel.bpmnType == 'SubProcess'){
+            let mds = getIncludeModels(subModel)
+            models.push(...mds)
+          }
+        }
+      });
+    }
+    return models;
+  }
 
 
 
 
 
-export { showSettingButton }
+export { showSettingButton, getIncludeModels }

@@ -26,9 +26,10 @@
 </template>
 
 <script lang="ts">
-import { DDeiEditorUtil } from "ddei-editor";
+import { DDeiEditorUtil, DDeiUtil, DDeiConfig, DDeiEnumBusCommandType } from "ddei-editor";
 import DialogBase from "./dialog"
 import { Matrix3 } from "three"
+import { getIncludeModels } from "../controls/util"
 
 export default {
   name: "ddei-flow-setting-button-dialog",
@@ -118,6 +119,7 @@ export default {
         let scaleX = 1, scaleY = 1;
         let targetWidth, targetHeight
         let container = model.pModel
+        let hidden = false
         if (!model.isExpand) {
           //展开当前容器下所有控件大小和坐标
           targetWidth = model.otherWidth ? model.otherWidth : 300
@@ -129,6 +131,7 @@ export default {
         }
         //展开，则关闭
         else {
+          hidden = true
           //展开当前容器下所有控件大小和坐标
           targetWidth = model.otherWidth
           targetHeight = model.otherHeight
@@ -173,32 +176,61 @@ export default {
             0, 1, model.cpv.y,
             0, 0, 1);
           m1.premultiply(move2Matrix)
+          let includeModels = getIncludeModels(model)
           model.transVectors(m1)
-
+          includeModels?.forEach(im=>{
+            im.hidden = hidden
+            im.transVectors(m1)
+          })
+          //TODO HIDDEN不牢靠
+          //TODO 内部的用自己m1，外部用m2，改为有空间则撑开，没空间则扩展更好
+          //TODO 删除后联动删除，或提示
+          //TODO tempZIndex的调整
+          //TODO 线和影子图形的显示
+          //TODO hidden以后不响应事件
+          //TODO 事件的层级，确保里面的控件能够显示小按钮
           let deltaWidth = (targetWidth - model.otherWidth) / 2
           let deltaHeight = (targetHeight - model.otherHeight) / 2
           //改变其他控件位置
           container.midList.forEach(mid => {
-            let subModel = container.models.get(mid);
-            if (subModel.baseModelType != 'DDeiLine') {
-              //对比控件的cpv，如果x相等，位置不变
-              let moveX = 0, moveY = 0
-              if (subModel.cpv.x > model.cpv.x) {
-                moveX = deltaWidth
-              } else if (subModel.cpv.x < model.cpv.x) {
-                moveX = -deltaWidth
-              }
-              if (subModel.cpv.y > model.cpv.y) {
-                moveY = deltaHeight
-              } else if (subModel.cpv.y < model.cpv.y) {
-                moveY = -deltaHeight
-              }
-              if (moveX || moveY) {
-                let m2 = new Matrix3(
-                  1, 0, moveX,
-                  0, 1, moveY,
-                  0, 0, 1);
-                subModel.transVectors(m2)
+            if (mid != model.id){
+              let subModel = container.models.get(mid);
+              if (subModel.baseModelType != 'DDeiLine') {
+                if (includeModels.indexOf(subModel) == -1) {
+                  if (!subModel.includePModelId){
+                    //对比控件的cpv，如果x相等，位置不变
+                    let moveX = 0, moveY = 0
+                    if (!subModel.includePModelId){
+                      if (subModel.cpv.x > model.cpv.x) {
+                        moveX = deltaWidth
+                      } else if (subModel.cpv.x < model.cpv.x) {
+                        moveX = -deltaWidth
+                      }
+                      if (subModel.cpv.y > model.cpv.y) {
+                        moveY = deltaHeight
+                      } else if (subModel.cpv.y < model.cpv.y) {
+                        moveY = -deltaHeight
+                      }
+                    
+                    
+                      if (moveX || moveY) {
+                        let m2 = new Matrix3(
+                          1, 0, moveX,
+                          0, 1, moveY,
+                          0, 0, 1);
+                        subModel.transVectors(m2)
+
+                        if(subModel.bpmnType == 'SubProcess'){
+                          let includeModels1 = getIncludeModels(subModel)
+                          includeModels1.forEach(lms=>{
+                            lms.transVectors(m2)
+                          });
+                        }
+                      }
+                      
+                    }
+                  }
+                }
               }
             }
           });
@@ -219,33 +251,14 @@ export default {
 
     subProcessUnLock() {
       delete this.model.lock
-      if(!this.editor.desigingSubProecsses){
-        this.editor.desigingSubProecsses = []
-      }
-      if (this.editor.desigingSubProecsses.indexOf(this.model) == -1){
-        this.editor.desigingSubProecsses.push(this.model)
-      }
-      this.editor.desigingSubProecsses.sort((a,b)=>{
-        if (a?.render && b?.render){
-          return a.render.tempZIndex - b.render.tempZIndex
-        }
-        return 0
-      })
     },
     subProcessLock() {
       this.model.lock = 1;
-      if (this.editor.desigingSubProecsses?.indexOf(this.model)){
-        this.editor.desigingSubProecsses.splice(this.editor.desigingSubProecsses.indexOf(this.model),1)
-      }
-      if (!this.editor.desigingSubProecsses?.length){
-        delete this.editor.desigingSubProecsses
-      }
     },
 
     deleteElement(srcElement) {
-      this.model.stage.removeModel(this.model,true)
-      DDeiEditorUtil.closeDialog(this.editor, 'ddei-flow-setting-button-dialog')
-      DDeiEditorUtil.closeDialog(this.editor, 'ddei-flow-element-setting-dialog')
+      let stage = this.model.stage
+      stage.removeModel(this.model, true)
     },
   }
 };

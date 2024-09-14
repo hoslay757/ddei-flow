@@ -15,13 +15,6 @@ export default {
     }
   },
 
-  mounted() {
-    this.editor.renderViewerIns[this.model.id] = this
-    this.editor.renderViewerElements[this.model.id] = this.$refs['divElement']
-    this.editor.bus.push("refresh-shape");
-    this.editor.bus.executeAll();
-  },
-
   methods:{
     refreshDragState(type){
       if (type == 1){
@@ -48,9 +41,7 @@ export default {
         </svg>
       </div>
       <div class="content-elements">
-        <component v-if="forceRefreshRenderViewers" :editor="editor" v-for="(item, index) in editor?.renderViewers"
-          :is="item.viewer" :options="item" v-bind="item">
-        </component>
+     
       </div>
     </div>
     <div class="markers">

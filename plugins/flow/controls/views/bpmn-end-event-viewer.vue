@@ -15,12 +15,7 @@ export default {
     }
   },
 
-  mounted() {
-    this.editor.renderViewerIns[this.model.id] = this
-    this.editor.renderViewerElements[this.model.id] = this.$refs['divElement']
-    this.editor.bus.push("refresh-shape");
-    this.editor.bus.executeAll();
-  }
+  
 };
 </script>
 <template>
@@ -46,8 +41,6 @@ export default {
   user-select: none;
   display: none;
   .icon-ddei-flow {
-    margin-left: 1.5px;
-    margin-top: 1.5px;
     width: 100%;
     height: 100%;
   }

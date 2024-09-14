@@ -7,7 +7,7 @@ export default {
   name: '嵌入子流程',
   code: 'subprocess',
   desc: 'bpmn中的SubProcess',
-  from: '100203',
+  from: '1000011',
   subject: 'bpmn',
   define: {
     bpmnBaseType: 'Activity',
@@ -76,6 +76,13 @@ export default {
     }
   },
   viewer: BpmnSubProcessViewer,
+  filters:{
+    LINE_OBI_FILTER: (model, param) => {
+      let line = param.line
+      //如果线的开始和结束节点之一是subprocess的子元素，则本subprocess不作为寻路障碍物
+      return false
+    }
+  },
   icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-sub-process-marker"></use>
       </svg>`,
