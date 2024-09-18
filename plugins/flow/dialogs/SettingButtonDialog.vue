@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import { DDeiEditorUtil, DDeiUtil, DDeiConfig, DDeiEnumBusCommandType } from "ddei-editor";
+import { DDeiEditorUtil, DDeiUtil, DDeiConfig, DDeiEnumBusCommandType, DDeiAbstractShape } from "ddei-editor";
 import DialogBase from "./dialog"
 import { Matrix3 } from "three"
 import { getIncludeModels } from "../controls/util"
@@ -126,6 +126,7 @@ export default {
     expandOrNotSubProcess() {
       let model = this.model
       let stage = model.stage
+      let layer = model.layer
       let ddInstance = stage.ddInstance
       //计算位置，显示按钮div
       let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
@@ -133,8 +134,6 @@ export default {
         //当前关闭，则展开
         let scaleX = 1, scaleY = 1;
         let targetWidth, targetHeight
-        let container = model.pModel
-        let hidden = false
         if (!model.isExpand) {
           //展开当前容器下所有控件大小和坐标
           targetWidth = model.otherWidth ? model.otherWidth : 300
@@ -146,7 +145,6 @@ export default {
         }
         //展开，则关闭
         else {
-          hidden = true
           //展开当前容器下所有控件大小和坐标
           targetWidth = model.otherWidth
           targetHeight = model.otherHeight
@@ -195,60 +193,23 @@ export default {
           model.transVectors(m1)
           includeModels?.forEach(im=>{
             im.transVectors(m1)
+            im.updateLinkModels()
           })
           
-          //TODO 内部的用自己m1，外部用m2，改为有空间则撑开，没空间则扩展更好
-          //TODO 连线关系的调整（隐藏、调整点关系）
-          let deltaWidth = (targetWidth - model.otherWidth) / 2
-          let deltaHeight = (targetHeight - model.otherHeight) / 2
-          //改变其他控件位置
-          container.midList.forEach(mid => {
-            if (mid != model.id){
-              let subModel = container.models.get(mid);
-              if (subModel.baseModelType != 'DDeiLine') {
-                if (includeModels.indexOf(subModel) == -1) {
-                  if (!subModel.includePModelId){
-                    //对比控件的cpv，如果x相等，位置不变
-                    let moveX = 0, moveY = 0
-                    if (!subModel.includePModelId){
-                      if (subModel.cpv.x > model.cpv.x) {
-                        moveX = deltaWidth
-                      } else if (subModel.cpv.x < model.cpv.x) {
-                        moveX = -deltaWidth
-                      }
-                      if (subModel.cpv.y > model.cpv.y) {
-                        moveY = deltaHeight
-                      } else if (subModel.cpv.y < model.cpv.y) {
-                        moveY = -deltaHeight
-                      }
-                    
-                    
-                      if (moveX || moveY) {
-                        let m2 = new Matrix3(
-                          1, 0, moveX,
-                          0, 1, moveY,
-                          0, 0, 1);
-                        subModel.transVectors(m2)
 
-                        if(subModel.bpmnType == 'SubProcess'){
-                          let includeModels1 = getIncludeModels(subModel)
-                          includeModels1.forEach(lms=>{
-                            lms.transVectors(m2)
-                          });
-                        }
-                      }
-                      
-                    }
-                  }
-                }
-              }
-            }
-          });
-          //重新计算连线
-          container.midList.forEach(mid => {
-            let subModel = container.models.get(mid);
-            subModel.updateLinkModels()
-          });
+          //展开时才会扩展，扩展后不收缩
+          if (model.isExpand == 1) {
+            let deltaWidth = (targetWidth - model.otherWidth) / 2
+            let deltaHeight = (targetHeight - model.otherHeight) / 2
+            this.extParentBounds(model, deltaWidth, deltaHeight)
+          
+          }
+          includeModels?.forEach(im => {
+            im.updateLinkModels()
+          })
+          model.updateLinkModels()
+          
+   
         }
         //通知改变
         editor.notifyChange()
@@ -259,6 +220,131 @@ export default {
       }
     },
 
+    //扩展上级控件大小以及位置
+    extParentBounds(model,deltaWidth,deltaHeight){
+      let stage = model.stage
+      let layer = model.layer
+      //获取本级所有控件
+      let curLevelModels = []
+      let parentSubProcess
+      if (model.includePModelId) {
+        parentSubProcess = stage.getModelById(model.includePModelId)
+        parentSubProcess?.includeModels.forEach(includeModelid => {
+          if (includeModelid != model.id) {
+            let subModel = stage.getModelById(includeModelid)
+            if (subModel && subModel.baseModelType != 'DDeiLine') {
+              curLevelModels.push(subModel)
+            }
+          }
+        })
+
+      } else {
+        let layerModels = layer.getSubModels()
+        layerModels.forEach(lm => {
+          if (lm && lm.baseModelType != 'DDeiLine' && !lm.includePModelId) {
+            curLevelModels.push(lm)
+          }
+        });
+      }
+      //扩展后的矩形
+      let modelRect = DDeiAbstractShape.getOutRectByPV([model])
+
+      //对比curLevelModels的控件，如果出现了外接矩形交叉，则扩展本级
+      let needExt = false
+      for (let c = 0; c < curLevelModels.length; c++) {
+        let rect = DDeiAbstractShape.getOutRectByPV([curLevelModels[c]])
+        if (DDeiUtil.isRectCross(modelRect, rect)) {
+          needExt = true;
+          break;
+        }
+      }
+
+      if (needExt) {
+        //TODO 连线关系的调整（隐藏、调整点关系）
+        //改变本级其他控件位置
+        curLevelModels.forEach(subModel => {
+          if (subModel.baseModelType != 'DDeiLine') {
+            //对比控件的cpv，如果x相等，位置不变
+            let moveX = 0, moveY = 0
+            if (subModel.cpv.x > model.cpv.x) {
+              moveX = deltaWidth
+            } else if (subModel.cpv.x < model.cpv.x) {
+              moveX = -deltaWidth
+            }
+            if (subModel.cpv.y > model.cpv.y) {
+              moveY = deltaHeight
+            } else if (subModel.cpv.y < model.cpv.y) {
+              moveY = -deltaHeight
+            }
+            if (moveX || moveY) {
+              let m2 = new Matrix3(
+                1, 0, moveX,
+                0, 1, moveY,
+                0, 0, 1);
+              subModel.transVectors(m2)
+
+              if (subModel.bpmnType == 'SubProcess') {
+                let includeModels1 = getIncludeModels(subModel)
+                includeModels1.forEach(lms => {
+                  lms.transVectors(m2)
+                  lms.updateLinkModels()
+                });
+              }
+            }
+          }
+          subModel.updateLinkModels()
+        });
+      }
+      if (parentSubProcess) {
+        let parentRect = DDeiAbstractShape.getOutRectByPV([parentSubProcess])
+        //对比上级控件大小，如果超出了，则扩展，扩展时预留20的空间出来
+        let rect = DDeiAbstractShape.getOutRectByPV([...curLevelModels, model])
+
+        if (!(parentRect.x + 20 <= rect.x && parentRect.x1 - 20 >= rect.x1
+          && parentRect.y + 20 <= rect.y && parentRect.y1 - 20 >= rect.y1)) {
+          //扩展父控件
+          let parentScaleX = (rect.width + 40) / parentRect.width
+          let parentScaleY = (rect.height + 40) / parentRect.height
+          //构建缩放矩阵
+          let m1 = new Matrix3()
+          let move1Matrix = new Matrix3(
+            1, 0, -parentSubProcess.cpv.x,
+            0, 1, -parentSubProcess.cpv.y,
+            0, 0, 1);
+          m1.premultiply(move1Matrix)
+          if (parentSubProcess.rotate) {
+            let angle = DDeiUtil.preciseTimes(parentSubProcess.rotate, DDeiConfig.ROTATE_UNIT)
+            let rotateMatrix = new Matrix3(
+              Math.cos(angle), Math.sin(angle), 0,
+              -Math.sin(angle), Math.cos(angle), 0,
+              0, 0, 1);
+            m1.premultiply(rotateMatrix)
+          }
+          let scaleMatrix = new Matrix3(
+            parentScaleX, 0, 0,
+            0, parentScaleY, 0,
+            0, 0, 1);
+          m1.premultiply(scaleMatrix)
+          if (parentSubProcess.rotate) {
+            let angle = DDeiUtil.preciseTimes(-parentSubProcess.rotate, DDeiConfig.ROTATE_UNIT)
+            let rotateMatrix = new Matrix3(
+              Math.cos(angle), Math.sin(angle), 0,
+              -Math.sin(angle), Math.cos(angle), 0,
+              0, 0, 1);
+            m1.premultiply(rotateMatrix)
+          }
+          let move2Matrix = new Matrix3(
+            1, 0, parentSubProcess.cpv.x + (rect.x + rect.width / 2 - parentRect.x - parentRect.width / 2),
+            0, 1, parentSubProcess.cpv.y + (rect.y + rect.height / 2 - parentRect.y - parentRect.height / 2),
+            0, 0, 1);
+          m1.premultiply(move2Matrix)
+          parentSubProcess.transVectors(m1)
+          this.extParentBounds(parentSubProcess, (rect.width + 40) - parentRect.width, (rect.height + 40) - parentRect.height)
+        }
+      }
+
+    },
+
     subProcessUnLock() {
       delete this.model.lock
     },
@@ -266,7 +352,7 @@ export default {
       this.model.lock = 1;
     },
 
-    deleteElement(srcElement) {
+    deleteElement() {
       let stage = this.model.stage
       stage.removeModel(this.model, true)
     },
