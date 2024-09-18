@@ -2,8 +2,9 @@
   <div :id="editor?.id + '_' + dialogId" :style="{ transform: 'scale(' + stageRatio + ')' }"
     class="ddei-flow-setting-button-dialog" v-if="forceRefresh">
     <div class="content" :style="{ 'flex-direction': model?.bpmnBaseType !='Event' ? 'column' : ''}">
-      <svg class="icon-ddei-flow" @mouseenter="settingMouseEnter($el)" @mouseleave="settingMouseEnterLeave($el)"
-        aria-hidden="true">
+      <svg class="icon-ddei-flow"
+        v-if="controlDefine?.subject == 'bpmn' && (bpmnSubTypeDataSource?.length > 0 || model?.bpmnBaseType == 'Activity')"
+        @mouseenter="settingMouseEnter($el)" @mouseleave="settingMouseEnterLeave($el)" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-setting"></use>
       </svg>
       <svg class="icon-ddei-flow" v-if="model?.bpmnType == 'SubProcess'" @click="expandOrNotSubProcess()"
@@ -46,6 +47,8 @@ export default {
       dialogId: 'ddei-flow-setting-button-dialog',
       model:null,
       stageRatio:1,
+      controlDefine:null,
+      bpmnSubTypeDataSource:null
     };
   },
   computed: {},
@@ -74,6 +77,18 @@ export default {
         
         if (this.model) {
           this.stageRatio = this.model.getStageRatio()
+          let controlDefine = DDeiEditorUtil.getControlDefine(this.model);
+          let ds = controlDefine.attrDefineMap.get("bpmnSubType")?.dataSource
+          if (ds?.length > 0) {
+            for (let i = 0; i < ds.length; i++) {
+              if (ds[i].value == this.model.bpmnSubType) {
+                this.bpmnSubTypeIndex = i
+                break;
+              }
+            }
+          }
+          this.bpmnSubTypeDataSource = ds
+          this.controlDefine = controlDefine
         }
 
       }
@@ -179,13 +194,10 @@ export default {
           let includeModels = getIncludeModels(model)
           model.transVectors(m1)
           includeModels?.forEach(im=>{
-            im.hidden = hidden
             im.transVectors(m1)
           })
-          //TODO 多层级隐藏的问题，HIDDEN不牢靠
+          
           //TODO 内部的用自己m1，外部用m2，改为有空间则撑开，没空间则扩展更好
-          //TODO tempZIndex的调整，移入移出后的zindex调整，确保移进subprocess后永远可以显示
-          //TODO hidden以后不响应事件
           //TODO 连线关系的调整（隐藏、调整点关系）
           let deltaWidth = (targetWidth - model.otherWidth) / 2
           let deltaHeight = (targetHeight - model.otherHeight) / 2
@@ -282,6 +294,7 @@ export default {
       margin-right: 2px;
       &:hover {
         opacity: 1.0;
+        cursor: pointer;
       }
 
     }

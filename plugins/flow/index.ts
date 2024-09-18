@@ -1,5 +1,5 @@
 import DDeiFlowControls from "./controls";
-import { DDeiPluginBase } from "ddei-editor";
+import { DDeiPluginBase, DDeiEditor,DDeiUtil } from "ddei-editor";
 import DDeiFlowLifeCycles from "./lifecycle"
 import DDeiFlowDialogs from "./dialogs"
 
@@ -62,6 +62,42 @@ class DDeiFlow extends DDeiPluginBase {
     } else if (this.dialogs instanceof DDeiPluginBase) {
       return this.dialogs.getDialogs(editor);
     }
+  }
+
+  installed(editor: DDeiEditor) {
+    //复写判定隐藏的方法，增加subprocess的情况
+    DDeiUtil.isModelHidden = this.createModelHiddenProxy(DDeiUtil.isModelHidden)
+  }
+
+
+  // 代理方法的工厂函数
+  createModelHiddenProxy(originalFunc) {
+    return function proxy() {
+      let model = arguments[0]
+      let hidden = originalFunc.apply(this, arguments);
+      if (!hidden){
+        let stage = model.stage
+        if(model.includePModelId){
+          let subProcessModel = stage.getModelById(model.includePModelId)
+          if (subProcessModel){
+            if (!subProcessModel.isExpand){
+              return true
+            }else{
+              return DDeiUtil.isModelHidden(subProcessModel)
+            }
+          }
+          
+        }else if(model.baseModelType == 'DDeiLine'){
+          let distLinks = stage.getDistModelLinks(model.id);
+          if (distLinks?.length == 2){
+            let hiddenOne = DDeiUtil.isModelHidden(distLinks[0].sm)
+            let hiddenTwo = DDeiUtil.isModelHidden(distLinks[1].sm)
+            return hiddenOne && hiddenTwo
+          }
+        }
+      }
+      return hidden
+    };
   }
   
 

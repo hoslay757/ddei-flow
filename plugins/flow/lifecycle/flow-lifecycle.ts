@@ -1,6 +1,6 @@
 import { DDeiAbstractShape,DDeiLifeCycle, DDeiFuncData, DDeiEditorUtil, DDeiUtil, DDeiFuncCallResult, DDeiEditorEnumBusCommandType, DDeiEnumBusCommandType } from "ddei-editor";
 import { clone, cloneDeep, debounce } from "lodash";
-import { getIncludeModels } from "../controls/util"
+import { getIncludeModels, showSettingButton } from "../controls/util"
 import { toRaw} from 'vue'
 
 class DDeiFlowLifeCycle extends DDeiLifeCycle {
@@ -443,15 +443,11 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
     let models = data?.models
     for (let i = 0; i < models?.length; i++) {
       if (models[i]) {
-        let controlDefine = DDeiEditorUtil.getControlDefine(models[i]);
-        if (controlDefine?.EVENT_MOUSE_MOVE_IN_CONTROL) {
-          let data1 = clone(data)
-          data1.model = models[i]
-          //0不存在无回调函数，继续调用/1调用成功，继续调用/2调用成功，中断调用/-1调用失败，继续调用/-2调用失败，中断调用。
-          let rs = controlDefine?.EVENT_MOUSE_MOVE_IN_CONTROL(operate, data1, ddInstance, evt)
-          if (rs && (rs.state == 2 || rs.state == -2)) {
+        let data1 = clone(data)
+        data1.model = models[i]
+        let rs = showSettingButton(operate, data1, ddInstance, evt)
+        if (rs && (rs.state == 2 || rs.state == -2)) {
             break;
-          }
         }
       }
     }
