@@ -27,10 +27,11 @@
 </template>
 
 <script lang="ts">
-import { DDeiEditorUtil, DDeiUtil, DDeiConfig, DDeiEnumBusCommandType, DDeiAbstractShape } from "ddei-editor";
+import { DDeiEditorUtil, DDeiUtil, DDeiConfig, DDeiLink, DDeiAbstractShape } from "ddei-editor";
 import DialogBase from "./dialog"
-import { Matrix3 } from "three"
+import { Matrix3, Vector3 } from "three"
 import { getIncludeModels } from "../controls/util"
+import { deflate } from "zlib";
 
 export default {
   name: "ddei-flow-setting-button-dialog",
@@ -134,6 +135,7 @@ export default {
         //当前关闭，则展开
         let scaleX = 1, scaleY = 1;
         let targetWidth, targetHeight
+        let includeModels = getIncludeModels(model)
         if (!model.isExpand) {
           //展开当前容器下所有控件大小和坐标
           targetWidth = model.otherWidth ? model.otherWidth : 300
@@ -142,6 +144,30 @@ export default {
           model.otherWidth = model.width
           model.otherHeight = model.height
           model.isExpand = 1
+          //恢复连线关系
+          //找到原有被收折的连线
+          let subLinks = stage.getSourceModelLinks(model.id)
+          subLinks?.forEach(subLink => {
+            if(subLink.oldMid && subLink.oldSmpath){
+              let subModel = layer.getModelById(subLink.oldMid)
+              if(subModel){
+                let subModelLinks = stage.getSourceModelLinks(subModel.id)
+                subModelLinks.forEach(subModelLink => {
+                  if (subModelLink.smpath == subLink.oldSmpath){
+                    subModelLink.disabled = false
+                    let sourcePV = subModelLink.getSourcePV()
+                    let distPV = subModelLink.getDistPV()
+                    distPV.x = sourcePV.x
+                    distPV.y = sourcePV.y
+                  }
+                });
+              }
+              stage.removeLink(subLink)
+              subModel?.updateLinkModels()
+            }
+          });
+          
+          model.updateLinkModels()
         }
         //展开，则关闭
         else {
@@ -152,6 +178,118 @@ export default {
           model.otherWidth = model.width
           model.otherHeight = model.height
           model.isExpand = 0
+          //调整连线关系，将内部控件移动到外部控件
+          //获取所有连线,只有一个端点在内部，且不为model的才需要调整
+          let lines = []
+          includeModels.forEach(ims=>{
+            //获取连线
+            let sublinks = stage.getSourceModelLinks(ims.id)
+            sublinks?.forEach(slink => {
+              if(slink.dm){
+                if (lines.indexOf(slink.dm) == -1){
+                  lines.push(slink.dm)
+                }else{
+                  lines.splice(lines.indexOf(slink.dm),1)
+                }
+              }
+            });
+          })
+          for(let ln = lines.length-1;ln>=0;ln--){
+            let line = lines[ln]
+            let sourceLinks = stage.getDistModelLinks(line.id)
+            let finded = false;
+            let inLink
+            for (let sl = 0; sl < sourceLinks.length;sl++){
+              if (sourceLinks[sl].sm == model){
+                finded = true
+                break;
+              }
+              if(includeModels.indexOf(sourceLinks[sl].sm) != -1){
+                inLink = sourceLinks[sl]
+              }
+            }
+            if(finded){
+              lines.splice(ln,1)
+            }
+            //调整连线关系
+            else if (inLink){
+              let distPV = inLink.getDistPV()
+              inLink.disabled = true
+              //找到出口方向交点
+              let crossPoint
+              let pvs = inLink.dm.pvs
+              if(inLink.dmpath == 'startPoint'){
+                for (let li = 0; li < pvs.length;li++){
+                  let p1 = pvs[li]
+                  let p2 = pvs[li+1]
+                  if(li == pvs.length-1){
+                    p2 = pvs[0]
+                  }
+                  for (let pi = 0; pi < model.operatePVS.length; pi++) {
+                    let p3 = model.operatePVS[pi]
+                    let p4 = model.operatePVS[pi + 1]
+                    if (pi == model.operatePVS.length - 1) {
+                      p3 = model.operatePVS[0]
+                      p4 = model.operatePVS[model.operatePVS.length - 1]
+                    }
+                    crossPoint = DDeiUtil.getLineCorssPoint(p1, p2, p3, p4);
+                    if (crossPoint) {
+                      break;
+                    }
+                    if (crossPoint) {
+                      break;
+                    }
+                  }
+                }
+              }else{
+                for (let li = pvs.length-1; li >=0; li--) {
+                  let p1 = pvs[li]
+                  let p2 = pvs[li - 1]
+                  if (li == pvs.length - 1) {
+                    p2 = pvs[pvs.length-1]
+                  }
+                  for (let pi = 0; pi < model.operatePVS.length; pi++) {
+                    let p3 = model.operatePVS[pi]
+                    let p4 = model.operatePVS[pi + 1]
+                    if (pi == model.operatePVS.length - 1) {
+                      p3 = model.operatePVS[0]
+                      p4 = model.operatePVS[model.operatePVS.length - 1]
+                    }
+                    crossPoint = DDeiUtil.getLineCorssPoint(p1, p2, p3, p4);
+                    if (crossPoint) {
+                      break;
+                    }
+                  }
+                  if (crossPoint){
+                    break;
+                  }
+                }
+              }
+              
+              
+          
+              //创建新的连接点
+              let id = "_" + DDeiUtil.getUniqueCode()
+              model.exPvs[id] = new Vector3(crossPoint.x, crossPoint.y, 1)
+              model.exPvs[id].id = id
+              
+              distPV.x = crossPoint.x
+              distPV.y = crossPoint.y
+              
+              let link = new DDeiLink({
+                sm: model,
+                dm: inLink.dm,
+                smpath: "exPvs." + id,
+                dmpath: inLink.dmpath,
+                stage: stage
+              });
+              link.oldSmpath = inLink.smpath
+              link.oldMid = inLink.sm.id
+              stage.addLink(link)
+
+            }
+          }
+          
         }
         scaleX = targetWidth / model.otherWidth
         scaleY = targetHeight / model.otherHeight
@@ -189,7 +327,7 @@ export default {
             0, 1, model.cpv.y,
             0, 0, 1);
           m1.premultiply(move2Matrix)
-          let includeModels = getIncludeModels(model)
+          
           model.transVectors(m1)
           includeModels?.forEach(im=>{
             im.transVectors(m1)
@@ -260,7 +398,6 @@ export default {
       }
 
       if (needExt) {
-        //TODO 连线关系的调整（隐藏、调整点关系）
         //改变本级其他控件位置
         curLevelModels.forEach(subModel => {
           if (subModel.baseModelType != 'DDeiLine') {
