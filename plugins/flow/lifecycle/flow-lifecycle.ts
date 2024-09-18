@@ -108,48 +108,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
   controlCreateBefore(operateType, data, ddInstance, evt){
     if (ddInstance && ddInstance["AC_DESIGN_EDIT"]) {
       if (data.models?.length > 0) {
-        //如果拖拽的为subProcess，将其includeModels也纳入拖放范围
-        let dragModels = [...data.models]
-        data.models.forEach(model => {
-          if (model.bpmnType == 'SubProcess') {
-            let models = getIncludeModels(model)
-            models.forEach(m => {
-              let stage = m.stage
-              let finded = false
-              for(let n = 0;n < dragModels.length;n++){
-                if(dragModels[n].oldId == m.id){
-                  finded = true;
-                  break;
-                }
-              }
-              if(!finded){
-                let copyModel = stage.ddInstance.controlModelClasses[m.modelType].loadFromJSON(m, { currentDdInstance: stage.ddInstance, currentStage: stage, currentLayer: m.layer, currentContainer: m.pModel });
-                this.changeModelId(m.stage, copyModel)
-                dragModels.push(copyModel)
-              }
-            })
-          }
-        });
-        let removeModels = []
-        for (let k = dragModels.length-1;k >=0;k--){
-          let dm = dragModels[k];
-          if(dm.oldId){
-            for (let i = 0; i < dragModels.length;i++){
-              if (dragModels[i].id == dm.oldId){
-                removeModels.push(dragModels[i]);
-                break;
-              }
-            }
-          }
-        }
-        removeModels.forEach(rm=>{
-          dragModels.splice(dragModels.indexOf(rm),1)
-        })
-        this.dragModels = dragModels
-        data.models.splice(0,data.models.length)
-        dragModels.forEach(dm=>{
-          data.models.push(dm)
-        })
+        this.dragModels = data.models        
         this.resetSubProcesses(data, ddInstance);
       }
     }
