@@ -1,6 +1,7 @@
 import { DDeiAbstractShape,DDeiLifeCycle, DDeiFuncData, DDeiEditorUtil, DDeiUtil, DDeiFuncCallResult, DDeiEditorEnumBusCommandType, DDeiEnumBusCommandType } from "ddei-editor";
-import { clone, debounce } from "lodash";
+import { clone, cloneDeep, debounce } from "lodash";
 import { getIncludeModels } from "../controls/util"
+import { toRaw} from 'vue'
 
 class DDeiFlowLifeCycle extends DDeiLifeCycle {
   
@@ -24,9 +25,11 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
 
   EVENT_CONTROL_DRAG_AFTER: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-drag-after", 1, (operateType, data, ddInstance, evt) => { this.controlDragAfter(operateType, data, ddInstance, evt) });
 
-  EVENT_CONTROL_CREATE_AFTER: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-create-after", 1, (operateType, data, ddInstance, evt) => { this.controlDragAfter(operateType, data, ddInstance, evt) });
+  EVENT_CONTROL_CREATE_AFTER: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-create-after", 1, (operateType, data, ddInstance, evt) => { this.controlCreateAfter(operateType, data, ddInstance, evt) });
 
-  EVENT_CONTROL_CREATE_BEFORE: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-create-before", 1, (operateType, data, ddInstance, evt) => { this.controlDragBefore(operateType, data, ddInstance, evt) });
+  EVENT_CONTROL_CREATE_BEFORE: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-create-before", 1, (operateType, data, ddInstance, evt) => { this.controlCreateBefore(operateType, data, ddInstance, evt) });
+
+  EVENT_COPY_BEFORE: DDeiFuncData | null = new DDeiFuncData("ddei-flow-copy-before", 1, (operateType, data, ddInstance, evt) => { this.controlCopyBefore(operateType, data, ddInstance, evt) });
 
   EVENT_CONTROL_DRAG_BEFORE: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-drag-before", 1, (operateType, data, ddInstance, evt) => { this.controlDragBefore(operateType, data, ddInstance, evt) });
 
@@ -63,18 +66,161 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
     }
   }
 
+  controlCopyBefore(operateType, data, ddInstance, evt) {
+    if (ddInstance && ddInstance["AC_DESIGN_EDIT"]) {
+      if (data.models?.size > 0) {
+        //如果拖拽的为subProcess，将其includeModels也纳入拖放范围
+        // let dragModels = [...data.models]
+        let lines = []
+        data.models.forEach(model => {
+          if (model.bpmnType == 'SubProcess') {
+            let models = getIncludeModels(model)
+            
+            models.forEach(m => {
+              data.models.set(m.id,m)
+              let links = m.stage.getSourceModelLinks(m.id)
+              links?.forEach(lk => {
+                if (lines.indexOf(lk.dm) == -1){
+                  lines.push(lk.dm)
+                }else{
+                  if(!data.models.has(lk.dm.id)){
+                    data.models.set(lk.dm.id,lk.dm)
+                  }
+                }
+              });
+            })
+            let links = model.stage.getSourceModelLinks(model.id)
+            links?.forEach(lk => {
+              if (lines.indexOf(lk.dm) == -1) {
+                lines.push(lk.dm)
+              } else {
+                if (!data.models.has(lk.dm.id)) {
+                  data.models.set(lk.dm.id, lk.dm)
+                }
+              }
+            });
+          }
+        });
+      }
+    }
+  }
+
+  controlCreateBefore(operateType, data, ddInstance, evt){
+    if (ddInstance && ddInstance["AC_DESIGN_EDIT"]) {
+      if (data.models?.length > 0) {
+        //如果拖拽的为subProcess，将其includeModels也纳入拖放范围
+        let dragModels = [...data.models]
+        data.models.forEach(model => {
+          if (model.bpmnType == 'SubProcess') {
+            let models = getIncludeModels(model)
+            models.forEach(m => {
+              let stage = m.stage
+              let finded = false
+              for(let n = 0;n < dragModels.length;n++){
+                if(dragModels[n].oldId == m.id){
+                  finded = true;
+                  break;
+                }
+              }
+              if(!finded){
+                let copyModel = stage.ddInstance.controlModelClasses[m.modelType].loadFromJSON(m, { currentDdInstance: stage.ddInstance, currentStage: stage, currentLayer: m.layer, currentContainer: m.pModel });
+                this.changeModelId(m.stage, copyModel)
+                dragModels.push(copyModel)
+              }
+            })
+          }
+        });
+        let removeModels = []
+        for (let k = dragModels.length-1;k >=0;k--){
+          let dm = dragModels[k];
+          if(dm.oldId){
+            for (let i = 0; i < dragModels.length;i++){
+              if (dragModels[i].id == dm.oldId){
+                removeModels.push(dragModels[i]);
+                break;
+              }
+            }
+          }
+        }
+        removeModels.forEach(rm=>{
+          dragModels.splice(dragModels.indexOf(rm),1)
+        })
+        this.dragModels = dragModels
+        data.models.splice(0,data.models.length)
+        dragModels.forEach(dm=>{
+          data.models.push(dm)
+        })
+        this.resetSubProcesses(data, ddInstance);
+      }
+    }
+  }
+
+  /**
+   * 修改模型ID
+   * @param stage 舞台
+   * @param item 控件
+   * @return 新的ID
+   */
+  changeModelId(stage, item: DDeiAbstractShape): string {
+    let newId = ""
+    while (true) {
+      stage.idIdx++
+
+      if (item.id.indexOf("_") != -1) {
+        newId = item.id.substring(0, item.id.lastIndexOf("_")) + "_" + stage.idIdx;
+      } else {
+        newId = item.id + "_cp_" + stage.idIdx;
+      }
+      if (!stage.getModelById(newId)) {
+        break;
+      }
+    }
+    item.oldId = item.id
+    item.id = newId
+    item.unicode = DDeiUtil.getUniqueCode()
+    let accuContainer = item.getAccuContainer()
+    if (accuContainer?.baseModelType == 'DDeiContainer') {
+      let midList: string = []
+      let models: Map<string, DDeiAbstractShape> = new Map<string, DDeiAbstractShape>();
+      accuContainer.midList.forEach(mid => {
+        let model = accuContainer.models.get(mid);
+        let modelNewId = this.changeModelId(stage, model)
+        models.set(modelNewId, model)
+        midList.push(modelNewId)
+      })
+      accuContainer.models = models
+      accuContainer.midList = midList
+    } else if (accuContainer?.baseModelType == 'DDeiTable') {
+      for (let i = 0; i < accuContainer.rows; i++) {
+        let rowObj = accuContainer.rows[i];
+        for (let j = 0; j < rowObj.length; j++) {
+          let accuContainer = rowObj[j].getAccuContainer()
+          let midList: string[] = []
+          let models: Map<string, DDeiAbstractShape> = new Map<string, DDeiAbstractShape>();
+          accuContainer.midList.forEach(mid => {
+            let model = accuContainer.models.get(mid);
+            let modelNewId = this.changeModelId(stage, model)
+            models.set(modelNewId, model)
+            midList.push(modelNewId)
+          })
+          accuContainer.models = models
+          accuContainer.midList = midList
+        }
+      }
+    }
+    return newId;
+  }
+
   /**
      * 拖拽前
      */
   controlDragBefore(operateType, data, ddInstance, evt): DDeiFuncCallResult {
     if (ddInstance && ddInstance["AC_DESIGN_EDIT"]) {
       if (data.models?.length > 0){
-        let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
-        //计算editor.desigingSubProecsses
-        let layer = data.models[0].layer;
+        
         
 
-        //如果拖拽的胃subProcess，将其includeModels也纳入拖放范围
+        //如果拖拽的为subProcess，将其includeModels也纳入拖放范围
         this.dragModels = [...data.models]
         data.models.forEach(model => {
           if (model.bpmnType == 'SubProcess') {
@@ -87,29 +233,124 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
             })
           }
         });
-        let subModels = layer.getSubModels(null, 20)
-        editor.desigingSubProecsses = []
-        subModels?.forEach(mds => {
-          if (mds.bpmnType == 'SubProcess') {
-            if (data.models.indexOf(mds) == -1){
-              if (!mds.lock && mds.isExpand) {
-                editor.desigingSubProecsses.push(mds)
-              }
-            }
-          }
-        });
-        editor.desigingSubProecsses.sort((a, b) => {
-          if (a?.render && b?.render) {
-            return a.render.tempZIndex - b.render.tempZIndex
-          }
-          return 0
-        })
+        this.resetSubProcesses(data,ddInstance)
         
         
       }
     }
   }
 
+  resetSubProcesses(data, ddInstance){
+    let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
+    //计算editor.desigingSubProecsses
+    let layer = data.models[0].layer;
+    let subModels = layer.getSubModels(null, 20)
+    editor.desigingSubProecsses = []
+    subModels?.forEach(mds => {
+      if (mds.bpmnType == 'SubProcess') {
+        if (data.models.indexOf(mds) == -1) {
+          if (!mds.lock && mds.isExpand) {
+            editor.desigingSubProecsses.push(mds)
+          }
+        }
+      }
+    });
+    editor.desigingSubProecsses.sort((a, b) => {
+      if (a?.render && b?.render) {
+        return a.render.tempZIndex - b.render.tempZIndex
+      }
+      return 0
+    })
+  }
+
+  modelsToTreeRoot(models:DDeiAbstractShape[],stage){
+    let treeRoot = []
+    let cachedModel = {}
+    models.forEach(model=>{
+      if (model.baseModelType != 'DDeiLine'){
+        //没有上一级,且没有includePModelId
+        if (model.pModel == model.layer && !model.includePModelId){
+          if (treeRoot.indexOf(model)) {
+            treeRoot.push(model)
+          } 
+        }
+        //有上一级,且没有includePModelId，且上一级不在选中范围内
+        else if (model.pModel != model.layer && !model.includePModelId){
+          if (models.indexOf(model.pModel) == -1){
+            if (treeRoot.indexOf(model)) {
+              treeRoot.push(model)
+            } 
+          }
+        }
+          //有includePModelId，且往上都不在选中范围内
+        else if (model.includePModelId){
+          let includePModelId = model.includePModelId
+          let include = false
+          while (includePModelId){
+            let ipm = cachedModel[includePModelId];
+            if (!ipm){
+              ipm = stage.getModelById(includePModelId)
+              cachedModel[includePModelId] = ipm
+            }
+            if (ipm){
+              if (models.indexOf(ipm) != -1){
+                include = true
+                break;
+              }
+              includePModelId = ipm.includePModelId
+            }else{
+              break;
+            }
+          }
+          if (!include){
+            if(treeRoot.indexOf(model)){
+              treeRoot.push(model)
+            } 
+          }
+        }
+      }
+    })
+    return treeRoot;
+  }
+
+
+  changeNodeZIndexDeep(model: DDeiAbstractShape,parentNode,stage){
+    let len = parentNode.includeModels.length
+    let oldZindex = model.zIndex ? model.zIndex : len
+    model.zIndex = parentNode.zIndex ? parentNode.zIndex + oldZindex : oldZindex
+    model.includeModels?.forEach(imid => {
+      let imodel = stage.getModelById(imid)
+      this.changeNodeZIndexDeep(imodel,model,stage)
+    });
+    let links = stage.getSourceModelLinks(model.id)
+    links?.forEach(link => {
+      this.changeNodeZIndexDeep(link.dm, parentNode,stage)
+    });
+  }
+
+  controlCreateAfter(operateType, data, ddInstance, evt): DDeiFuncCallResult {
+    //复制的情况，由于ID发生了变化，需要重新维护关系
+    
+    this.dragModels?.forEach(dmodel=>{
+      if(dmodel.includePModelId){
+        for (let k = 0; k < this.dragModels?.length;k++){
+          if (this.dragModels[k].oldId == dmodel.includePModelId){
+            let subProcessModel = this.dragModels[k];
+            dmodel.includePModelId = subProcessModel.id
+            let oldIndex = subProcessModel.includeModels.indexOf(dmodel.oldId)
+            if (oldIndex != -1){
+              subProcessModel.includeModels.splice(oldIndex, 1, dmodel.id)
+            }
+            
+            break;
+          }
+        }
+      }
+    })
+    
+    this.controlDragAfter(operateType, data, ddInstance, evt)
+    
+  }
 
   /**
    * 拖拽后
@@ -137,7 +378,23 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
             pid = pid.substring(0, pid.indexOf("_shadow"))
           }
         }
-        this.dragModels?.forEach(dmodel => {
+        
+        let dmodels = []
+        this.dragModels?.forEach(dm => {
+          //建立新关系
+          let id = dm.id
+          if (id.indexOf("_shadow") != -1) {
+            id = id.substring(0, id.indexOf("_shadow"))
+            dmodels.push(stage.getModelById(id))
+          }else{
+            dmodels.push(dm)
+          }
+          
+        })
+        
+        let treeRoots = this.modelsToTreeRoot(dmodels,stage)
+        
+        treeRoots?.forEach(dmodel => {
           //建立新关系
           let id = dmodel.id
           if (id.indexOf("_shadow") != -1) {
@@ -158,10 +415,12 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
             if (includePModel && includePModel.includeModels.indexOf(id) != -1) {
               includePModel.includeModels.splice(includePModel.includeModels.indexOf(id), 1)
             }
+            delete dSourceModel.includePModelId
             delete dSourceModel.render.tempZIndex
           }
           //更新关系
           if (dragContainerModel) {
+            
             if (!dragContainerModel.includeModels) {
               dragContainerModel.includeModels = []
             }
@@ -170,10 +429,14 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
               dragContainerModel.includeModels.push(id)
               
               dSourceModel.includePModelId = pid
-              dSourceModel.render.tempZIndex = dragContainerModel.render.tempZIndex + (dragContainerModel.includeModels.length)
+              this.changeNodeZIndexDeep(dSourceModel, dragContainerModel,stage)
+              
             }
           }
+          dmodel.pModel.resortModelByZIndex()
         })
+
+        
         
         editor.bus.push("refresh-shape");
         editor.bus.executeAll();

@@ -182,13 +182,11 @@ export default {
             im.hidden = hidden
             im.transVectors(m1)
           })
-          //TODO HIDDEN不牢靠
+          //TODO 多层级隐藏的问题，HIDDEN不牢靠
           //TODO 内部的用自己m1，外部用m2，改为有空间则撑开，没空间则扩展更好
-          //TODO 删除后联动删除，或提示
-          //TODO tempZIndex的调整
-          //TODO 线和影子图形的显示
+          //TODO tempZIndex的调整，移入移出后的zindex调整，确保移进subprocess后永远可以显示
           //TODO hidden以后不响应事件
-          //TODO 事件的层级，确保里面的控件能够显示小按钮
+          //TODO 连线关系的调整（隐藏、调整点关系）
           let deltaWidth = (targetWidth - model.otherWidth) / 2
           let deltaHeight = (targetHeight - model.otherHeight) / 2
           //改变其他控件位置

@@ -1,4 +1,4 @@
-import { DDeiUtil, DDeiConfig,DDeiEditor, DDeiEditorUtil, DDeiEnumOperateType, DDei, DDeiFuncCallResult, DDeiAbstractShape } from 'ddei-editor'
+import { DDeiUtil, DDeiLink,DDeiConfig,DDeiEditor, DDeiEditorUtil, DDeiEnumOperateType, DDei, DDeiFuncCallResult, DDeiAbstractShape } from 'ddei-editor'
 
 /**
  * 额外显示一个切换控件类型的小图标在右上角区域
@@ -36,7 +36,10 @@ const showSettingButton = function (operate: DDeiEnumOperateType, data: object |
   return rs;
 }
 
-const getIncludeModels = function(subProcessModel){
+const getIncludeModels = function(subProcessModel,modelLinks,first:boolean = true){
+    if (!modelLinks){
+      modelLinks = []
+    }
     let stage = subProcessModel.stage;
     let models = []
     if (!subProcessModel.includeModels) {
@@ -51,12 +54,50 @@ const getIncludeModels = function(subProcessModel){
         if (subModel){
           models.push(subModel)
           if (subModel.bpmnType == 'SubProcess'){
-            let mds = getIncludeModels(subModel)
+            let mds = getIncludeModels(subModel, modelLinks,false)
             models.push(...mds)
           }
+          // let sublinks = stage.getSourceModelLinks(subModel.id)
+          // sublinks?.forEach(lk => {
+          //   models.push(lk)
+          //   if (modelLinks.indexOf(lk) == -1){
+          //     modelLinks.push(lk)
+          //   }
+          // });
         }
       });
     }
+    // let links = stage.getSourceModelLinks(subProcessModel.id)
+    // links?.forEach(lk => {
+    //   models.push(lk)
+    //   if (modelLinks.indexOf(lk) == -1) {
+    //     modelLinks.push(lk)
+    //   }
+    // });
+    // if (first){
+    //   let startLinkLines = []
+    //   let appendLines = []
+    //   for (let k = models.length-1;k >=0;k--){
+    //     if(models[k] instanceof DDeiLink){
+    //       if (models[k].sm && models.indexOf(models[k].sm) != -1 ){
+    //         if (startLinkLines.indexOf(models[k].dm) == -1){
+    //           startLinkLines.push(models[k].dm)
+    //         }else{
+    //           appendLines.push(models[k].dm)
+    //         }
+    //       }
+    //       models.splice(k, 1)
+    //     }
+        
+    //   }
+
+    //   appendLines.forEach(aline=>{
+    //     if (models.indexOf(aline) == -1){
+    //       models.push(aline)
+    //     }
+    //   })
+      
+    // }
     return models;
   }
 
