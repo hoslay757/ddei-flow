@@ -31,7 +31,6 @@ import { DDeiEditorUtil, DDeiUtil, DDeiConfig, DDeiLink, DDeiAbstractShape } fro
 import DialogBase from "./dialog"
 import { Matrix3, Vector3 } from "three"
 import { getIncludeModels } from "../controls/util"
-import { deflate } from "zlib";
 
 export default {
   name: "ddei-flow-setting-button-dialog",

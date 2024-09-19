@@ -57,47 +57,11 @@ const getIncludeModels = function(subProcessModel,modelLinks,first:boolean = tru
             let mds = getIncludeModels(subModel, modelLinks,false)
             models.push(...mds)
           }
-          // let sublinks = stage.getSourceModelLinks(subModel.id)
-          // sublinks?.forEach(lk => {
-          //   models.push(lk)
-          //   if (modelLinks.indexOf(lk) == -1){
-          //     modelLinks.push(lk)
-          //   }
-          // });
+          
         }
       });
     }
-    // let links = stage.getSourceModelLinks(subProcessModel.id)
-    // links?.forEach(lk => {
-    //   models.push(lk)
-    //   if (modelLinks.indexOf(lk) == -1) {
-    //     modelLinks.push(lk)
-    //   }
-    // });
-    // if (first){
-    //   let startLinkLines = []
-    //   let appendLines = []
-    //   for (let k = models.length-1;k >=0;k--){
-    //     if(models[k] instanceof DDeiLink){
-    //       if (models[k].sm && models.indexOf(models[k].sm) != -1 ){
-    //         if (startLinkLines.indexOf(models[k].dm) == -1){
-    //           startLinkLines.push(models[k].dm)
-    //         }else{
-    //           appendLines.push(models[k].dm)
-    //         }
-    //       }
-    //       models.splice(k, 1)
-    //     }
-        
-    //   }
-
-    //   appendLines.forEach(aline=>{
-    //     if (models.indexOf(aline) == -1){
-    //       models.push(aline)
-    //     }
-    //   })
-      
-    // }
+    
     return models;
   }
 

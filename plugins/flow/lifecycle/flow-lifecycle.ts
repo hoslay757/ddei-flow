@@ -1,5 +1,5 @@
 import { DDeiAbstractShape,DDeiLifeCycle, DDeiFuncData, DDeiEditorUtil, DDeiUtil, DDeiFuncCallResult, DDeiEditorEnumBusCommandType, DDeiEnumBusCommandType } from "ddei-editor";
-import { clone, cloneDeep, debounce } from "lodash";
+import { clone} from "lodash";
 import { getIncludeModels, showSettingButton } from "../controls/util"
 import { toRaw} from 'vue'
 
@@ -33,9 +33,10 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
 
   EVENT_CONTROL_DRAG_BEFORE: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-drag-before", 1, (operateType, data, ddInstance, evt) => { this.controlDragBefore(operateType, data, ddInstance, evt) });
 
-  EVENT_AFTER_CLOSE_FILE: DDeiFuncData | null = new DDeiFuncData("ddei-flow-hidden-eles", 1, (operateType, data, ddInstance, evt) => { this.hiddenTempElements(operateType, data, ddInstance, evt)});
+  EVENT_CLOSE_FILE_AFTER: DDeiFuncData | null = new DDeiFuncData("ddei-flow-hidden-eles", 1, (operateType, data, ddInstance, evt) => { this.hiddenTempElements(operateType, data, ddInstance, evt) });
 
   EVENT_CONTROL_DEL_AFTER: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-del-after", 1, (operateType, data, ddInstance, evt) => { this.controlDelAfter(operateType, data, ddInstance, evt) });
+
 
   dragModels :DDeiAbstractShape[]|null = null
   /**
@@ -378,6 +379,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
             delete dSourceModel.render.tempZIndex
           }
           //更新关系
+          
           if (dragContainerModel) {
             
             if (!dragContainerModel.includeModels) {
@@ -476,7 +478,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
     let models = data.models;
     let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
     let stage = ddInstance.stage
-    
+
     models.forEach(model => {
       if (model.bpmnType == 'SubProcess') {
         let includeModels = getIncludeModels(model)
@@ -485,7 +487,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
         })
       }
     });
-    
+
     DDeiEditorUtil.closeDialog(editor, 'ddei-flow-setting-button-dialog')
     DDeiEditorUtil.closeDialog(editor, 'ddei-flow-element-setting-dialog')
     return result;

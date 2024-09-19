@@ -70,6 +70,7 @@ class DDeiFlow extends DDeiPluginBase {
   }
 
 
+
   // 代理方法的工厂函数
   createModelHiddenProxy(originalFunc) {
     return function proxy() {
@@ -99,6 +100,7 @@ class DDeiFlow extends DDeiPluginBase {
       return hidden
     };
   }
+
   
 
   static configuration(options) {

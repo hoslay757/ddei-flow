@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import DDeiEditorView from "ddei-editor";
 import { DDeiCoreStandLayout } from "ddei-editor";
-import { ref, getCurrentInstance } from "vue";
+import {  getCurrentInstance } from "vue";
 import { DDeiEditor, DDeiFile } from "ddei-editor";
 import DDeiFlow from "@ddei-flow";
 //获取主对象实例，代替this获取$refs
@@ -14,7 +14,6 @@ const options = {
     DDeiFlow
   ],
 }
-
 </script>
 
 <template>
