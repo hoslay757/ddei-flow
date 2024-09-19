@@ -185,7 +185,7 @@ export default {
             //获取连线
             let sublinks = stage.getSourceModelLinks(ims.id)
             sublinks?.forEach(slink => {
-              if(slink.dm){
+              if (!slink.disabled && slink.dm){
                 if (lines.indexOf(slink.dm) == -1){
                   lines.push(slink.dm)
                 }else{
@@ -200,14 +200,17 @@ export default {
             let finded = false;
             let inLink
             for (let sl = 0; sl < sourceLinks.length;sl++){
-              if (sourceLinks[sl].sm == model){
-                finded = true
-                break;
-              }
-              if(includeModels.indexOf(sourceLinks[sl].sm) != -1){
-                inLink = sourceLinks[sl]
+              if (!sourceLinks[sl].disabled){
+                if (sourceLinks[sl].sm == model){
+                  finded = true
+                  break;
+                }
+                if(includeModels.indexOf(sourceLinks[sl].sm) != -1){
+                  inLink = sourceLinks[sl]
+                }
               }
             }
+            
             if(finded){
               lines.splice(ln,1)
             }
@@ -271,6 +274,11 @@ export default {
               //创建新的连接点
               let id = "_" + DDeiUtil.getUniqueCode()
               model.exPvs[id] = new Vector3(crossPoint.x, crossPoint.y, 1)
+              let projPoint = model.getProjPoint({ x: crossPoint.x, y: crossPoint.y });
+              // debugger
+              model.exPvs[id].rate = projPoint.rate
+              model.exPvs[id].sita = projPoint.sita
+              model.exPvs[id].index = projPoint.index
               model.exPvs[id].id = id
               
               distPV.x = crossPoint.x

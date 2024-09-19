@@ -1,4 +1,4 @@
-import { showSettingButton } from "../util"
+import { getIncludeModels, showSettingButton } from "../util"
 import BpmnSubProcessViewer from "../views/bpmn-subprocess-viewer.vue"
 
 
@@ -79,8 +79,23 @@ export default {
   filters:{
     LINE_OBI_FILTER: (model, param) => {
       let line = param.line
-      //如果线的开始和结束节点之一是subprocess的子元素，则本subprocess不作为寻路障碍物
-      return false
+      let distLinks = line.stage.getDistModelLinks(line.id);
+      let includeModels = getIncludeModels(model)
+      //如果线的开始点和结束点之一是本subprocess，则作为障碍物
+      for (let i = 0; i < distLinks.length;i++){
+        if (!distLinks[i].disabled){
+          if(distLinks[i].sm == model){
+            return true;
+          } 
+          //如果线的开始和结束节点之一是subprocess的子元素，则本subprocess不作为寻路障碍物
+          else if (includeModels.indexOf(distLinks[i].sm) != -1){
+            return false
+          }
+        }
+      }
+
+     
+      return true
     }
   },
   icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
