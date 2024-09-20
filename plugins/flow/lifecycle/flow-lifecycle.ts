@@ -33,6 +33,9 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
 
   EVENT_CONTROL_DRAG_BEFORE: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-drag-before", 1, (operateType, data, ddInstance, evt) => { this.controlDragBefore(operateType, data, ddInstance, evt) });
 
+
+  EVENT_CONTROL_ROTATE_BEFORE: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-rotate-before", 1, (operateType, data, ddInstance, evt) => { this.controlDragBefore(operateType, data, ddInstance, evt) });
+
   EVENT_CLOSE_FILE_AFTER: DDeiFuncData | null = new DDeiFuncData("ddei-flow-hidden-eles", 1, (operateType, data, ddInstance, evt) => { this.hiddenTempElements(operateType, data, ddInstance, evt) });
 
   EVENT_CONTROL_DEL_AFTER: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-del-after", 1, (operateType, data, ddInstance, evt) => { this.controlDelAfter(operateType, data, ddInstance, evt) });
