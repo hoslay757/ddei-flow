@@ -67,11 +67,7 @@ export default {
       'name': '嵌入子流程',
       'orderNo': 91,
     },
-    {
-      'id': '1000101',
-      'name': 'Pool',
-      'orderNo': 101,
-    },
+    
     {
       'id': '1000201',
       'name': '并行网关',
@@ -96,6 +92,11 @@ export default {
       'id': '1000205',
       'name': '事件网关',
       'orderNo': 205,
-    }
+    },
+    {
+      'id': '1000401',
+      'name': 'Group',
+      'orderNo': 401,
+    },
   ]
 }

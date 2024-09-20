@@ -53,7 +53,7 @@ const getIncludeModels = function(subProcessModel,modelLinks,first:boolean = tru
         let subModel = stage.getModelById(subModelId)
         if (subModel){
           models.push(subModel)
-          if (subModel.bpmnType == 'SubProcess'){
+          if (subModel.bpmnType == 'SubProcess' || subModel.bpmnType == 'Group'){
             let mds = getIncludeModels(subModel, modelLinks,false)
             models.push(...mds)
           }

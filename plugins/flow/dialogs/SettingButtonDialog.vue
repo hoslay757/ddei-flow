@@ -7,15 +7,17 @@
         @mouseenter="settingMouseEnter($el)" @mouseleave="settingMouseEnterLeave($el)" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-setting"></use>
       </svg>
-      <svg class="icon-ddei-flow" v-if="model?.bpmnType == 'SubProcess'" @click="expandOrNotSubProcess()"
-        aria-hidden="true">
+      <svg class="icon-ddei-flow" v-if="model?.bpmnType == 'SubProcess' || model?.bpmnType == 'Group'"
+        @click="expandOrNotSubProcess()" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-sub-process-marker"></use>
       </svg>
-      <svg class="icon-ddei-flow" v-if="model?.bpmnType == 'SubProcess' && model.isExpand == 1 && !model.lock"
+      <svg class="icon-ddei-flow"
+        v-if="(model?.bpmnType == 'SubProcess' || model?.bpmnType == 'Group') && model.isExpand == 1 && !model.lock"
         @click="subProcessLock()" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-lock"></use>
       </svg>
-      <svg class="icon-ddei-flow" v-if="model?.bpmnType == 'SubProcess' && model.isExpand == 1 && model.lock"
+      <svg class="icon-ddei-flow"
+        v-if="(model?.bpmnType == 'SubProcess' || model?.bpmnType == 'Group') && model.isExpand == 1 && model.lock"
         @click="subProcessUnLock()" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-unlock"></use>
       </svg>
@@ -220,19 +222,17 @@ export default {
               //找到出口方向交点
               let crossPoint
               let pvs = inLink.dm.pvs
+              let projPoint
               if(inLink.dmpath == 'startPoint'){
-                for (let li = 0; li < pvs.length;li++){
+                for (let li = 0; li < pvs.length-1;li++){
                   let p1 = pvs[li]
                   let p2 = pvs[li+1]
-                  if(li == pvs.length-1){
-                    p2 = pvs[0]
-                  }
                   for (let pi = 0; pi < model.operatePVS.length; pi++) {
                     let p3 = model.operatePVS[pi]
                     let p4 = model.operatePVS[pi + 1]
                     if (pi == model.operatePVS.length - 1) {
                       p3 = model.operatePVS[0]
-                      p4 = model.operatePVS[model.operatePVS.length - 1]
+                      p4 = model.operatePVS[pi]
                     }
                     crossPoint = DDeiUtil.getLineCorssPoint(p1, p2, p3, p4);
                     if (crossPoint) {
@@ -244,18 +244,15 @@ export default {
                   }
                 }
               }else{
-                for (let li = pvs.length-1; li >=0; li--) {
+                for (let li = pvs.length-1; li >0; li--) {
                   let p1 = pvs[li]
                   let p2 = pvs[li - 1]
-                  if (li == pvs.length - 1) {
-                    p2 = pvs[pvs.length-1]
-                  }
                   for (let pi = 0; pi < model.operatePVS.length; pi++) {
                     let p3 = model.operatePVS[pi]
                     let p4 = model.operatePVS[pi + 1]
                     if (pi == model.operatePVS.length - 1) {
                       p3 = model.operatePVS[0]
-                      p4 = model.operatePVS[model.operatePVS.length - 1]
+                      p4 = model.operatePVS[pi]
                     }
                     crossPoint = DDeiUtil.getLineCorssPoint(p1, p2, p3, p4);
                     if (crossPoint) {
@@ -267,21 +264,34 @@ export default {
                   }
                 }
               }
-              
+
+              if (crossPoint){
+                projPoint = model.getProjPoint({x:crossPoint.x,y:crossPoint.y})
+              }
+              if (!projPoint){
+                let proPoints
+                if (inLink.dmpath == 'startPoint') {
+                  proPoints = DDeiAbstractShape.getProjPointDists(model.operatePVS, inLink.dm.startPoint.x, inLink.dm.startPoint.y, true, 1);
+                }else{
+                  proPoints = DDeiAbstractShape.getProjPointDists(model.operatePVS, inLink.dm.endPoint.x, inLink.dm.endPoint.y, true, 1);
+                }
+                
+                projPoint = proPoints[0]
+              }
               
           
               //创建新的连接点
               let id = "_" + DDeiUtil.getUniqueCode()
-              model.exPvs[id] = new Vector3(crossPoint.x, crossPoint.y, 1)
-              let projPoint = model.getProjPoint({ x: crossPoint.x, y: crossPoint.y });
+              model.exPvs[id] = new Vector3(projPoint.x, projPoint.y, 1)
+              
               // debugger
               model.exPvs[id].rate = projPoint.rate
               model.exPvs[id].sita = projPoint.sita
               model.exPvs[id].index = projPoint.index
               model.exPvs[id].id = id
               
-              distPV.x = crossPoint.x
-              distPV.y = crossPoint.y
+              distPV.x = projPoint.x
+              distPV.y = projPoint.y
               
               let link = new DDeiLink({
                 sm: model,
@@ -427,7 +437,7 @@ export default {
                 0, 0, 1);
               subModel.transVectors(m2)
 
-              if (subModel.bpmnType == 'SubProcess') {
+              if (subModel.bpmnType == 'SubProcess' || subModel.bpmnType == 'Group') {
                 let includeModels1 = getIncludeModels(subModel)
                 includeModels1.forEach(lms => {
                   lms.transVectors(m2)

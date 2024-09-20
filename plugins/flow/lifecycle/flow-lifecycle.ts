@@ -74,7 +74,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
         // let dragModels = [...data.models]
         let lines = []
         data.models.forEach(model => {
-          if (model.bpmnType == 'SubProcess') {
+          if (model.bpmnType == 'SubProcess' || model.bpmnType == 'Group') {
             let models = getIncludeModels(model)
             
             models.forEach(m => {
@@ -183,7 +183,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
         //如果拖拽的为subProcess，将其includeModels也纳入拖放范围
         this.dragModels = [...data.models]
         data.models.forEach(model => {
-          if (model.bpmnType == 'SubProcess') {
+          if (model.bpmnType == 'SubProcess' || model.bpmnType == 'Group') {
             let models = getIncludeModels(model)
             models.forEach(m=>{
               
@@ -207,7 +207,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
     let subModels = layer.getSubModels(null, 20)
     editor.desigingSubProecsses = []
     subModels?.forEach(mds => {
-      if (mds.bpmnType == 'SubProcess') {
+      if (mds.bpmnType == 'SubProcess' || mds.bpmnType == 'Group') {
         if (data.models.indexOf(mds) == -1) {
           if (!mds.lock && mds.isExpand) {
             editor.desigingSubProecsses.push(mds)
@@ -480,7 +480,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
     let stage = ddInstance.stage
 
     models.forEach(model => {
-      if (model.bpmnType == 'SubProcess') {
+      if (model.bpmnType == 'SubProcess' || model.bpmnType == 'Group') {
         let includeModels = getIncludeModels(model)
         includeModels.forEach(lms => {
           stage.removeModel(lms, true)
