@@ -349,6 +349,13 @@
       "unicode_decimal": 59346
     },
     {
+      "icon_id": "41936332",
+      "name": "user-icon",
+      "font_class": "user-icon",
+      "unicode": "e808",
+      "unicode_decimal": 59400
+    },
+    {
       "icon_id": "7123346",
       "name": "end-event-message",
       "font_class": "end-event-message",

@@ -3,7 +3,7 @@
     class="ddei-flow-setting-button-dialog" v-if="forceRefresh">
     <div class="content" :style="{ 'flex-direction': model?.bpmnBaseType !='Event' ? 'column' : ''}">
       <svg class="icon-ddei-flow"
-        v-if="controlDefine?.subject == 'bpmn' && (bpmnSubTypeDataSource?.length > 0 || model?.bpmnBaseType == 'Activity')"
+        v-if="controlDefine?.subject == 'bpmn' && (bpmnSubTypeDataSource?.length > 0 || model?.bpmnBaseType == 'Activity' || model?.bpmnBaseType == 'Line')"
         @mouseenter="settingMouseEnter($el)" @mouseleave="settingMouseEnterLeave($el)" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-setting"></use>
       </svg>

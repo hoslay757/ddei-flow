@@ -1,7 +1,8 @@
 import DDeiFlowControls from "./controls";
-import { DDeiPluginBase, DDeiEditor,DDeiUtil } from "ddei-editor";
+import { DDeiPluginBase, DDeiEditor, DDeiUtil, DDeiCoreToolboxSimplePanel } from "ddei-editor";
 import DDeiFlowLifeCycles from "./lifecycle"
 import DDeiFlowDialogs from "./dialogs"
+import { DDeiEditorUtil, DDeiExtSearch, DDeiExtQuickControl } from "ddei-editor"
 
 class DDeiFlow extends DDeiPluginBase {
   type: string = "package"
@@ -10,13 +11,122 @@ class DDeiFlow extends DDeiPluginBase {
   /**
    * 缺省实例
    */
-  static defaultIns: DDeiFlow = new DDeiFlow(null);
+  static defaultIns: DDeiFlow = new DDeiFlow({
+    initConfig: {
+      //覆盖
+      rewrite: {
+        currentLayout: "ddei-core-layout-simple",
+        config: {
+          initData: {
+            controls:
+              [
+                {
+                  id: "start",
+                  model: "1000001",
+                  offsetY: -150
+                }
+              ]
+          }
+        }
+      },
+      //追加
+      append: {
+        extensions: [
+          DDeiExtSearch,
+          DDeiExtQuickControl,
+          DDeiCoreToolboxSimplePanel.configuration({
+            direct: 1,//方向，1纵向，2横向
+            position: 8,//位置1-9顺时针，1为左上角，9为中心
+            drag: 1,//是否允许拖拽位置
+            chooseCreate: 1,//是否在选择控件时创建一个控件
+            groups: [
+              {
+                editMode: 1,
+                desc: "选择",
+                icon: `<svg class="icon" style="width: 28px; height: 28px;margin-left:-1px;margin-top:2px; " aria-hidden="true">
+            <use xlink: href = "#icon-a-ziyuan432">< /use>
+          </svg>`
+              },
+              {
+                editMode: 2,
+                desc: "平移画布",
+                icon: `<svg class="icon" style="width: 28px; height: 28px;margin-left:-1px;margin-top:2px; " aria-hidden="true">
+            <use xlink: href = "#icon-a-ziyuan431">< /use>
+          </svg>`
+              },
+              {
+                controls: [
+                  "1000001",
+                  "1000002",
+                  "1000003",
+                ]
+              },
+              {
+                controls: [
+                  "1000011",
+                  "1000021",
+                  "1000031",
+                  "1000041",
+                  "1000051",
+                  "1000061",
+                  "1000071",
+                  "1000081",
+                  "1000091",
+                ]
+              },
+              {
+                controls: [
+                  "1000201",
+                  "1000202",
+                  "1000203",
+                  "1000204",
+                  "1000205",
+                ]
+              },
+              {
+                controls: [
+                  "1000401",
+                ]
+              },
+              {
+                controls: [
+                  "1000501",
+                  "1000504",
+                  "1000505",
+                  "103010",
+                  "103011"
+                ]
+              },
+
+              {
+                editMode: 4,
+                desc: "连线",
+                controls: [
+                  "1000601"
+                ]
+              }
+            ]
+          })
+        ]
+      }
+    }
+  });
 
   controls: object = DDeiFlowControls;
 
   lifecycles: object = DDeiFlowLifeCycles;
 
   dialogs: object = DDeiFlowDialogs;
+
+
+  //获取默认配置
+  static getInitConfig() {
+    return DDeiFlow.defaultIns.getInitConfig()
+  }
+
+  getInitConfig(){
+    return this.options?.initConfig
+  }
 
   getOptions(): object {
     let options = {}
@@ -67,6 +177,9 @@ class DDeiFlow extends DDeiPluginBase {
   installed(editor: DDeiEditor) {
     //复写判定隐藏的方法，增加subprocess的情况
     DDeiUtil.isModelHidden = this.createModelHiddenProxy(DDeiUtil.isModelHidden)
+    DDeiEditorUtil.lineInitJSON = {
+      modelCode: "1000601",
+    };
   }
 
 

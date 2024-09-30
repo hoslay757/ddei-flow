@@ -462,6 +462,10 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
     //循环每个models，验证是否为本插件的控件，只有本插件的控件才响应
     let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
     if (editor) {
+      //如果存在选中控件，则不处理
+      if (editor.ddInstance.stage.selectedModels.size > 0) {
+        return;
+      }
       let settingBtnEle = document.getElementById(editor.id + "_ddei-flow-setting-button-dialog");
       let settingDialogEle = document.getElementById(editor.id + "_ddei-flow-element-setting-dialog");
       if (settingBtnEle && !settingDialogEle && !(evt.target == settingBtnEle || evt.target?.parentElement == settingBtnEle || evt.target.parentElement?.parentElement == settingBtnEle || evt.target.parentElement?.parentElement?.parentElement == settingBtnEle)) {

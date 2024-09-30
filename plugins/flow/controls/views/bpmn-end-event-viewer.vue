@@ -3,7 +3,7 @@ import '@/assets/iconfont/iconfont.css'
 import '@/assets/iconfont/iconfont.js'
 
 export default {
-  name: "ddei-flow-bpmn-viewer-end-gateway",
+  name: "ddei-flow-bpmn-viewer-end-event",
   props: {
     model: {
       type: Object,
@@ -19,7 +19,7 @@ export default {
 };
 </script>
 <template>
-  <div ref="divElement" class="ddei-flow-bpmn-viewer-start-event" title="结束事件">
+  <div ref="divElement" class="ddei-flow-bpmn-viewer-end-event" title="结束事件">
     <svg class="icon-ddei-flow" aria-hidden="true">
       <use v-if="!model.bpmnSubType || model.bpmnSubType == 1" xlink:href="#icon-ddei-flow-end-event-none"></use>
       <use v-if="model.bpmnSubType == 2" xlink:href="#icon-ddei-flow-end-event-message"></use>
@@ -35,7 +35,7 @@ export default {
 </template>
 
 <style lang="less" scoped>
-.ddei-flow-bpmn-viewer-start-event {
+.ddei-flow-bpmn-viewer-end-event {
   position: absolute;
   pointer-events:none;
   user-select: none;

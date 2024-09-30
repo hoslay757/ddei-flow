@@ -6,10 +6,22 @@ import { DDeiUtil, DDeiLink,DDeiConfig,DDeiEditor, DDeiEditorUtil, DDeiEnumOpera
 const showSettingButton = function (operate: DDeiEnumOperateType, data: object | null, ddInstance: DDei, evt: Event): DDeiFuncCallResult {
   let rs = new DDeiFuncCallResult();
   rs.state = 2;
-  let model = data.model
+  
+
   //计算位置，显示按钮div
   let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
   if (editor) {
+    let model = data.model
+    //如果存在选中控件，则重新定位到选中控件
+    if (editor.ddInstance.stage.selectedModels.size > 0){
+      if (!editor.ddInstance.stage.selectedModels.has(model.id)){
+        if (editor.ddInstance.stage.selectedModels.size == 1) {
+          model = Array.from(editor.ddInstance.stage.selectedModels.values())[0]
+        }else{
+          return rs;
+        }
+      }
+    }
     //位置
     editor.tempOperateModel = model
     let stageRatio = model.getStageRatio()

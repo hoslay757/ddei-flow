@@ -14,6 +14,63 @@
           </svg>
         </div>
       </div>
+      <div class="row" v-if="lineTypeDataSource?.length > 0">
+        <div class="change-bpmn-sub-type">
+          <svg class="icon-ddei-flow" @click="changeLineType(-1)" style="width:16px;height:16px;" aria-hidden="true">
+            <use xlink:href="#icon-ddei-flow-left"></use>
+          </svg>
+          <div class="change-bpmn-sub-type-text">
+            {{ lineTypeDataSource[lineTypeIndex].text }}
+          </div>
+          <svg class="icon-ddei-flow" @click="changeLineType(1)" style="width:16px;height:16px;" aria-hidden="true">
+            <use xlink:href="#icon-ddei-flow-right"></use>
+          </svg>
+        </div>
+      </div>
+
+      <div class="row" v-if="model?.bpmnSubType == 5 && startPointTypeDataSource?.length > 0">
+        <div class="change-point-type">
+          <div class="change-point-type-title">
+            起点
+          </div>
+          <svg class="icon-ddei-flow" @click="changePointType(1,-1)" aria-hidden="true">
+            <use xlink:href="#icon-ddei-flow-left"></use>
+          </svg>
+          <div class="change-point-type-text">
+            {{ startPointTypeDataSource[startPointTypeIndex].text }}
+          </div>
+          <svg class="icon-ddei-flow" @click="changePointType(1,1)" aria-hidden="true">
+            <use xlink:href="#icon-ddei-flow-right"></use>
+          </svg>
+        </div>
+      </div>
+      <div class="row" v-if="model?.bpmnBaseType == 'Sequence'">
+        <div class="quick-button" @click="exchangePoints()">
+          <div class="quick-button-text">
+            交换
+          </div>
+          <svg class="icon" aria-hidden="true">
+            <use xlink:href="#icon-zhihuan"></use>
+          </svg>
+        </div>
+      </div>
+      <div class="row" v-if="model?.bpmnSubType == 5 && endPointTypeDataSource?.length > 0">
+        <div class="change-point-type">
+          <div class="change-point-type-title">
+            终点
+          </div>
+          <svg class="icon-ddei-flow" @click="changePointType(2,-1)" aria-hidden="true">
+            <use xlink:href="#icon-ddei-flow-left"></use>
+          </svg>
+          <div class="change-point-type-text">
+            {{ endPointTypeDataSource[endPointTypeIndex].text }}
+          </div>
+          <svg class="icon-ddei-flow" @click="changePointType(2,1)" aria-hidden="true">
+            <use xlink:href="#icon-ddei-flow-right"></use>
+          </svg>
+        </div>
+      </div>
+
       <div class="row" v-if="model?.bpmnBaseType == 'Activity'">
         <div class="change-bpmn-marker" @click="changeBpmnLabel('isLoop')">
           <div :class="{ 'chk_state': model?.isLoop != 1, 'chk_state_checked': model?.isLoop == 1 }">
@@ -77,7 +134,13 @@ export default {
       dialogId: 'ddei-flow-element-setting-dialog',
       model:null,
       bpmnSubTypeDataSource:null,
-      bpmnSubTypeIndex:-1
+      bpmnSubTypeIndex:-1,
+      startPointTypeDataSource: null,
+      startPointTypeIndex: -1,
+      endPointTypeDataSource: null,
+      endPointTypeIndex: -1,
+      lineTypeDataSource: null,
+      lineTypeIndex: -1
     };
   },
   computed: {},
@@ -106,18 +169,65 @@ export default {
         
         if (this.model) {
           let controlDefine = DDeiEditorUtil.getControlDefine(this.model);
-          let ds = controlDefine.attrDefineMap.get("bpmnSubType")?.dataSource
-          if (ds?.length > 0) {
-            for (let i = 0; i < ds.length; i++) {
-              if (ds[i].value == this.model.bpmnSubType) {
-                this.bpmnSubTypeIndex = i
-                break;
+          {
+            let ds = controlDefine.attrDefineMap.get("bpmnSubType")?.dataSource
+            if (ds?.length > 0) {
+              for (let i = 0; i < ds.length; i++) {
+                if (ds[i].value == this.model.bpmnSubType) {
+                  this.bpmnSubTypeIndex = i
+                  break;
+                }
               }
             }
+            this.bpmnSubTypeDataSource = ds
           }
-          this.bpmnSubTypeDataSource = ds
+          this.refreshPointType()
+          {
+            let ds = controlDefine.attrDefineMap.get("type")?.dataSource
+            if (ds?.length > 0) {
+              let value = this.model.type ? this.model.type : 1
+              for (let i = 0; i < ds.length; i++) {
+                if (ds[i].value == value) {
+                  this.lineTypeIndex = i
+                  break;
+                }
+              }
+            }
+            this.lineTypeDataSource = ds
+          }
         }
 
+      }
+    },
+
+    refreshPointType(){
+      let controlDefine = DDeiEditorUtil.getControlDefine(this.model);
+      {
+        
+        let ds = controlDefine.attrDefineMap.get("sp.type")?.dataSource
+        if (ds?.length > 0) {
+          let value = this.model.sp?.type ? this.model.sp.type : -1
+          for (let i = 0; i < ds.length; i++) {
+            if (ds[i].value == value) {
+              this.startPointTypeIndex = i
+              break;
+            }
+          }
+        }
+        this.startPointTypeDataSource = ds
+      }
+      {
+        let ds = controlDefine.attrDefineMap.get("ep.type")?.dataSource
+        if (ds?.length > 0) {
+          let value = this.model.ep?.type ? this.model.ep.type : -1
+          for (let i = 0; i < ds.length; i++) {
+            if (ds[i].value == value) {
+              this.endPointTypeIndex = i
+              break;
+            }
+          }
+        }
+        this.endPointTypeDataSource = ds
       }
     },
     /**
@@ -136,6 +246,141 @@ export default {
       } else {
         this.model.bpmnSubType = ds[this.bpmnSubTypeIndex].value
       }
+      if(this.model.bpmnBaseType == 'Sequence'){
+        this.changeLineBySubType()
+      }
+     
+      this.model.render.clearCachedValue()
+      this.model.initPVS()
+      this.model.render.enableRefreshShape()
+      editor.bus.push(DDeiEnumBusCommandType.RefreshShape);
+      editor.bus.executeAll();
+      
+
+    },
+
+    /**
+     * 根据线段的bpmnSubType修改线的样式以及部分选项的范围值
+     */
+    changeLineBySubType(){
+      let subType = this.model.bpmnSubType ? this.model.bpmnSubType : 1
+      delete this.model.sp
+      delete this.model.ep
+      delete this.model.dash
+      switch(subType){
+        case 1: {
+          this.model.ep = { type: 51 }
+          break;
+        }
+        case 2: {
+          this.model.sp = { type: 4 }
+          this.model.ep = { type: 51 }
+          break;
+        }
+        case 3: {
+          this.model.ep = { type: 51 }
+          break;
+        }
+        case 4: {
+          this.model.ep = {
+            type: 5
+          }
+          this.model.sp = {
+            type: 2
+          }
+          this.model.dash = [10, 5]
+          break;
+        }
+        case 5: {
+          this.model.ep = {
+            type: 0
+          }
+          this.model.sp = {
+            type: 0
+          }
+          this.model.dash = [4, 4]
+          break;
+        }
+      }
+      this.refreshPointType()
+    },
+
+    /**
+     * 切换连线类型
+     */
+    changeLineType(delta) {
+      let editor = this.editor
+      let ds = this.lineTypeDataSource
+      this.lineTypeIndex += delta
+      if (this.lineTypeIndex >= ds.length) {
+        this.model.type = ds[0].value
+        this.lineTypeIndex = 0
+      } else if (this.lineTypeIndex == -1) {
+        this.model.type = ds[ds.length - 1].value
+        this.lineTypeIndex = ds.length - 1
+      } else {
+        this.model.type = ds[this.lineTypeIndex].value
+      }
+      this.model.render.clearCachedValue()
+      this.model.initPVS()
+      this.model.render.enableRefreshShape()
+      editor.bus.push(DDeiEnumBusCommandType.RefreshShape);
+      editor.bus.executeAll();
+    },
+
+    /**
+     * 切换点的类型
+     */
+    changePointType(type,delta) {
+      let editor = this.editor
+      //开始点
+      if (type == 1){
+        let ds = this.startPointTypeDataSource
+        this.startPointTypeIndex += delta
+        if (!this.model.sp){
+          this.model.sp = {}
+        }
+        if (this.startPointTypeIndex >= ds.length) {
+          this.model.sp.type = ds[0].value
+          this.startPointTypeIndex = 0
+        } else if (this.startPointTypeIndex == -1) {
+          this.model.sp.type = ds[ds.length - 1].value
+          this.startPointTypeIndex = ds.length - 1
+        } else {
+          this.model.sp.type = ds[this.startPointTypeIndex].value
+        }
+      }
+      //结束点
+      else if(type == 2){
+        let ds = this.endPointTypeDataSource
+        this.endPointTypeIndex += delta
+        if (!this.model.ep) {
+          this.model.ep = {}
+        }
+        if (this.endPointTypeIndex >= ds.length) {
+          this.model.ep.type = ds[0].value
+          this.endPointTypeIndex = 0
+        } else if (this.endPointTypeIndex == -1) {
+          this.model.ep.type = ds[ds.length - 1].value
+          this.endPointTypeIndex = ds.length - 1
+        } else {
+          this.model.ep.type = ds[this.endPointTypeIndex].value
+        }
+      }
+     
+      this.model.initPVS()
+      this.model.render.enableRefreshShape()
+      editor.bus.push(DDeiEnumBusCommandType.RefreshShape);
+      editor.bus.executeAll();
+    },
+
+    /**
+     * 交换起点和终点
+     */
+    exchangePoints(){
+      let editor = this.editor
+      this.model.exchangeStartAndEnd();
+      this.model.render.enableRefreshShape()
       editor.bus.push(DDeiEnumBusCommandType.RefreshShape);
       editor.bus.executeAll();
     },
@@ -168,8 +413,10 @@ export default {
   border: 1px solid var(--panel-border); 
   box-shadow: 0px 2px 24px 0px hsl(0deg 0% 0% /0.25); 
   border-radius: 6px;
+  color: black;
 
   .content {
+    
     width: 100%;
     height: 100%;
     overflow-y: auto;
@@ -186,7 +433,9 @@ export default {
       width:100%;
       &:hover{
         background: rgb(230, 228, 228);
+        cursor: pointer;
       }
+
       .icon-ddei-flow{
         opacity: 0.5;
         &:hover{
@@ -245,7 +494,53 @@ export default {
           }
       }
 
-      
+      .quick-button{
+        height: 20px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .icon{
+          width: 14px;
+          height: 14px;
+          opacity: 0.5;
+          
+          &:hover {
+            opacity: 1.0;
+          }
+        }
+        &-text{
+          margin-right:5px;
+          color:black;
+          font-size: 12px;
+        }
+        
+      }
+
+
+      .change-point-type {
+        height: 20px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .icon-ddei-flow {
+          width: 14px;
+          height: 14px;
+        }
+
+        &-title {
+          margin-right: 5px;
+          color: black;
+          font-size: 12px;
+        }
+        &-text {
+          color: black;
+          font-size: 12px;
+        }
+
+      }
     }
     
   }
