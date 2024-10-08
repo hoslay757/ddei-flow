@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "7123637",
+      "name": "sequence",
+      "font_class": "sequence",
+      "unicode": "e78e",
+      "unicode_decimal": 59278
+    },
+    {
+      "icon_id": "7123721",
+      "name": "comment",
+      "font_class": "comment",
+      "unicode": "e7b1",
+      "unicode_decimal": 59313
+    },
+    {
+      "icon_id": "38889245",
+      "name": "group",
+      "font_class": "group",
+      "unicode": "e608",
+      "unicode_decimal": 58888
+    },
+    {
       "icon_id": "39182011",
       "name": "资源 415",
       "font_class": "lock",

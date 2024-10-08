@@ -18,9 +18,9 @@ export default {
   methods:{
     refreshDragState(type){
       if (type == 1){
-        this.$refs['divElement'].style.border = "1px solid green"
+        this.$refs['rectSvg'].children[0].style.stroke = "green"
       }else{
-        this.$refs['divElement'].style.border = ""
+        this.$refs['rectSvg'].children[0].style.stroke = ""
       }
     }
   }
@@ -28,7 +28,7 @@ export default {
 </script>
 <template>
   <div ref="divElement" class="ddei-flow-bpmn-viewer-group">
-    <svg class="border-svg">
+    <svg class="border-svg" ref="rectSvg">
       <rect rx="10" ry="10" width="100%" height="100%" x="0" y="0"></rect>
     </svg>
     <div v-if="model?.name" :class="{ 'title': !model.isExpand, 'title-expand': model.isExpand }">
@@ -64,7 +64,7 @@ export default {
     height:100%;
     rect{
       fill: none;
-      stroke: black;
+      stroke: var(--borderColor);
       stroke-width: 2px;
       stroke-dasharray: 10,5,1,5;
     }

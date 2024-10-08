@@ -12,8 +12,11 @@ export default {
   define: {
     bpmnBaseType: 'Activity',
     bpmnType: 'SubProcess',
-    width: 110,
-    height: 70,
+    width: 300,
+    height: 200,
+    otherWidth: 110,
+    otherHeight: 70,
+    isExpand:1,
     border:{
       round:5
     },
@@ -79,22 +82,34 @@ export default {
   filters:{
     LINE_OBI_FILTER: (model, param) => {
       let line = param.line
-      let distLinks = line.stage.getDistModelLinks(line.id);
-      let includeModels = getIncludeModels(model)
-      //如果线的开始点和结束点之一是本subprocess，则作为障碍物
-      for (let i = 0; i < distLinks.length;i++){
-        if (!distLinks[i].disabled){
-          if(distLinks[i].sm == model){
-            return true;
-          } 
-          //如果线的开始和结束节点之一是subprocess的子元素，则本subprocess不作为寻路障碍物
-          else if (includeModels.indexOf(distLinks[i].sm) != -1){
-            return false
+      if (line) {
+        let distLinks = line.stage.getDistModelLinks(line.id);
+        if (distLinks) {
+          let len = distLinks.length
+          let includeModels = getIncludeModels(model)
+          //如果线的开始点和结束点之一是本subprocess，则作为障碍物
+          for (let i = 0; i < len; i++) {
+            if (!distLinks[i].disabled) {
+              if (distLinks[i].sm == model) {
+                return true;
+              }
+              //如果线的开始和结束节点之一是subprocess的子元素，则本subprocess不作为寻路障碍物
+              else if (includeModels.indexOf(distLinks[i].sm) != -1) {
+                return false
+              }
+            }
+          }
+        }
+      } else {
+        let otherModel = param.model
+        if (otherModel) {
+          let subprocessIncludeModels = getIncludeModels(otherModel)
+          if (subprocessIncludeModels.indexOf(model) != -1) {
+            return false;
           }
         }
       }
 
-     
       return true
     }
   },

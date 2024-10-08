@@ -16,18 +16,18 @@ class DDeiFlow extends DDeiPluginBase {
       //覆盖
       rewrite: {
         currentLayout: "ddei-core-layout-simple",
-        config: {
-          initData: {
-            controls:
-              [
-                {
-                  id: "start",
-                  model: "1000001",
-                  offsetY: -150
-                }
-              ]
-          }
-        }
+        // config: {
+        //   initData: {
+        //     controls:
+        //       [
+        //         {
+        //           id: "start",
+        //           model: "1000001",
+        //           offsetY: -150
+        //         }
+        //       ]
+        //   }
+        // }
       },
       //追加
       append: {
@@ -38,7 +38,7 @@ class DDeiFlow extends DDeiPluginBase {
             direct: 1,//方向，1纵向，2横向
             position: 8,//位置1-9顺时针，1为左上角，9为中心
             drag: 1,//是否允许拖拽位置
-            chooseCreate: 1,//是否在选择控件时创建一个控件
+            dragCreate: 1,//是否在选择控件时创建一个控件
             groups: [
               {
                 editMode: 1,
@@ -48,11 +48,11 @@ class DDeiFlow extends DDeiPluginBase {
           </svg>`
               },
               {
-                editMode: 2,
-                desc: "平移画布",
-                icon: `<svg class="icon" style="width: 28px; height: 28px;margin-left:-1px;margin-top:2px; " aria-hidden="true">
-            <use xlink: href = "#icon-a-ziyuan431">< /use>
-          </svg>`
+                editMode: 4,
+                desc: "连线",
+                controls: [
+                  "1000601"
+                ]
               },
               {
                 controls: [
@@ -89,20 +89,19 @@ class DDeiFlow extends DDeiPluginBase {
                 ]
               },
               {
+                editMode: 2,
+                desc: "注释",
+                icon: `<svg class="icon-ddei-flow" style="width: 28px; height: 28px;margin-left:-1px;margin-top:2px; " aria-hidden="true">
+                      <use xlink:href = "#icon-ddei-flow-comment">< /use>
+                    </svg>`
+              },
+              {
                 controls: [
                   "1000501",
                   "1000504",
                   "1000505",
                   "103010",
                   "103011"
-                ]
-              },
-
-              {
-                editMode: 4,
-                desc: "连线",
-                controls: [
-                  "1000601"
                 ]
               }
             ]

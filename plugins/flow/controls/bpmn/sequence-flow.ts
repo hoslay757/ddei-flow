@@ -10,7 +10,7 @@ export default {
     bpmnBaseType: 'Sequence',
     bpmnSubType: 1,
     ep: {
-      type: 1
+      type: 51
     },
     pvs: [
       { x: -75, y: 0, z: 1 },
@@ -20,6 +20,7 @@ export default {
     cpv: {
       x: 0, y: 0
     },
+    
     //组合控件
     composes: [
       {
@@ -109,5 +110,9 @@ export default {
         },
       ]
     }
-  }
+  },
+  icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-sequence"></use>
+      </svg>`
+  
 }

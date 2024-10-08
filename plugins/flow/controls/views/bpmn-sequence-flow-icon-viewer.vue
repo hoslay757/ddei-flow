@@ -34,14 +34,16 @@ export default {
     refreshView(model,vNode,tempShape,composeRender){
       //获取线段的属性
       let lineModel = this.model.pModel;
+      if(lineModel){
       this.type = lineModel.bpmnSubType
       if (this.type) {
 
-        let color = lineModel.render.getCachedValue("color")
-        if (!color) {
-          color = DDeiUtil.getStyleValue("canvas-control-border", this.editor.ddInstance);
+          let color = lineModel.render?.getCachedValue("color")
+          if (!color) {
+            color = DDeiUtil.getStyleValue("canvas-control-border", this.editor.ddInstance);
+          }
+          this.lineWidth = lineModel.render?.getCachedValue("width")
         }
-        this.lineWidth = lineModel.render.getCachedValue("width")
       }
     }
   }

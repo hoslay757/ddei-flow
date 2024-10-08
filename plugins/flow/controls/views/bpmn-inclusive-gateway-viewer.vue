@@ -37,6 +37,7 @@ export default {
     
     width: calc(100% - 1px);
     height:calc(100% - 1px);
+    fill: var(--borderColor);
   }
   
 }

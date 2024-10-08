@@ -463,7 +463,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
     let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
     if (editor) {
       //如果存在选中控件，则不处理
-      if (editor.ddInstance.stage.selectedModels.size > 0) {
+      if (editor.ddInstance.stage.selectedModels?.size > 0) {
         return;
       }
       let settingBtnEle = document.getElementById(editor.id + "_ddei-flow-setting-button-dialog");
