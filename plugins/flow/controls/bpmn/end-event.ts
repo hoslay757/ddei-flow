@@ -12,7 +12,7 @@ export default {
     width: 40,
     height: 40,
     bpmnBaseType: 'Event',
-    bpmntype:"EndEvent",
+    bpmnType:"EndEvent",
     bpmnSubType: 1,
     ext: {
       attrs: [

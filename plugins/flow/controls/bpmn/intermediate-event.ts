@@ -14,7 +14,7 @@ export default {
     height: 40,
     bpmnBaseType: 'Event',
     bpmnSubType: 1,
-    bpmntype: 'IntermediateEvent',
+    bpmnType: 'IntermediateEvent',
     ext: {
       attrs: [
         {

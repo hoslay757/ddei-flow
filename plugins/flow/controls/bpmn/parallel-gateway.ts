@@ -11,6 +11,8 @@ export default {
   define: {
     width: 50,
     height: 50,
+    bpmnBaseType: 'Gateway',
+    bpmnType: 'ParallelGateway',
     ext:{
       sample: {
         eqrat: true

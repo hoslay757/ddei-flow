@@ -112,6 +112,14 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
   controlCreateBefore(operateType, data, ddInstance, evt){
     if (ddInstance && ddInstance["AC_DESIGN_EDIT"]) {
       if (data.models?.length > 0) {
+        let toolBoxs = document.getElementsByClassName("ddei-core-panel-toolbox-simple")
+        for (let i = 0; i < toolBoxs.length; i++) {
+          toolBoxs[i].style.display = "none"
+        }
+        let topMenus = document.getElementsByClassName("ddei-core-panel-topmenu-simple")
+        for (let i = 0; i < topMenus.length; i++) {
+          topMenus[i].style.display = "none"
+        }
         this.dragModels = data.models        
         this.resetSubProcesses(data, ddInstance);
       }
@@ -182,6 +190,14 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
       if (data.models?.length > 0){
         
         
+        let toolBoxs = document.getElementsByClassName("ddei-core-panel-toolbox-simple")
+        for (let i = 0; i < toolBoxs.length; i++) {
+          toolBoxs[i].style.display = "none"
+        }
+        let topMenus = document.getElementsByClassName("ddei-core-panel-topmenu-simple")
+        for (let i = 0; i < topMenus.length; i++) {
+          topMenus[i].style.display = "none"
+        }
 
         //如果拖拽的为subProcess，将其includeModels也纳入拖放范围
         this.dragModels = [...data.models]
@@ -206,7 +222,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
   resetSubProcesses(data, ddInstance){
     let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
     //计算editor.desigingSubProecsses
-    let layer = data.models[0].layer;
+    let layer = data.models[0].layer ? data.models[0].layer : editor.ddInstance.stage.layers[editor.ddInstance.stage.layerIndex];
     let subModels = layer.getSubModels(null, 20)
     editor.desigingSubProecsses = []
     subModels?.forEach(mds => {
@@ -224,6 +240,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
       }
       return 0
     })
+    
   }
 
   modelsToTreeRoot(models:DDeiAbstractShape[],stage){
@@ -322,7 +339,6 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
     if (ddInstance && ddInstance["AC_DESIGN_EDIT"]) {
       let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
       if (editor.desigingSubProecsses?.length > 0 && this.dragModels?.length > 0) {
-        //比较被拖拽的对象是否位于desigingSubProecsses中，如果是则变色
         let dragContainerModel = null;
         let model = this.dragModels[0]
         let stage = model.stage;
@@ -406,6 +422,14 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
         editor.bus.executeAll();
         this.dragModels = null
 
+      }
+      let toolBoxs = document.getElementsByClassName("ddei-core-panel-toolbox-simple")
+      for (let i = 0; i < toolBoxs.length; i++) {
+        toolBoxs[i].style.display = ""
+      }
+      let topMenus = document.getElementsByClassName("ddei-core-panel-topmenu-simple")
+      for (let i = 0; i < topMenus.length; i++) {
+        topMenus[i].style.display = ""
       }
     }
   }

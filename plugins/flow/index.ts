@@ -1,5 +1,5 @@
 import DDeiFlowControls from "./controls";
-import { DDeiPluginBase, DDeiEditor, DDeiUtil, DDeiCoreToolboxSimplePanel } from "ddei-editor";
+import { DDeiPluginBase, DDeiEditor, DDeiUtil, DDeiCoreToolboxSimplePanel, DDeiCoreTopMenuSimplePanel } from "ddei-editor";
 import DDeiFlowLifeCycles from "./lifecycle"
 import DDeiFlowDialogs from "./dialogs"
 import { DDeiEditorUtil, DDeiExtSearch, DDeiExtQuickControl } from "ddei-editor"
@@ -15,19 +15,7 @@ class DDeiFlow extends DDeiPluginBase {
     initConfig: {
       //覆盖
       rewrite: {
-        currentLayout: "ddei-core-layout-simple",
-        // config: {
-        //   initData: {
-        //     controls:
-        //       [
-        //         {
-        //           id: "start",
-        //           model: "1000001",
-        //           offsetY: -150
-        //         }
-        //       ]
-        //   }
-        // }
+        currentLayout: "ddei-core-layout-simple"
       },
       //追加
       append: {
@@ -105,6 +93,11 @@ class DDeiFlow extends DDeiPluginBase {
                 ]
               }
             ]
+          }),
+          DDeiCoreTopMenuSimplePanel.configuration({
+            direct: 2,//方向，1纵向，2横向
+            position: 2,//位置1-9顺时针，1为左上角，9为中心
+            drag: 1,//是否允许拖拽位置
           })
         ]
       }
@@ -179,6 +172,10 @@ class DDeiFlow extends DDeiPluginBase {
     DDeiEditorUtil.lineInitJSON = {
       modelCode: "1000601",
     };
+    DDeiEditorUtil.getLineInitJSON = this.createGetLineInitJSONProxy(DDeiEditorUtil.getLineInitJSON, editor)
+    DDeiUtil.getLineInitJSON = DDeiEditorUtil.getLineInitJSON
+    DDeiEditorUtil.getModelInitJSON = this.createGetModelInitJSONProxy(DDeiEditorUtil.getModelInitJSON, editor)
+    DDeiUtil.getModelInitJSON = DDeiEditorUtil.getModelInitJSON
   }
 
 
@@ -210,6 +207,67 @@ class DDeiFlow extends DDeiPluginBase {
         }
       }
       return hidden
+    };
+  }
+
+  createGetLineInitJSONProxy(originalFunc) {
+    return function proxy() {
+      let ddInstance = arguments[0]
+      let smodel = arguments[1]
+      let emodel = arguments[2]
+      if (ddInstance && smodel?.id && emodel?.id){
+        let startModel = ddInstance.stage.getModelById(smodel.id);
+        let endModel = ddInstance.stage.getModelById(emodel.id);
+        if (startModel){
+          //验证：1.开始连开始
+          if (startModel.bpmnType == "StartEvent") {
+            if (endModel.bpmnType == "StartEvent") {
+              return null
+            }
+          }
+          else if (startModel.bpmnType == "EndEvent") {
+            if (endModel.bpmnType == "EndEvent") {
+              return null
+            }
+          }
+          //判断补偿和默认
+          
+          if ((startModel.bpmnType == 'EndEvent' && startModel.bpmnSubType == 7) 
+          || (startModel.bpmnType == 'IntermediateEvent' && (startModel.bpmnSubType == 28 || startModel.bpmnSubType == 29))
+            ||  (startModel.bpmnType == 'StartEvent' && startModel.bpmnSubType == 17) 
+          ) {
+            return {
+              modelCode: "1000601",
+              bpmnSubType: 5,
+              dash :[4, 4],
+              ep: { type: 1 }
+            }
+          }
+        }
+        
+      }
+      return originalFunc.apply(this, arguments);
+    };
+  }
+
+  createGetModelInitJSONProxy(originalFunc) {
+    return function proxy() {
+      let ddInstance = arguments[0]
+      let model = arguments[1]
+      let createControls = arguments[2]
+      if (ddInstance && model && createControls?.length > 0){
+        if ((model.bpmnType == 'EndEvent' && model.bpmnSubType == 7)
+          || (model.bpmnType == 'IntermediateEvent' && (model.bpmnSubType == 28 || model.bpmnSubType == 29))
+          || (model.bpmnType == 'StartEvent' && model.bpmnSubType == 17)
+        ) {
+          //增加补偿标志
+          createControls.forEach(c=>{
+            c.isCompensation = 1
+          });
+          return createControls;
+        }
+      }
+      return originalFunc.apply(this, arguments);
     };
   }
 
