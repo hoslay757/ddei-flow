@@ -18,28 +18,28 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
     return this.mouseMoveInControl(operateType, data, ddInstance, evt)
   });
 
-  EVENT_MOUSE_OPERATING: DDeiFuncData | null = new DDeiFuncData("ddei-flow-hidden-eles", 1, (operateType, data, ddInstance, evt) => { this.hiddenTempElements(operateType, data, ddInstance, evt) });
+  EVENT_MOUSE_OPERATING: DDeiFuncData | null = new DDeiFuncData("ddei-flow-hidden-eles", 1, (operateType, data, ddInstance, evt) => { return this.hiddenTempElements(operateType, data, ddInstance, evt) });
 
+  EVENT_CONTROL_DRAGING: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-draging", 1, (operateType, data, ddInstance, evt) => { return this.controlDraging(operateType, data, ddInstance, evt) });
 
-  EVENT_CONTROL_DRAGING: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-draging", 1, (operateType, data, ddInstance, evt) => { this.controlDraging(operateType, data, ddInstance, evt) });
+  EVENT_CONTROL_DRAG_AFTER: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-drag-after", 1, (operateType, data, ddInstance, evt) => { return this.controlDragAfter(operateType, data, ddInstance, evt) });
 
-  EVENT_CONTROL_DRAG_AFTER: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-drag-after", 1, (operateType, data, ddInstance, evt) => { this.controlDragAfter(operateType, data, ddInstance, evt) });
+  EVENT_CONTROL_CREATE_AFTER: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-create-after", 1, (operateType, data, ddInstance, evt) => { return this.controlCreateAfter(operateType, data, ddInstance, evt) });
 
-  EVENT_CONTROL_CREATE_AFTER: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-create-after", 1, (operateType, data, ddInstance, evt) => { this.controlCreateAfter(operateType, data, ddInstance, evt) });
+  EVENT_CONTROL_CREATE_BEFORE: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-create-before", 1, (operateType, data, ddInstance, evt) => { return this.controlCreateBefore(operateType, data, ddInstance, evt) });
 
-  EVENT_CONTROL_CREATE_BEFORE: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-create-before", 1, (operateType, data, ddInstance, evt) => { this.controlCreateBefore(operateType, data, ddInstance, evt) });
+  EVENT_COPY_BEFORE: DDeiFuncData | null = new DDeiFuncData("ddei-flow-copy-before", 1, (operateType, data, ddInstance, evt) => { return this.controlCopyBefore(operateType, data, ddInstance, evt) });
 
-  EVENT_COPY_BEFORE: DDeiFuncData | null = new DDeiFuncData("ddei-flow-copy-before", 1, (operateType, data, ddInstance, evt) => { this.controlCopyBefore(operateType, data, ddInstance, evt) });
+  EVENT_CONTROL_DRAG_BEFORE: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-drag-before", 1, (operateType, data, ddInstance, evt) => { return this.controlDragBefore(operateType, data, ddInstance, evt) });
 
-  EVENT_CONTROL_DRAG_BEFORE: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-drag-before", 1, (operateType, data, ddInstance, evt) => { this.controlDragBefore(operateType, data, ddInstance, evt) });
+  EVENT_CONTROL_ROTATE_BEFORE: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-rotate-before", 1, (operateType, data, ddInstance, evt) => { return this.controlDragBefore(operateType, data, ddInstance, evt) });
 
+  EVENT_CLOSE_FILE_AFTER: DDeiFuncData | null = new DDeiFuncData("ddei-flow-hidden-eles", 1, (operateType, data, ddInstance, evt) => { return this.hiddenTempElements(operateType, data, ddInstance, evt) });
 
-  EVENT_CONTROL_ROTATE_BEFORE: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-rotate-before", 1, (operateType, data, ddInstance, evt) => { this.controlDragBefore(operateType, data, ddInstance, evt) });
+  EVENT_CONTROL_DEL_AFTER: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-del-after", 1, (operateType, data, ddInstance, evt) => { return this.controlDelAfter(operateType, data, ddInstance, evt) });
 
-  EVENT_CLOSE_FILE_AFTER: DDeiFuncData | null = new DDeiFuncData("ddei-flow-hidden-eles", 1, (operateType, data, ddInstance, evt) => { this.hiddenTempElements(operateType, data, ddInstance, evt) });
-
-  EVENT_CONTROL_DEL_AFTER: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-del-after", 1, (operateType, data, ddInstance, evt) => { this.controlDelAfter(operateType, data, ddInstance, evt) });
-
+  EVENT_CONTROL_SELECT_BEFORE: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-select-before", 1, (operateType, data, ddInstance, evt) => { return this.controlSelectBefore(operateType, data, ddInstance, evt) });
+  
 
   dragModels :DDeiAbstractShape[]|null = null
   /**
@@ -470,13 +470,29 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
   mouseMoveInControl(operate, data, ddInstance, evt) {
     //循环每个models，验证是否为本插件的控件，只有本插件的控件才响应
     let models = data?.models
-    for (let i = 0; i < models?.length; i++) {
-      if (models[i]) {
-        let data1 = clone(data)
-        data1.model = models[i]
-        let rs = showSettingButton(operate, data1, ddInstance, evt)
-        if (rs && (rs.state == 2 || rs.state == -2)) {
-            break;
+    if (models?.length > 0){
+      let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
+      if (editor.tempChooseCallActivity) {
+        if (models[0] != editor.tempChooseCallActivity && editor.tempCallActivity != models[0]) {
+          // if (models[0].id != editor.tempChooseCallActivity.id && (models[0].bpmnBaseType == 'Activity' || models[0].bpmnBaseType == 'Event')){
+            editor.tempCallActivity?.render?.clearCachedValue();
+            editor.tempCallActivity = models[0]
+            models[0].render.setCachedValue("border.color", "blue")
+            editor.bus.push("refresh-shape");
+            editor.bus.executeAll();
+          // }
+        }
+      }else{
+        for (let i = 0; i < models.length; i++) {
+          if (models[i]) {
+            //选择调用控件
+            let data1 = clone(data)
+            data1.model = models[i]
+            let rs = showSettingButton(operate, data1, ddInstance, evt)
+            if (rs && (rs.state == 2 || rs.state == -2)) {
+                break;
+            }
+          }
         }
       }
     }
@@ -486,6 +502,10 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
     //循环每个models，验证是否为本插件的控件，只有本插件的控件才响应
     let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
     if (editor) {
+      if (editor.tempCallActivity){
+        editor.tempCallActivity.render.clearCachedValue();
+        delete editor.tempCallActivity
+      }
       //如果存在选中控件，则不处理
       if (editor.ddInstance.stage.selectedModels?.size > 0) {
         return;
@@ -521,6 +541,31 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
 
     DDeiEditorUtil.closeDialog(editor, 'ddei-flow-setting-button-dialog')
     DDeiEditorUtil.closeDialog(editor, 'ddei-flow-element-setting-dialog')
+    return result;
+  }
+
+  controlSelectBefore(operateType, data, ddInstance, evt): DDeiFuncCallResult {
+    let result = new DDeiFuncCallResult()
+    result.state = 1
+    let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
+    
+    if (editor.tempChooseCallActivity) {
+      if (editor.tempCallActivity){
+        editor.tempChooseCallActivity.activityId = editor.tempCallActivity.id
+        editor.tempChooseCallActivity.destroyRender();
+        editor.tempChooseCallActivity.initRender()
+      }
+      editor.tempCallActivity?.render?.clearCachedValue();
+      delete editor.tempCallActivity
+      delete editor.tempChooseCallActivity
+      
+      
+
+      editor.bus.push(DDeiEnumBusCommandType.RefreshShape);
+      editor.bus.executeAll();
+
+      result.state = -1
+    }
     return result;
   }
 

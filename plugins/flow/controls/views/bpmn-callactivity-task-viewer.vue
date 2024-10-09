@@ -15,18 +15,69 @@ export default {
     }
   },
 
+  methods:{
+    refreshView(model, vNode, tempShape, composeRender){
+      if(this.model.activityId){
+        if (this.model.upActivityId != this.model.activityId){
+          this.model.upActivityId = this.model.activityId
+          //获取另一个元素的控件
+          let viewModel = this.model.stage.getModelById(this.model.activityId)
+          if (viewModel){
+            viewModel = this.getCallActivityTask(viewModel)
+            
+            this.$refs['viewDiv'].innerHTML = "加载中"
+            setTimeout(() => {
+              this.editor.flow.toImage([viewModel]).then(html => {
+                if (html) {
+                  this.$refs['viewDiv'].innerHTML = ""
+                  this.$refs['viewDiv'].style.backgroundImage = 'url(' + html + ')'
+                }
+              })
+            }, 30);
+            
+          }
+        }
+      }
+    },
+
+    getCallActivityTask(model){
+      if (model.bpmnType == 'CallActivityTask') {
+        if (model.activityId){
+          let viewModel = this.model.stage.getModelById(model.activityId)
+          if (viewModel) {
+            model = this.getCallActivityTask(viewModel)
+          }
+        }
+      }
+      return model
+    }
+  }
+
   
 };
 </script>
 <template>
   <div ref="divElement" class="ddei-flow-bpmn-viewer-callactivity-task">
-    <div class="title">
-      <svg class="icon-ddei-flow" aria-hidden="true">
-        <use xlink:href="#icon-ddei-flow-call-activity"></use>
-      </svg>
+    <div v-if="!model || !model.activityId" class="title">
       <div class="text">
-        {{ model.name ? model.name : "调用活动" }}
+        {{ "调用" }}
       </div>
+    </div>
+    <div v-if="model?.activityId" ref="viewDiv" class="view">
+    </div>
+    <div class="markers">
+      <svg class="icon-ddei-flow" v-if="model.isLoop == 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-loop-marker"></use>
+      </svg>
+      <svg class="icon-ddei-flow" v-if="model.multiInstance == 1 && model.isParallel != 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-sequential-mi-marker"></use>
+      </svg>
+      <svg class="icon-ddei-flow" v-if="model.multiInstance == 1 && model.isParallel == 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-parallel-mi-marker"></use>
+      </svg>
+      <svg class="icon-ddei-flow" v-if="model.isCompensation == 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-compensation-marker"></use>
+      </svg>
     </div>
   </div>
 </template>
@@ -70,6 +121,27 @@ export default {
       text-overflow: ellipsis;
     }
 
+  }
+  .view {
+    height: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% 100%;
+  }
+  .markers {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    width: 100%;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .icon-ddei-flow {
+      width: 18px;
+      height: 18px;
+    }
   }
 }
 </style>

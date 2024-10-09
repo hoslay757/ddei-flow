@@ -7,6 +7,10 @@
         @mouseenter="settingMouseEnter($el)" @mouseleave="settingMouseEnterLeave($el)" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-setting"></use>
       </svg>
+      <svg class="icon-ddei-flow" v-if="model?.bpmnType == 'CallActivityTask'" @mousedown="startChooseActivity($el)"
+        aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-link"></use>
+      </svg>
       <svg class="icon-ddei-flow" v-if="model?.bpmnType == 'SubProcess' || model?.bpmnType == 'Group'"
         @click="expandOrNotSubProcess()" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-sub-process-marker"></use>
@@ -29,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import { DDeiEditorUtil, DDeiUtil, DDeiConfig, DDeiLink, DDeiAbstractShape } from "ddei-editor";
+import { DDeiEditorUtil, DDeiUtil, DDeiConfig, DDeiLink, DDeiAbstractShape, DDeiEditorState } from "ddei-editor";
 import DialogBase from "./dialog"
 import { Matrix3, Vector3 } from "three"
 import { getIncludeModels } from "../controls/util"
@@ -63,6 +67,9 @@ export default {
   },
   methods: {
 
+    startChooseActivity(evt){
+      this.editor.tempChooseCallActivity = this.model
+    },
     forceRefreshView: function () {
       this.forceRefresh = false
       this.$nextTick(() => {
@@ -285,7 +292,6 @@ export default {
               let id = "_" + DDeiUtil.getUniqueCode()
               model.exPvs[id] = new Vector3(projPoint.x, projPoint.y, 1)
               
-              // debugger
               model.exPvs[id].rate = projPoint.rate
               model.exPvs[id].sita = projPoint.sita
               model.exPvs[id].index = projPoint.index

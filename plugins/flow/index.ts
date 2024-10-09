@@ -2,7 +2,9 @@ import DDeiFlowControls from "./controls";
 import { DDeiPluginBase, DDeiEditor, DDeiUtil, DDeiCoreToolboxSimplePanel, DDeiCoreTopMenuSimplePanel } from "ddei-editor";
 import DDeiFlowLifeCycles from "./lifecycle"
 import DDeiFlowDialogs from "./dialogs"
-import { DDeiEditorUtil, DDeiExtSearch, DDeiExtQuickControl } from "ddei-editor"
+import DDeiFlowHotkeys from "./hotkeys";
+import DDeiFlowAPI from "./apis/api";
+import { DDeiEditorUtil, DDeiExtSearch, DDeiExtQuickControl, DDeiConfig } from "ddei-editor"
 
 class DDeiFlow extends DDeiPluginBase {
   type: string = "package"
@@ -104,6 +106,8 @@ class DDeiFlow extends DDeiPluginBase {
     }
   });
 
+  hotkeys: object = DDeiFlowHotkeys;
+
   controls: object = DDeiFlowControls;
 
   lifecycles: object = DDeiFlowLifeCycles;
@@ -166,6 +170,14 @@ class DDeiFlow extends DDeiPluginBase {
     }
   }
 
+  getHotKeys(editor) {
+    if (DDeiPluginBase.isSubclass(this.hotkeys, DDeiPluginBase)) {
+      return this.hotkeys.defaultIns.getHotKeys(editor);
+    } else if (this.hotkeys instanceof DDeiPluginBase) {
+      return this.hotkeys.getHotKeys(editor);
+    }
+  }
+
   installed(editor: DDeiEditor) {
     //复写判定隐藏的方法，增加subprocess的情况
     DDeiUtil.isModelHidden = this.createModelHiddenProxy(DDeiUtil.isModelHidden)
@@ -176,6 +188,10 @@ class DDeiFlow extends DDeiPluginBase {
     DDeiUtil.getLineInitJSON = DDeiEditorUtil.getLineInitJSON
     DDeiEditorUtil.getModelInitJSON = this.createGetModelInitJSONProxy(DDeiEditorUtil.getModelInitJSON, editor)
     DDeiUtil.getModelInitJSON = DDeiEditorUtil.getModelInitJSON
+
+    editor.flow = new DDeiFlowAPI(editor)
+    DDeiConfig.SERI_FIELDS['AbstractShape'].SKIP.push("upActivityId")
+    DDeiConfig.SERI_FIELDS['AbstractShape'].SKIP2.push("upActivityId")
   }
 
 
@@ -285,6 +301,7 @@ class DDeiFlow extends DDeiPluginBase {
 
 export * from "./controls"
 export * from "./lifecycle"
-
+export * from "./hotkeys"
+export * from "./apis/api"
 export { DDeiFlow }
 export default DDeiFlow;
