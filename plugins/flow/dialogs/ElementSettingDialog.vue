@@ -70,7 +70,14 @@
           </svg>
         </div>
       </div>
-
+      <div class="row" v-if="model?.bpmnType == 'CallActivityTask'">
+        <div class="change-bpmn-marker" @click="changeBpmnLabel('displayView')">
+          <div :class="{ 'chk_state': model?.displayView != 1, 'chk_state_checked': model?.displayView == 1 }">
+            <span>{{ model?.displayView == 1 ? '✓' : '' }}</span>
+          </div>
+          预览
+        </div>
+      </div>
       <div class="row" v-if="model?.bpmnBaseType == 'Activity'">
         <div class="change-bpmn-marker" @click="changeBpmnLabel('isLoop')">
           <div :class="{ 'chk_state': model?.isLoop != 1, 'chk_state_checked': model?.isLoop == 1 }">
@@ -395,6 +402,7 @@ export default {
       }else{
         this.model[label] = 0
       }
+      delete this.model.upActivityId
       
       editor.bus.push(DDeiEnumBusCommandType.RefreshShape);
       editor.bus.executeAll();

@@ -17,23 +17,27 @@ export default {
 
   methods:{
     refreshView(model, vNode, tempShape, composeRender){
-      if(this.model.activityId){
+      if (this.model.activityId){
         if (this.model.upActivityId != this.model.activityId){
           this.model.upActivityId = this.model.activityId
           //获取另一个元素的控件
           let viewModel = this.model.stage.getModelById(this.model.activityId)
           if (viewModel){
             viewModel = this.getCallActivityTask(viewModel)
-            
-            this.$refs['viewDiv'].innerHTML = "加载中"
-            setTimeout(() => {
-              this.editor.flow.toImage([viewModel]).then(html => {
-                if (html) {
-                  this.$refs['viewDiv'].innerHTML = ""
-                  this.$refs['viewDiv'].style.backgroundImage = 'url(' + html + ')'
-                }
-              })
-            }, 30);
+            if (this.model.displayView){
+              this.$refs['viewDiv'].innerHTML = "加载中"
+              setTimeout(() => {
+                this.editor.flow.toImage([viewModel]).then(html => {
+                  if (html) {
+                    this.$refs['viewDiv'].innerHTML = ""
+                    this.$refs['viewDiv'].style.backgroundImage = 'url(' + html + ')'
+                  }
+                })
+              }, 30);
+            }else{
+              this.$refs['viewDiv'].style.backgroundImage = ""
+              this.$refs['viewDiv'].innerHTML = "<div style='flex:1'>"+(viewModel.name ? viewModel.name : viewModel.code ? viewModel.code : viewModel.id)+"</div>"
+            }
             
           }
         }
@@ -59,7 +63,7 @@ export default {
 <template>
   <div ref="divElement" class="ddei-flow-bpmn-viewer-callactivity-task">
     <div v-if="!model || !model.activityId" class="title">
-      <div class="text">
+      <div class="text" >
         {{ "调用" }}
       </div>
     </div>
@@ -123,10 +127,26 @@ export default {
 
   }
   .view {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--fontColor);
+    font-family: var(--fontFamily);
+    font-size: var(--fontSize);
+    font-style: var(--fontStyle);
+    font-weight: var(--fontWeight);
+    text-decoration: var(--textDecoration);
     height: 100%;
     background-repeat: no-repeat;
     background-position: center;
     background-size: 100% 100%;
+    .text {
+      flex: 1;
+      white-space: nowrap;
+      padding: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
   .markers {
     position: absolute;

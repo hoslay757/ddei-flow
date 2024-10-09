@@ -474,13 +474,13 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
       let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
       if (editor.tempChooseCallActivity) {
         if (models[0] != editor.tempChooseCallActivity && editor.tempCallActivity != models[0]) {
-          // if (models[0].id != editor.tempChooseCallActivity.id && (models[0].bpmnBaseType == 'Activity' || models[0].bpmnBaseType == 'Event')){
+          if (models[0].id != editor.tempChooseCallActivity.id && (models[0].bpmnBaseType == 'Activity' || models[0].bpmnBaseType == 'Event')){
             editor.tempCallActivity?.render?.clearCachedValue();
             editor.tempCallActivity = models[0]
             models[0].render.setCachedValue("border.color", "blue")
             editor.bus.push("refresh-shape");
             editor.bus.executeAll();
-          // }
+          }
         }
       }else{
         for (let i = 0; i < models.length; i++) {
