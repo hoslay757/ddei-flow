@@ -133,10 +133,11 @@ export default {
       //计算位置，显示按钮div
       let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
       if (editor) {
-        //当前关闭，则展开
+        
         let scaleX = 1, scaleY = 1;
         let targetWidth, targetHeight
         let includeModels = getIncludeModels(model)
+        //当前关闭，则展开
         if (!model.isExpand) {
           //展开当前容器下所有控件大小和坐标
           targetWidth = model.otherWidth ? model.otherWidth : 300
@@ -396,7 +397,7 @@ export default {
       } else {
         let layerModels = layer.getSubModels()
         layerModels.forEach(lm => {
-          if (lm && lm.baseModelType != 'DDeiLine' && !lm.includePModelId) {
+          if (lm && lm.baseModelType != 'DDeiLine' && !lm.includePModelId && lm.id != model.id) {
             curLevelModels.push(lm)
           }
         });
@@ -457,6 +458,8 @@ export default {
         if (!(parentRect.x + 20 <= rect.x && parentRect.x1 - 20 >= rect.x1
           && parentRect.y + 20 <= rect.y && parentRect.y1 - 20 >= rect.y1)) {
           //扩展父控件
+          // let parentScaleX = (parentRect.width+deltaWidth*2) / parentRect.width
+          // let parentScaleY = (parentRect.height + deltaHeight * 2) / parentRect.height
           let parentScaleX = (rect.width + 40) / parentRect.width
           let parentScaleY = (rect.height + 40) / parentRect.height
           //构建缩放矩阵
@@ -492,8 +495,29 @@ export default {
             0, 1, parentSubProcess.cpv.y + (rect.y + rect.height / 2 - parentRect.y - parentRect.height / 2),
             0, 0, 1);
           m1.premultiply(move2Matrix)
+
+          // let move3Matrix = new Matrix3(
+          //   1, 0, deltaWidth,
+          //   0, 1, deltaHeight,
+          //   0, 0, 1);
+          // m1.premultiply(move3Matrix)
           parentSubProcess.transVectors(m1)
+
+          // curLevelModels.forEach(subModel => {
+          //   if (subModel.baseModelType != 'DDeiLine') {
+          //     subModel.transVectors(move3Matrix)
+          //     subModel.updateLinkModels()
+          //   }
+          // });
+          // let includeModels2 = getIncludeModels(model)
+          // includeModels2.forEach(lms => {
+          //   lms.transVectors(move3Matrix)
+          //   lms.updateLinkModels()
+          // });
+          // model.transVectors(move3Matrix)
+          // model.updateLinkModels()
           this.extParentBounds(parentSubProcess, (rect.width + 40) - parentRect.width, (rect.height + 40) - parentRect.height)
+          parentSubProcess.updateLinkModels()
         }
       }
 

@@ -13,7 +13,7 @@ const showSettingButton = function (operate: DDeiEnumOperateType, data: object |
   if (editor) {
     let model = data.model
     //如果存在选中控件，则重新定位到选中控件
-    if (editor.ddInstance.stage.selectedModels.size > 0){
+    if (editor.ddInstance.stage.selectedModels?.size > 0){
       if (!editor.ddInstance.stage.selectedModels.has(model.id)){
         if (editor.ddInstance.stage.selectedModels.size == 1) {
           model = Array.from(editor.ddInstance.stage.selectedModels.values())[0]
