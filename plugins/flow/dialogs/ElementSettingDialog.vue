@@ -402,8 +402,9 @@ export default {
       }else{
         this.model[label] = 0
       }
-      delete this.model.upActivityId
-      
+      if (label == 'displayView'){
+        delete this.model.upActivityId
+      }
       editor.bus.push(DDeiEnumBusCommandType.RefreshShape);
       editor.bus.executeAll();
     }

@@ -78,7 +78,44 @@ const getIncludeModels = function(subProcessModel,modelLinks,first:boolean = tru
   }
 
 
+const getParentModels = function(model){
+  let returnArray = []
+  if (model?.includePModelId){
+    let stage = model.stage
+    let pModel = stage.getModelById(model.includePModelId)
+    returnArray.push(pModel);
+    let pModels = getParentModels(pModel);
+    returnArray.push(...pModels)
+  }
+
+  return returnArray
+  
+}
+
+const updateCallActivityView = function (stage,layer,dragParentActiveIds){
+  let pModels = new Map()
+  //老关系和新关系的所有上级都要检查是否被callactivity引用，如果存在引用，则更新图像
+  dragParentActiveIds.forEach(parentActId => {
+    let pModel = stage.getModelById(parentActId)
+    pModels.set(pModel.id, pModel)
+    let pModelList = getParentModels(pModel)
+    pModelList.forEach(pm => {
+      pModels.set(pm.id, pm)
+    });
+  })
+
+  let subModels = layer.getSubModels(null, 20)
+  subModels.forEach(sm => {
+
+    if (sm.bpmnType == 'CallActivityTask' && pModels.has(sm.upActivityId)) {
+
+      delete sm.upActivityId
+    }
+  });
+}
 
 
 
-export { showSettingButton, getIncludeModels }
+
+
+export { showSettingButton, getIncludeModels, getParentModels, updateCallActivityView }

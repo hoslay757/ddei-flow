@@ -36,7 +36,7 @@
 import { DDeiEditorUtil, DDeiUtil, DDeiConfig, DDeiLink, DDeiAbstractShape, DDeiEditorState } from "ddei-editor";
 import DialogBase from "./dialog"
 import { Matrix3, Vector3 } from "three"
-import { getIncludeModels } from "../controls/util"
+import { getIncludeModels, updateCallActivityView } from "../controls/util"
 
 export default {
   name: "ddei-flow-setting-button-dialog",

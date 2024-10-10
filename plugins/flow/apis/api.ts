@@ -17,7 +17,7 @@ class DDeiFlowAPI {
    * 将模型转换为图片 并返回base64
    * @param models 
    */
-  toImage(models:DDeiAbstractShape[]):Promise{
+  toImage(models:DDeiAbstractShape[],skipMark:boolean = false):Promise{
     return new Promise((resolve, reject) => {
       let imageMap = {}
       let allModels = []
@@ -36,7 +36,7 @@ class DDeiFlowAPI {
       })
       let promiseArr = []
       let ddInstance = this.editor.ddInstance
-      
+      let rat1 = ddInstance?.render.ratio;
       allModels.forEach(model => {
           promiseArr.push(new Promise((resolve, reject) => {
             let loadImage = false
@@ -45,8 +45,16 @@ class DDeiFlowAPI {
               let cloneElements = this.toSimpleSvg(domElement)
               html2canvas(domElement,{
                 useCORS: true,
-                scale: 2,
-                quality: 1
+                scale: rat1,
+                quality: 1,
+                logging:false,
+                // foreignObjectRendering:true,
+                ignoreElements: e=>{
+                  if (e.className == 'markers'){
+                    return true
+                  }
+                  return false
+                },
               }).then(canvas => {
                 imageMap[model.id] = new Image()
                 // 创建一个图片元素
@@ -76,7 +84,7 @@ class DDeiFlowAPI {
       let canvas = document.createElement("canvas")
       
       let outRect = DDeiAbstractShape.getOutRectByPV(allModels);
-      let rat1 = ddInstance?.render.ratio;
+      
       
 
       let width = outRect.width * rat1

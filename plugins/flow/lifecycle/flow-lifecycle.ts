@@ -1,7 +1,7 @@
 import { DDeiAbstractShape,DDeiLifeCycle, DDeiFuncData, DDeiEditorUtil, DDeiUtil, DDeiFuncCallResult, DDeiEditorEnumBusCommandType, DDeiEnumBusCommandType } from "ddei-editor";
 import { clone} from "lodash";
-import { getIncludeModels, showSettingButton } from "../controls/util"
-import { toRaw} from 'vue'
+import { getIncludeModels, showSettingButton, updateCallActivityView } from "../controls/util"
+
 
 class DDeiFlowLifeCycle extends DDeiLifeCycle {
   
@@ -339,6 +339,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
     if (ddInstance && ddInstance["AC_DESIGN_EDIT"]) {
       let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
       if (editor.desigingSubProecsses?.length > 0 && this.dragModels?.length > 0) {
+        let dragParentActiveIds = []
         let dragContainerModel = null;
         let model = this.dragModels[0]
         let stage = model.stage;
@@ -394,6 +395,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
             if (includePModel && includePModel.includeModels.indexOf(id) != -1) {
               includePModel.includeModels.splice(includePModel.includeModels.indexOf(id), 1)
             }
+            dragParentActiveIds.push(dSourceModel.includePModelId)
             delete dSourceModel.includePModelId
             delete dSourceModel.render.tempZIndex
           }
@@ -412,9 +414,16 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
               this.changeNodeZIndexDeep(dSourceModel, dragContainerModel,stage)
               
             }
+            if (dragParentActiveIds.indexOf(pid) == -1){
+              dragParentActiveIds.push(pid)
+            }
           }
           dmodel.pModel.resortModelByZIndex()
         })
+        
+        updateCallActivityView(stage, model.layer, dragParentActiveIds)
+        
+        
 
         
         
