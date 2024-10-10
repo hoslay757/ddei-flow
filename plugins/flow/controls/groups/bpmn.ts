@@ -128,5 +128,11 @@ export default {
       'name': '序列流',
       'orderNo': 601,
     }
+    ,
+    {
+      'id': '1000701',
+      'name': '注释',
+      'orderNo': 701,
+    }
   ]
 }

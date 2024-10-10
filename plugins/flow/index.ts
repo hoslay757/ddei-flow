@@ -81,11 +81,9 @@ class DDeiFlow extends DDeiPluginBase {
                 ]
               },
               {
-                editMode: 2,
-                desc: "注释",
-                icon: `<svg class="icon-ddei-flow" style="width: 28px; height: 28px;margin-left:-1px;margin-top:2px; " aria-hidden="true">
-                      <use xlink:href = "#icon-ddei-flow-comment">< /use>
-                    </svg>`
+                controls: [
+                  "1000701",
+                ]
               },
               {
                 controls: [
@@ -262,6 +260,19 @@ class DDeiFlow extends DDeiPluginBase {
             }
           }
         }
+
+        if (startModel?.bpmnType == 'Comment' || endModel?.bpmnType == 'Comment') {
+          //注释为协会、以及直线、无箭头
+          
+          return {
+            modelCode: "1000601",
+            bpmnSubType: 5,
+            dash: [4, 4],
+            sp : {type:0},
+            ep: {type:0},
+            type:1
+          }
+        }
         
       }
       return originalFunc.apply(this, arguments);
@@ -274,6 +285,7 @@ class DDeiFlow extends DDeiPluginBase {
       let model = arguments[1]
       let createControls = arguments[2]
       if (ddInstance && model && createControls?.length > 0){
+        
         if ((model.bpmnType == 'EndEvent' && model.bpmnSubType == 7)
           || (model.bpmnType == 'IntermediateEvent' && (model.bpmnSubType == 28 || model.bpmnSubType == 29))
           || (model.bpmnType == 'StartEvent' && model.bpmnSubType == 17)

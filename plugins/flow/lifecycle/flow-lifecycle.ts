@@ -18,7 +18,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
     return this.mouseMoveInControl(operateType, data, ddInstance, evt)
   });
 
-  EVENT_MOUSE_OPERATING: DDeiFuncData | null = new DDeiFuncData("ddei-flow-hidden-eles", 1, (operateType, data, ddInstance, evt) => { return this.hiddenTempElements(operateType, data, ddInstance, evt) });
+  EVENT_MOUSE_OPERATING: DDeiFuncData | null = new DDeiFuncData("ddei-flow-hidden-eles", 1, (operateType, data, ddInstance, evt) => { return this.mouseOperating(operateType,data,ddInstance,evt) });
 
   EVENT_CONTROL_DRAGING: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-draging", 1, (operateType, data, ddInstance, evt) => { return this.controlDraging(operateType, data, ddInstance, evt) });
 
@@ -463,6 +463,10 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
     }
   }
 
+
+  mouseOperating(operateType, data, ddInstance, evt){
+    return this.hiddenTempElements(operateType, data, ddInstance, evt)
+  }
 
   /**
   * 鼠标移动进入画布的钩子
