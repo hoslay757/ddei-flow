@@ -34,9 +34,28 @@ class DDeiFlowAPI {
         }
         
       })
-      let promiseArr = []
       let ddInstance = this.editor.ddInstance
       let rat1 = ddInstance?.render.ratio;
+      let stage = ddInstance.stage
+      let lines = []
+      let doubleLines = []
+      allModels.forEach(ims => {
+        //获取连线
+        let sublinks = stage.getSourceModelLinks(ims.id)
+        sublinks?.forEach(slink => {
+          if (!slink.disabled && slink.dm) {
+            if (lines.indexOf(slink.dm) == -1) {
+              lines.push(slink.dm)
+            } else {
+              doubleLines.push(slink.dm)
+            }
+          }
+        });
+      })
+      lines = doubleLines;
+      let promiseArr = []
+      
+      allModels.push(...lines)
       allModels.forEach(model => {
           promiseArr.push(new Promise((resolve, reject) => {
             let loadImage = false
@@ -100,9 +119,14 @@ class DDeiFlowAPI {
         for (let i = 0; i < allModels.length;i++){
           let model = allModels[i]
           let modelImage = imageMap[model.id]
+          
           if (modelImage){
-        
-            ctx?.drawImage(modelImage, model.essBounds.x * rat1, model.essBounds.y * rat1)
+            let outRect = DDeiAbstractShape.getOutRectByPV([model]);
+            if(model.baseModelType == 'DDeiLine'){
+              ctx?.drawImage(modelImage, ((outRect.x + outRect.x1) / 2 - model.render.tempCanvas.offsetWidth / 2/rat1) * rat1, ((outRect.y + outRect.y1) / 2 - model.render.tempCanvas.offsetHeight / 2/rat1 )* rat1)
+            }else{
+              ctx?.drawImage(modelImage, outRect.x * rat1, outRect.y * rat1)
+            }
           }
         }
         

@@ -136,10 +136,10 @@ export default {
     font-style: var(--fontStyle);
     font-weight: var(--fontWeight);
     text-decoration: var(--textDecoration);
-    height: 100%;
+    height: calc(100% - 20px);
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 100% 100%;
+    background-size: contain;
     .text {
       flex: 1;
       white-space: nowrap;
