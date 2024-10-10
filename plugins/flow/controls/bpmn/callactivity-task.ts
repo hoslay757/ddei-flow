@@ -3,7 +3,7 @@ import BpmnCallActivityTaskViewer from "../views/bpmn-callactivity-task-viewer.v
 
 export default {
   id: '1000081',
-  name: '调用活动',
+  name: '调用',
   code: 'call',
   desc: 'bpmn中的CallaAtivityTask',
   from: '100002',
@@ -30,7 +30,7 @@ export default {
         {
           'code': 'name',
           'name': '标题',
-          'desc': '调用活动',
+          'desc': '调用',
           'controlType': 'text',
           'dataType': 'string',
           'defaultValue': "调用",
@@ -75,7 +75,7 @@ export default {
           'desc': '备注说明',
           'controlType': 'textarea',
           'dataType': 'string',
-          'defaultValue': "调用活动节点",
+          'defaultValue': "调用节点，可以调用任务、编排或者子流程",
           'type': [1, 2] //类别，1图形，2业务，3事件
         }
       ],

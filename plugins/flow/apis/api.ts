@@ -23,7 +23,7 @@ class DDeiFlowAPI {
       let allModels = []
       models.forEach(model=>{
         allModels.push(model)
-        if (model.bpmnType == 'SubProcess') {
+        if (model.allowIncludeModel) {
           let subModels = getIncludeModels(model)
           subModels.forEach(sm=>{
             if (!DDeiUtil.isModelHidden(sm)){

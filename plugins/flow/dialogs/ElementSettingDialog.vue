@@ -110,7 +110,8 @@
           补偿
         </div>
       </div>
-      <div class="row" v-if="model?.bpmnBaseType == 'Activity' && model?.bpmnType == 'SubProcess' ">
+      <div class="row"
+        v-if="model?.bpmnBaseType == 'Activity' && (model.bpmnType == 'SubProcess' || model.bpmnType == 'ChoreographySubProcess') ">
         <div class="change-bpmn-marker" @click="changeBpmnLabel('isAdHoc')">
           <div :class="{ 'chk_state': model?.isAdHoc != 1, 'chk_state_checked': model?.isAdHoc == 1 }">
             <span>{{ model?.isAdHoc == 1 ? '✓' : '' }}</span>

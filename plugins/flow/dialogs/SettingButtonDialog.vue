@@ -11,17 +11,14 @@
         aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-link"></use>
       </svg>
-      <svg class="icon-ddei-flow" v-if="model?.bpmnType == 'SubProcess' || model?.bpmnType == 'Group'"
-        @click="expandOrNotSubProcess()" aria-hidden="true">
+      <svg class="icon-ddei-flow" v-if="model?.allowIncludeModel" @click="expandOrNotSubProcess()" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-sub-process-marker"></use>
       </svg>
-      <svg class="icon-ddei-flow"
-        v-if="(model?.bpmnType == 'SubProcess' || model?.bpmnType == 'Group') && model.isExpand == 1 && !model.lock"
+      <svg class="icon-ddei-flow" v-if="model?.allowIncludeModel && model.isExpand == 1 && !model.lock"
         @click="subProcessLock()" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-lock"></use>
       </svg>
-      <svg class="icon-ddei-flow"
-        v-if="(model?.bpmnType == 'SubProcess' || model?.bpmnType == 'Group') && model.isExpand == 1 && model.lock"
+      <svg class="icon-ddei-flow" v-if="model?.allowIncludeModel && model.isExpand == 1 && model.lock"
         @click="subProcessUnLock()" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-unlock"></use>
       </svg>
@@ -444,7 +441,7 @@ export default {
                 0, 0, 1);
               subModel.transVectors(m2)
 
-              if (subModel.bpmnType == 'SubProcess' || subModel.bpmnType == 'Group') {
+              if (subModel.allowIncludeModel) {
                 let includeModels1 = getIncludeModels(subModel)
                 includeModels1.forEach(lms => {
                   lms.transVectors(m2)

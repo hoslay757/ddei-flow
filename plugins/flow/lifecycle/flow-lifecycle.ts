@@ -55,11 +55,17 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
         let model = models[0]
         for (let i = 0; i < editor.desigingSubProecsses?.length; i++) {
           let containerModel = editor.desigingSubProecsses[i]
+          let isIn = false
           if (model.isInRect(containerModel.essBounds.x, containerModel.essBounds.y, containerModel.essBounds.x + containerModel.essBounds.width, containerModel.essBounds.y + containerModel.essBounds.height)) {
-            dragContainerModel = containerModel
             let k = editor.viewerMap.get(containerModel.id)
-            k.component.ctx.refreshDragState(1)
-          } else {
+            if (!k.component.ctx.isInRect || (k.component.ctx.isInRect && k.component.ctx.isInRect(model))){
+              dragContainerModel = containerModel
+              k.component.ctx.refreshDragState(1)
+              isIn = true
+            }
+          } 
+          
+          if(!isIn){
             let k = editor.viewerMap.get(containerModel.id)
             k.component.ctx.refreshDragState(0)
           }
@@ -77,7 +83,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
         // let dragModels = [...data.models]
         let lines = []
         data.models.forEach(model => {
-          if (model.bpmnType == 'SubProcess' || model.bpmnType == 'Group') {
+          if (model.allowIncludeModel) {
             let models = getIncludeModels(model)
             
             models.forEach(m => {
@@ -202,12 +208,9 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
         //如果拖拽的为subProcess，将其includeModels也纳入拖放范围
         this.dragModels = [...data.models]
         data.models.forEach(model => {
-          if (model.bpmnType == 'SubProcess' || model.bpmnType == 'Group') {
+          if (model.allowIncludeModel) {
             let models = getIncludeModels(model)
             models.forEach(m=>{
-              
-              // let md = DDeiUtil.getShadowControl(m);
-              // layer.shadowControls.push(md);
               data.models.push(m)
             })
           }
@@ -226,7 +229,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
     let subModels = layer.getSubModels(null, 20)
     editor.desigingSubProecsses = []
     subModels?.forEach(mds => {
-      if (mds.bpmnType == 'SubProcess' || mds.bpmnType == 'Group') {
+      if (mds.allowIncludeModel) {
         if (data.models.indexOf(mds) == -1) {
           if (!mds.lock && mds.isExpand) {
             editor.desigingSubProecsses.push(mds)
@@ -345,10 +348,13 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
         let stage = model.stage;
         for (let i = 0; i < editor.desigingSubProecsses.length; i++) {
           let containerModel = editor.desigingSubProecsses[i]
-          if (model.isInRect(containerModel.essBounds.x, containerModel.essBounds.y, containerModel.essBounds.x + containerModel.essBounds.width, containerModel.essBounds.y + containerModel.essBounds.height)) {
-            dragContainerModel = containerModel
-          }
           let k = editor.viewerMap.get(containerModel.id)
+          if (model.isInRect(containerModel.essBounds.x, containerModel.essBounds.y, containerModel.essBounds.x + containerModel.essBounds.width, containerModel.essBounds.y + containerModel.essBounds.height)) {
+            if (!k.component.ctx.isInRect || (k.component.ctx.isInRect && k.component.ctx.isInRect(model))) {
+              dragContainerModel = containerModel
+            }
+          }
+          
           k.component.ctx.refreshDragState(0)
         }
         let pid
@@ -540,7 +546,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
     let stage = ddInstance.stage
 
     models.forEach(model => {
-      if (model.bpmnType == 'SubProcess' || model.bpmnType == 'Group') {
+      if (model.allowIncludeModel) {
         let includeModels = getIncludeModels(model)
         includeModels.forEach(lms => {
           stage.removeModel(lms, true)
