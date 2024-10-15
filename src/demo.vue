@@ -42,5 +42,7 @@ const options = {
 </script>
 
 <template>
-  <DDeiEditorView ref="ddei_editor_1" :options="options" id="ddei_editor_1"></DDeiEditorView>
+  <div style="padding-top:500px;">
+    <DDeiEditorView ref="ddei_editor_1" :options="options" id="ddei_editor_1"></DDeiEditorView>
+  </div>
 </template>

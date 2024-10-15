@@ -27,10 +27,12 @@ const showSettingButton = function (operate: DDeiEnumOperateType, data: object |
     let stageRatio = model.getStageRatio()
     //获取model的绝对位置
     let modelPos = DDeiUtil.getModelsDomAbsPosition([model])
-    let left = modelPos.left + modelPos.width + (6.5 * (stageRatio - 1)) 
-    let top = modelPos.top + (6.5 * (stageRatio - 1))
+    let editorEle = document.getElementById(editor.id)
+    let editorPos = DDeiUtil.getDomAbsPosition(editorEle)
+    let left = modelPos.left + modelPos.width + (6.5 * (stageRatio - 1))- editorPos.left
+    let top = modelPos.top + (6.5 * (stageRatio - 1)) - editorPos.top
     if (model.bpmnBaseType == 'Event') {
-      left = modelPos.left + modelPos.width + (12 * (stageRatio - 1)) 
+      left = modelPos.left + modelPos.width + (12 * (stageRatio - 1)) - editorPos.left
     }
 
     let settingBtnEle = document.getElementById(editor.id + "_ddei-flow-setting-button-dialog");
