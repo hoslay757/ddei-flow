@@ -34,7 +34,7 @@ class DDeiFlow extends DDeiPluginBase {
                 editMode: 1,
                 desc: "选择",
                 icon: `<svg class="icon" style="width: 28px; height: 28px;margin-left:-1px;margin-top:2px; " aria-hidden="true">
-            <use xlink: href = "#icon-a-ziyuan432">< /use>
+            <use xlink: href = "#icon-selector">< /use>
           </svg>`
               },
               {
