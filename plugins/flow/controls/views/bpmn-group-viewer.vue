@@ -56,6 +56,17 @@ export default {
   font-weight: var(--fontWeight);
   text-decoration: var(--textDecoration);
 
+  .content-header-locked {
+    width: 12px;
+    height: 12px;
+    font-size: 12px;
+    opacity: 0.5;
+    color: var(--fontColor);
+    position: absolute;
+    right:5px;
+    top:5px;
+  }
+
   .border-svg{
     position: absolute;
     left:0;

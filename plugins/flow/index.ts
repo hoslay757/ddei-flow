@@ -317,5 +317,6 @@ export * from "./controls"
 export * from "./lifecycle"
 export * from "./hotkeys"
 export * from "./apis/api"
+export * from "./dialogs"
 export { DDeiFlow }
 export default DDeiFlow;

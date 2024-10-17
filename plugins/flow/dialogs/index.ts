@@ -1,6 +1,6 @@
 import {DDeiPluginBase} from "ddei-editor";
-import ElementSettingDialog from "./elementsettingdialog"
-import SettingButtonDialog from "./settingbuttondialog"
+import DDeiFlowElementSettingDialog from "./elementsettingdialog"
+import DDeiFlowSettingButtonDialog from "./settingbuttondialog"
 
 class DDeiFlowDialogs extends DDeiPluginBase {
 
@@ -10,7 +10,7 @@ class DDeiFlowDialogs extends DDeiPluginBase {
    */
   static defaultIns: DDeiFlowDialogs = new DDeiFlowDialogs(null);
 
-  plugins: object[] = [ElementSettingDialog, SettingButtonDialog]
+  plugins: object[] = [DDeiFlowElementSettingDialog, DDeiFlowSettingButtonDialog]
 
   getDialogs(editor) {
     let dialogs = []
@@ -44,5 +44,5 @@ class DDeiFlowDialogs extends DDeiPluginBase {
 }
 
 
-export { DDeiFlowDialogs, ElementSettingDialog, SettingButtonDialog }
+export { DDeiFlowDialogs, DDeiFlowElementSettingDialog, DDeiFlowSettingButtonDialog }
 export default DDeiFlowDialogs

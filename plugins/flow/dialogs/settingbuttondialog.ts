@@ -7,7 +7,25 @@ class DDeiFlowSettingButtonDialog extends DDeiPluginBase{
   /**
    * 缺省实例
    */
-  static defaultIns: DDeiFlowSettingButtonDialog = new DDeiFlowSettingButtonDialog(null);
+  static defaultIns: DDeiFlowSettingButtonDialog = new DDeiFlowSettingButtonDialog({
+    buttons: [
+      {
+        id: 'ddei-flow-change-bpmnsubtype'
+      },
+      {
+        id: 'ddei-flow-choose-activity'
+      },
+      {
+        id: 'ddei-flow-expand-or-not'
+      },
+      {
+        id: 'ddei-flow-lock-or-unlock'
+      },
+      {
+        id: 'ddei-flow-remove-control'
+      }
+    ]
+  });
 
 
   plugins: object[] = [SettingButtonDialog]
