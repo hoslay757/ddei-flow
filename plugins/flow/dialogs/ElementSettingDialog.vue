@@ -1,123 +1,159 @@
 <template>
   <div :id="editor?.id + '_' + dialogId" class="ddei-flow-element-setting-dialog" v-if="forceRefresh">
     <div class="content">
-      <div class="row" v-if="bpmnSubTypeDataSource?.length > 0">
-        <div class="change-bpmn-sub-type">
-          <svg class="icon-ddei-flow" @click="changeBpmnSubType(-1)" style="width:16px;height:16px;" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-left"></use>
-          </svg>
-          <div class="change-bpmn-sub-type-text">
-            {{ bpmnSubTypeDataSource[bpmnSubTypeIndex].text }}
+      <div v-for="item in options?.items" style="display: contents;">
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-change-bpmnsubtype' && bpmnSubTypeDataSource?.length > 0">
+          <div class="change-bpmn-sub-type">
+            <svg class="icon-ddei-flow" @click="changeBpmnSubType(-1)" style="width:16px;height:16px;"
+              aria-hidden="true">
+              <use xlink:href="#icon-ddei-flow-left"></use>
+            </svg>
+            <div class="change-bpmn-sub-type-text">
+              {{ bpmnSubTypeDataSource[bpmnSubTypeIndex].text }}
+            </div>
+            <svg class="icon-ddei-flow" @click="changeBpmnSubType(1)" style="width:16px;height:16px;"
+              aria-hidden="true">
+              <use xlink:href="#icon-ddei-flow-right"></use>
+            </svg>
           </div>
-          <svg class="icon-ddei-flow" @click="changeBpmnSubType(1)" style="width:16px;height:16px;" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-right"></use>
-          </svg>
         </div>
-      </div>
-      <div class="row" v-if="lineTypeDataSource?.length > 0">
-        <div class="change-bpmn-sub-type">
-          <svg class="icon-ddei-flow" @click="changeLineType(-1)" style="width:16px;height:16px;" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-left"></use>
-          </svg>
-          <div class="change-bpmn-sub-type-text">
-            {{ lineTypeDataSource[lineTypeIndex].text }}
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-change-linetype' && lineTypeDataSource?.length > 0">
+          <div class="change-bpmn-sub-type">
+            <svg class="icon-ddei-flow" @click="changeLineType(-1)" style="width:16px;height:16px;" aria-hidden="true">
+              <use xlink:href="#icon-ddei-flow-left"></use>
+            </svg>
+            <div class="change-bpmn-sub-type-text">
+              {{ lineTypeDataSource[lineTypeIndex].text }}
+            </div>
+            <svg class="icon-ddei-flow" @click="changeLineType(1)" style="width:16px;height:16px;" aria-hidden="true">
+              <use xlink:href="#icon-ddei-flow-right"></use>
+            </svg>
           </div>
-          <svg class="icon-ddei-flow" @click="changeLineType(1)" style="width:16px;height:16px;" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-right"></use>
-          </svg>
         </div>
-      </div>
 
-      <div class="row" v-if="model?.bpmnSubType == 5 && startPointTypeDataSource?.length > 0">
-        <div class="change-point-type">
-          <div class="change-point-type-title">
-            起点
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-change-linepointtype' && model?.bpmnSubType == 5 && startPointTypeDataSource?.length > 0">
+          <div class="change-point-type">
+            <div class="change-point-type-title">
+              起点
+            </div>
+            <svg class="icon-ddei-flow" @click="changePointType(1,-1)" aria-hidden="true">
+              <use xlink:href="#icon-ddei-flow-left"></use>
+            </svg>
+            <div class="change-point-type-text">
+              {{ startPointTypeDataSource[startPointTypeIndex].text }}
+            </div>
+            <svg class="icon-ddei-flow" @click="changePointType(1,1)" aria-hidden="true">
+              <use xlink:href="#icon-ddei-flow-right"></use>
+            </svg>
           </div>
-          <svg class="icon-ddei-flow" @click="changePointType(1,-1)" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-left"></use>
-          </svg>
-          <div class="change-point-type-text">
-            {{ startPointTypeDataSource[startPointTypeIndex].text }}
-          </div>
-          <svg class="icon-ddei-flow" @click="changePointType(1,1)" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-right"></use>
-          </svg>
         </div>
-      </div>
-      <div class="row" v-if="model?.bpmnBaseType == 'Sequence'">
-        <div class="quick-button" @click="exchangePoints()">
-          <div class="quick-button-text">
-            交换
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-change-linepointtype' && model?.bpmnBaseType == 'Sequence'">
+          <div class="quick-button" @click="exchangePoints()">
+            <div class="quick-button-text">
+              交换
+            </div>
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#icon-zhihuan"></use>
+            </svg>
           </div>
-          <svg class="icon" aria-hidden="true">
-            <use xlink:href="#icon-zhihuan"></use>
-          </svg>
         </div>
-      </div>
-      <div class="row" v-if="model?.bpmnSubType == 5 && endPointTypeDataSource?.length > 0">
-        <div class="change-point-type">
-          <div class="change-point-type-title">
-            终点
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-change-linepointtype' && model?.bpmnSubType == 5 && endPointTypeDataSource?.length > 0">
+          <div class="change-point-type">
+            <div class="change-point-type-title">
+              终点
+            </div>
+            <svg class="icon-ddei-flow" @click="changePointType(2,-1)" aria-hidden="true">
+              <use xlink:href="#icon-ddei-flow-left"></use>
+            </svg>
+            <div class="change-point-type-text">
+              {{ endPointTypeDataSource[endPointTypeIndex].text }}
+            </div>
+            <svg class="icon-ddei-flow" @click="changePointType(2,1)" aria-hidden="true">
+              <use xlink:href="#icon-ddei-flow-right"></use>
+            </svg>
           </div>
-          <svg class="icon-ddei-flow" @click="changePointType(2,-1)" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-left"></use>
-          </svg>
-          <div class="change-point-type-text">
-            {{ endPointTypeDataSource[endPointTypeIndex].text }}
-          </div>
-          <svg class="icon-ddei-flow" @click="changePointType(2,1)" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-right"></use>
-          </svg>
         </div>
-      </div>
-      <div class="row" v-if="model?.bpmnType == 'CallActivityTask'">
-        <div class="change-bpmn-marker" @click="changeBpmnLabel('displayView')">
-          <div :class="{ 'chk_state': model?.displayView != 1, 'chk_state_checked': model?.displayView == 1 }">
-            <span>{{ model?.displayView == 1 ? '✓' : '' }}</span>
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-callactivity-review' && model?.bpmnType == 'CallActivityTask'">
+          <div class="change-bpmn-marker" @click="changeBpmnLabel('displayView')">
+            <div :class="{ 'chk_state': model?.displayView != 1, 'chk_state_checked': model?.displayView == 1 }">
+              <span>{{ model?.displayView == 1 ? '✓' : '' }}</span>
+            </div>
+            预览
           </div>
-          预览
         </div>
-      </div>
-      <div class="row" v-if="model?.bpmnBaseType == 'Activity'">
-        <div class="change-bpmn-marker" @click="changeBpmnLabel('isLoop')">
-          <div :class="{ 'chk_state': model?.isLoop != 1, 'chk_state_checked': model?.isLoop == 1 }">
-            <span>{{ model?.isLoop == 1 ? '✓' :''}}</span>
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && model?.bpmnBaseType == 'Activity'">
+          <div class="change-bpmn-marker" @click="changeBpmnLabel('isLoop')">
+            <div :class="{ 'chk_state': model?.isLoop != 1, 'chk_state_checked': model?.isLoop == 1 }">
+              <span>{{ model?.isLoop == 1 ? '✓' :''}}</span>
+            </div>
+            循环
           </div>
-          循环
         </div>
-      </div>
-      <div class="row" v-if="model?.bpmnBaseType == 'Activity'">
-        <div class="change-bpmn-marker" @click="changeBpmnLabel('multiInstance')">
-          <div :class="{ 'chk_state': model?.multiInstance != 1, 'chk_state_checked': model?.multiInstance == 1 }">
-            <span>{{ model?.multiInstance == 1 ? '✓' : '' }}</span>
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && model?.bpmnBaseType == 'Activity'">
+          <div class="change-bpmn-marker" @click="changeBpmnLabel('multiInstance')">
+            <div :class="{ 'chk_state': model?.multiInstance != 1, 'chk_state_checked': model?.multiInstance == 1 }">
+              <span>{{ model?.multiInstance == 1 ? '✓' : '' }}</span>
+            </div>
+            多实例
           </div>
-          多实例
         </div>
-      </div>
-      <div class="row" v-if="model?.bpmnBaseType == 'Activity' && model?.multiInstance == 1">
-        <div class="change-bpmn-marker" @click="changeBpmnLabel('isParallel')">
-          <div :class="{ 'chk_state': model?.isParallel != 1, 'chk_state_checked': model?.isParallel == 1 }">
-            <span>{{ model?.isParallel == 1 ? '✓' : '' }}</span>
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && model?.bpmnBaseType == 'Activity' && model?.multiInstance == 1">
+          <div class="change-bpmn-marker" @click="changeBpmnLabel('isParallel')">
+            <div :class="{ 'chk_state': model?.isParallel != 1, 'chk_state_checked': model?.isParallel == 1 }">
+              <span>{{ model?.isParallel == 1 ? '✓' : '' }}</span>
+            </div>
+            并行
           </div>
-          并行
         </div>
-      </div>
-      <div class="row" v-if="model?.bpmnBaseType == 'Activity'">
-        <div class="change-bpmn-marker" @click="changeBpmnLabel('isCompensation')">
-          <div :class="{ 'chk_state': model?.isCompensation != 1, 'chk_state_checked': model?.isCompensation == 1 }">
-            <span>{{ model?.isCompensation == 1 ? '✓' : '' }}</span>
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && model?.bpmnBaseType == 'Activity'">
+          <div class="change-bpmn-marker" @click="changeBpmnLabel('isCompensation')">
+            <div :class="{ 'chk_state': model?.isCompensation != 1, 'chk_state_checked': model?.isCompensation == 1 }">
+              <span>{{ model?.isCompensation == 1 ? '✓' : '' }}</span>
+            </div>
+            补偿
           </div>
-          补偿
         </div>
-      </div>
-      <div class="row"
-        v-if="model?.bpmnBaseType == 'Activity' && (model.bpmnType == 'SubProcess' || model.bpmnType == 'ChoreographySubProcess') ">
-        <div class="change-bpmn-marker" @click="changeBpmnLabel('isAdHoc')">
-          <div :class="{ 'chk_state': model?.isAdHoc != 1, 'chk_state_checked': model?.isAdHoc == 1 }">
-            <span>{{ model?.isAdHoc == 1 ? '✓' : '' }}</span>
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && model?.bpmnBaseType == 'Activity' && (model.bpmnType == 'SubProcess' || model.bpmnType == 'ChoreographySubProcess') ">
+          <div class="change-bpmn-marker" @click="changeBpmnLabel('isAdHoc')">
+            <div :class="{ 'chk_state': model?.isAdHoc != 1, 'chk_state_checked': model?.isAdHoc == 1 }">
+              <span>{{ model?.isAdHoc == 1 ? '✓' : '' }}</span>
+            </div>
+            自定义
           </div>
-          自定义
         </div>
+        <div class="row" v-if="!item.viewer && item.id == 'ddei-flow-property-editor-text'">
+          <div class="change-property-text" :title="item.desc">
+            <div class="change-property-text-title">
+              {{ item.label }}
+            </div>
+            <div class="change-property-text-input">
+              <input v-model="model[item.property]" :placeholder="item.desc">
+            </div>
+          </div>
+        </div>
+        <div class="row" v-if="!item.viewer && item.id == 'ddei-flow-property-editor-textarea'">
+          <div class="change-property-textarea" :title="item.desc">
+            <div class="change-property-textarea-title">
+              {{ item.label }}
+            </div>
+            <div class="change-property-textarea-input">
+              <textarea v-model="model[item.property]" :placeholder="item.desc"></textarea>
+            </div>
+          </div>
+        </div>
+         <component v-if="item.viewer" :is="item.viewer" :editor="editor" :options="options" :model="model" v-bind="item">
+        </component>
       </div>
     </div>
   </div>
@@ -437,8 +473,7 @@ export default {
     align-items: center;
 
     .row {
-      height:20px;
-      flex:0 0 20px;
+      flex:0 1 20px;
       margin:0 5px;
       width:100%;
       &:hover{
@@ -545,12 +580,70 @@ export default {
           color: black;
           font-size: 12px;
         }
+
         &-text {
           color: black;
           font-size: 12px;
         }
 
       }
+
+      .change-property-text {
+        height: 20px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        &-title {
+          flex: 0 0 40px;
+          color: black;
+          font-size: 12px;
+        }
+
+        &-input {
+          flex: 1;
+          color: black;
+          font-size: 12px;
+          text-align: left;
+
+          input {
+            width: 95%;
+            height: 18px;
+          }
+        }
+
+      }
+
+
+      .change-property-textarea {
+        height: 60px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        &-title {
+          flex: 0 0 40px;
+          color: black;
+          font-size: 12px;
+        }
+
+        &-input {
+          flex: 1;
+          color: black;
+          font-size: 12px;
+          text-align: left;
+
+          textarea {
+            width: 95%;
+            height: 55px;
+          }
+        }
+
+      }
+
+
     }
     
   }
