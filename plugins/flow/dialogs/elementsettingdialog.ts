@@ -19,6 +19,7 @@ class DDeiFlowElementSettingDialog extends DDeiPluginBase{
         label: "名称",
         desc: "名称",
         property: 'name',
+        condition:"model.bpmnBaseType != 'Event'"
       },
       {
         id: 'ddei-flow-property-editor-textarea',

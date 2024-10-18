@@ -3,7 +3,7 @@
     <div class="content">
       <div v-for="item in options?.items" style="display: contents;">
         <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-change-bpmnsubtype' && bpmnSubTypeDataSource?.length > 0">
+          v-if="!item.viewer && item.id == 'ddei-flow-change-bpmnsubtype' && validItemCondition(item) && bpmnSubTypeDataSource?.length > 0">
           <div class="change-bpmn-sub-type">
             <svg class="icon-ddei-flow" @click="changeBpmnSubType(-1)" style="width:16px;height:16px;"
               aria-hidden="true">
@@ -19,7 +19,7 @@
           </div>
         </div>
         <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-change-linetype' && lineTypeDataSource?.length > 0">
+          v-if="!item.viewer && item.id == 'ddei-flow-change-linetype' && validItemCondition(item) && lineTypeDataSource?.length > 0">
           <div class="change-bpmn-sub-type">
             <svg class="icon-ddei-flow" @click="changeLineType(-1)" style="width:16px;height:16px;" aria-hidden="true">
               <use xlink:href="#icon-ddei-flow-left"></use>
@@ -34,7 +34,7 @@
         </div>
 
         <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-change-linepointtype' && model?.bpmnSubType == 5 && startPointTypeDataSource?.length > 0">
+          v-if="!item.viewer && item.id == 'ddei-flow-change-linepointtype' && validItemCondition(item) && model?.bpmnSubType == 5 && startPointTypeDataSource?.length > 0">
           <div class="change-point-type">
             <div class="change-point-type-title">
               起点
@@ -51,7 +51,7 @@
           </div>
         </div>
         <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-change-linepointtype' && model?.bpmnBaseType == 'Sequence'">
+          v-if="!item.viewer && item.id == 'ddei-flow-change-linepointtype' && validItemCondition(item) && model?.bpmnBaseType == 'Sequence'">
           <div class="quick-button" @click="exchangePoints()">
             <div class="quick-button-text">
               交换
@@ -62,7 +62,7 @@
           </div>
         </div>
         <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-change-linepointtype' && model?.bpmnSubType == 5 && endPointTypeDataSource?.length > 0">
+          v-if="!item.viewer && item.id == 'ddei-flow-change-linepointtype' && validItemCondition(item) && model?.bpmnSubType == 5 && endPointTypeDataSource?.length > 0">
           <div class="change-point-type">
             <div class="change-point-type-title">
               终点
@@ -79,7 +79,7 @@
           </div>
         </div>
         <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-callactivity-review' && model?.bpmnType == 'CallActivityTask'">
+          v-if="!item.viewer && item.id == 'ddei-flow-callactivity-review' && validItemCondition(item) && model?.bpmnType == 'CallActivityTask'">
           <div class="change-bpmn-marker" @click="changeBpmnLabel('displayView')">
             <div :class="{ 'chk_state': model?.displayView != 1, 'chk_state_checked': model?.displayView == 1 }">
               <span>{{ model?.displayView == 1 ? '✓' : '' }}</span>
@@ -88,7 +88,7 @@
           </div>
         </div>
         <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && model?.bpmnBaseType == 'Activity'">
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnBaseType == 'Activity'">
           <div class="change-bpmn-marker" @click="changeBpmnLabel('isLoop')">
             <div :class="{ 'chk_state': model?.isLoop != 1, 'chk_state_checked': model?.isLoop == 1 }">
               <span>{{ model?.isLoop == 1 ? '✓' :''}}</span>
@@ -97,7 +97,7 @@
           </div>
         </div>
         <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && model?.bpmnBaseType == 'Activity'">
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnBaseType == 'Activity'">
           <div class="change-bpmn-marker" @click="changeBpmnLabel('multiInstance')">
             <div :class="{ 'chk_state': model?.multiInstance != 1, 'chk_state_checked': model?.multiInstance == 1 }">
               <span>{{ model?.multiInstance == 1 ? '✓' : '' }}</span>
@@ -106,7 +106,7 @@
           </div>
         </div>
         <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && model?.bpmnBaseType == 'Activity' && model?.multiInstance == 1">
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnBaseType == 'Activity' && model?.multiInstance == 1">
           <div class="change-bpmn-marker" @click="changeBpmnLabel('isParallel')">
             <div :class="{ 'chk_state': model?.isParallel != 1, 'chk_state_checked': model?.isParallel == 1 }">
               <span>{{ model?.isParallel == 1 ? '✓' : '' }}</span>
@@ -115,7 +115,7 @@
           </div>
         </div>
         <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && model?.bpmnBaseType == 'Activity'">
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnBaseType == 'Activity'">
           <div class="change-bpmn-marker" @click="changeBpmnLabel('isCompensation')">
             <div :class="{ 'chk_state': model?.isCompensation != 1, 'chk_state_checked': model?.isCompensation == 1 }">
               <span>{{ model?.isCompensation == 1 ? '✓' : '' }}</span>
@@ -132,7 +132,7 @@
             自定义
           </div>
         </div>
-        <div class="row" v-if="!item.viewer && item.id == 'ddei-flow-property-editor-text'">
+        <div class="row" v-if="!item.viewer && item.id == 'ddei-flow-property-editor-text' && validItemCondition(item)">
           <div class="change-property-text" :title="item.desc">
             <div class="change-property-text-title">
               {{ item.label }}
@@ -142,7 +142,8 @@
             </div>
           </div>
         </div>
-        <div class="row" v-if="!item.viewer && item.id == 'ddei-flow-property-editor-textarea'">
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-property-editor-textarea' && validItemCondition(item) ">
           <div class="change-property-textarea" :title="item.desc">
             <div class="change-property-textarea-title">
               {{ item.label }}
@@ -152,7 +153,8 @@
             </div>
           </div>
         </div>
-         <component v-if="item.viewer" :is="item.viewer" :editor="editor" :options="options" :model="model" v-bind="item">
+        <component v-if="item.viewer" :is="item.viewer" :editor="editor" :options="options" :model="model"
+          v-bind="item">
         </component>
       </div>
     </div>
@@ -196,6 +198,16 @@ export default {
     this.refreshData()
   },
   methods: {
+
+    validItemCondition(item){
+      if (!item.condition){
+        return true;
+      }else{
+        let func = new Function("model","item","editor","component","return "+item.condition)
+        let rs = func(this.model, item, this.editor, this)
+        return rs
+      }
+    },
 
     forceRefreshView: function () {
       this.forceRefresh = false

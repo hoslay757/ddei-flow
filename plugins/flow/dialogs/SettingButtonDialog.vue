@@ -3,34 +3,35 @@
     class="ddei-flow-setting-button-dialog" v-if="forceRefresh">
     <div class="content" :style="{ 'flex-direction': model?.bpmnBaseType !='Event' ? 'column' : ''}">
       <div v-for="btn in options?.buttons" style="display:contents">
-        <component v-if="btn.viewer" :is="btn.viewer" :editor="editor" :options="options" :model="model">
+        <component v-if="btn.viewer" :is="btn.viewer" :editor="editor" :options="options" :model="model" v-bind="btn">
         </component>
         <svg class="icon-ddei-flow"
-          v-if="!btn.viewer && btn.id == 'ddei-flow-change-bpmnsubtype' && controlDefine?.subject == 'bpmn' && (bpmnSubTypeDataSource?.length > 0 || model?.bpmnBaseType == 'Activity' || model?.bpmnBaseType == 'Line')"
+          v-if="!btn.viewer && btn.id == 'ddei-flow-change-bpmnsubtype' && validItemCondition(btn) && controlDefine?.subject == 'bpmn' && (bpmnSubTypeDataSource?.length > 0 || model?.bpmnBaseType == 'Activity' || model?.bpmnBaseType == 'Line')"
           @mouseenter="settingMouseEnter($el)" @mouseleave="settingMouseEnterLeave($el)" aria-hidden="true">
           <use xlink:href="#icon-ddei-flow-setting"></use>
         </svg>
         <svg class="icon-ddei-flow"
-          v-if="!btn.viewer && btn.id == 'ddei-flow-choose-activity' && model?.bpmnType == 'CallActivityTask'"
+          v-if="!btn.viewer && btn.id == 'ddei-flow-choose-activity' && validItemCondition(btn) && model?.bpmnType == 'CallActivityTask'"
           @mousedown="startChooseActivity($el)" aria-hidden="true">
           <use xlink:href="#icon-ddei-flow-link"></use>
         </svg>
         <svg class="icon-ddei-flow"
-          v-if="!btn.viewer && btn.id == 'ddei-flow-expand-or-not' && model?.allowIncludeModel"
+          v-if="!btn.viewer && btn.id == 'ddei-flow-expand-or-not' && validItemCondition(btn) && model?.allowIncludeModel"
           @click="expandOrNotSubProcess()" aria-hidden="true">
           <use xlink:href="#icon-ddei-flow-sub-process-marker"></use>
         </svg>
         <svg class="icon-ddei-flow"
-          v-if="!btn.viewer && btn.id == 'ddei-flow-lock-or-unlock' && model?.allowIncludeModel && model.isExpand == 1 && !model.lock"
+          v-if="!btn.viewer && btn.id == 'ddei-flow-lock-or-unlock' && validItemCondition(btn) && model?.allowIncludeModel && model.isExpand == 1 && !model.lock"
           @click="subProcessLock()" aria-hidden="true">
           <use xlink:href="#icon-ddei-flow-lock"></use>
         </svg>
         <svg class="icon-ddei-flow"
-          v-if="!btn.viewer && btn.id == 'ddei-flow-lock-or-unlock' && model?.allowIncludeModel && model.isExpand == 1 && model.lock"
+          v-if="!btn.viewer && btn.id == 'ddei-flow-lock-or-unlock' && validItemCondition(btn) && model?.allowIncludeModel && model.isExpand == 1 && model.lock"
           @click="subProcessUnLock()" aria-hidden="true">
           <use xlink:href="#icon-ddei-flow-unlock"></use>
         </svg>
-        <svg class="icon-ddei-flow" v-if="!btn.viewer && btn.id == 'ddei-flow-remove-control'"
+        <svg class="icon-ddei-flow"
+          v-if="!btn.viewer && btn.id == 'ddei-flow-remove-control' && validItemCondition(btn) "
           @click="deleteElement($el)" aria-hidden="true">
           <use xlink:href="#icon-ddei-flow-trash"></use>
         </svg>
@@ -73,6 +74,16 @@ export default {
     this.refreshData()
   },
   methods: {
+
+    validItemCondition(btn) {
+      if (!btn.condition) {
+        return true;
+      } else {
+        let func = new Function("model", "btn", "editor", "component", "return " + btn.condition)
+        let rs = func(this.model, btn, this.editor, this)
+        return rs
+      }
+    },
 
     startChooseActivity(evt){
       this.editor.tempChooseCallActivity = this.model
