@@ -11,7 +11,7 @@ export default {
   subject: 'bpmn',
   define: {
     bpmnBaseType: 'Activity',
-    bpmnType: 'ScriptTask',
+    bpmnType: 'BusinessTask',
     width: 110,
     height: 70,
     border:{

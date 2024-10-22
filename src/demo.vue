@@ -27,6 +27,10 @@ const options = {
           id: "ddei-core-open",
           name: "打开"
         },
+        {
+          id: "ddei-core-download",
+          name: "下载"
+        },
         
         {
           id: "ddei-core-new",
@@ -35,7 +39,7 @@ const options = {
         {
           name: "测试",
           action: function (editor) {
-            console.log("测试:" + editor.id)
+            console.log(editor.flow.toBPMNXML())
           }
         }
       ]

@@ -1,6 +1,12 @@
-import { DDeiEditor, DDeiUtil, DDeiAbstractShape } from "ddei-editor"
+import { DDeiEditor, DDeiUtil, DDeiAbstractShape, DDeiStage,DDeiFile,DDeiSheet,DDeiLayer } from "ddei-editor"
 import {getIncludeModels} from "../controls/util"
 import html2canvas from "html2canvas"
+import DDeiFlowFile from "./file"
+import DDeiFlowGraph from "./graph";
+import DDeiFlowNode from "./node";
+import DDeiFlowGroup from "./group";
+import DDeiFlowSequence from "./sequence"
+import DDeiFlowSubProcess from "./subprocess"
 /**
  * DDeiFlow插件的API方法包，提供了API以及工具函数
  * 初始化时挂载到editor的flow属性上
@@ -9,8 +15,22 @@ class DDeiFlowAPI {
 
   editor:DDeiEditor;
 
+  /**
+   * 配置的属性
+   */
+  jsonField: string[] = ["id", "name", "code", "text", "desc", "condition", "default", "bpmnType", "bpmnSubType", "bpmnBaseType", "isLoop", "isLoop", "multiInstance", "isParallel", "isCompensation","isAdHoc","essBounds"]
+
+
   constructor(editor:DDeiEditor){
     this.editor = editor
+  }
+
+  /**
+   * 配置返回的json数据字段
+   * @param fn 外部方法，用来修改jsonField
+   */
+  configJsonField(fn) {
+    fn(this.jsonField)
   }
 
   /**
@@ -193,6 +213,643 @@ class DDeiFlowAPI {
     });
     return cloneElements;
   }
+
+  /**
+   * 将当前文档转换为易于识别和解析的json对象
+   */
+  toFlowObject(fileObj:boolean = false,allSheets: boolean = false): DDeiFlowFile|DDeiFlowGraph | null {
+    let file = this.editor.files[this.editor.currentFileIndex];
+    if (file) {
+      let returnFile = new DDeiFlowFile({ id: file.id, name: file.name })
+      let sheets = file.sheets;
+      let sheetLen = sheets.length;
+      let i = 0
+      
+      if (!allSheets) {
+        i = file.currentSheetIndex;
+        sheetLen = i + 1;
+      }
+      for (; i < sheetLen; i++) {
+        let sheet = sheets[i];
+        let graphics = this.stage2FlowObj(sheet.stage, fileObj)
+        if (!fileObj){
+          return graphics[0]
+        }
+        graphics?.forEach(graph=>{
+          graph.file = returnFile
+          returnFile.graphics.push(graph)
+        })
+      }
+    
+      return returnFile
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * 将舞台对象转换为易于解析和遍历的json对象
+   * @param stage 舞台对象
+   * @returns json对象
+   */
+  stage2FlowObj(stage: DDeiStage, allLayers: boolean = true): DDeiFlowGraph[]|null {
+    if (stage) {
+      let layers = stage.layers;
+      if (!(layers?.length > 0)) {
+        return null;
+      }
+      let layerLen = layers.length;
+      let i = 0;
+      let singleLayer = false
+      if (!allLayers) {
+        i = stage.layerIndex;
+        layerLen = i + 1;
+      }
+      if (!allLayers || layerLen == 1) {
+        singleLayer = true
+      }
+      //每个图层生成一个流程
+      let returnArray = []
+      let modelsCache = {}
+      for (; i < layerLen; i++) {
+        let layer = layers[i];
+        let graph = new DDeiFlowGraph({ id: singleLayer ?stage.id:stage.id+"_"+layer.id,name:stage.name});
+        //获取当前图层所有元素，转换为json对象
+        let models = stage.getLayerModels()
+        models.forEach(model => {
+          modelsCache[model.id] = model
+          let node =  this.parseModelToFlowNode(model);
+          if(node){
+            node.graph = graph
+            graph.nodes.set(node.id,node)
+          }
+        });
+        let deletedNodes = []
+        //根据包含关系，建立正确的subprocess关系
+        graph.nodes.forEach(node=>{
+          //如果当前节点的includePModelId不为空，且最终指向一个subprocess，则建立子流程关系
+          let model = modelsCache[node.id]
+          
+          if (model.includePModelId){
+            
+            let subProcessNode = this.getSubProcessNode(model.includePModelId,graph,modelsCache);
+            if (subProcessNode){
+              let subProcesses = this.getSubProcessNodes(subProcessNode.id, graph, modelsCache);
+              node.graph = subProcessNode;
+              
+              node.subProcesses = subProcesses;
+              subProcessNode.nodes.set(node.id, node)
+              
+              deletedNodes.push(node.id)
+            }
+          }
+        });
+        let isolatedNodes = []
+        let groups = []
+        //建立整个图网络
+        graph.nodes.forEach(node => {
+          
+          if (node instanceof DDeiFlowSequence) {
+            //如果为连接线，则建立两边的关系
+            //线图形对应的json对象
+            let lineModel = modelsCache[node.id]
+            let lineSequenceNode = node
+            let lineLinks = stage.getDistModelLinks(lineSequenceNode.id)
+            //获取另一端节点
+            let includeSubProcess1, includeSubProcess2,lineNode1,lineNode2
+            if (lineLinks?.length > 0) {
+              let lineLink = lineLinks[0]
+              if (lineLink.sm) {
+                let distPV = lineLink.getDistPV()
+                lineNode1 = graph.nodes.get(lineLink.sm.id)
+                let lineNodeModel = modelsCache[lineNode1.id];
+                includeSubProcess1 = this.getSubProcessNode(lineNodeModel.includePModelId,graph,modelsCache);
+                if (distPV == lineModel.startPoint) {
+                  lineSequenceNode.prevNode = lineNode1
+                } else if (distPV == lineModel.endPoint) {
+                  lineSequenceNode.nextNode = lineNode1
+                }
+              }
+            }
+           
+            if (lineLinks?.length > 0) {
+              let lineLink = lineLinks[1]
+              if (lineLink.sm) {
+                let distPV = lineLink.getDistPV()
+                lineNode2 = graph.nodes.get(lineLink.sm.id)
+                let lineNodeModel = modelsCache[lineNode2.id];
+                includeSubProcess2 = this.getSubProcessNode(lineNodeModel.includePModelId, graph, modelsCache);
+                if (distPV == lineModel.startPoint) {
+                  lineSequenceNode.prevNode = lineNode2
+                } else if (distPV == lineModel.endPoint) {
+                  lineSequenceNode.nextNode = lineNode2
+                }
+              }
+            }
+           
+            // //如果不在同一层级，指向下一条线的记录其完整的层级
+            // if (includeSubProcess1 != includeSubProcess2){
+              
+            //   if (includeSubProcess1 && lineNode1) {
+            //     //将node转换为subprocessnode
+            //     lineNode1.subProcesses = this.getSubProcessNodes(includeSubProcess1.id, graph, modelsCache);
+            //   }
+            //   if (includeSubProcess2 & lineNode2) {
+                
+            //     //将node转换为subprocessnode
+            //     lineNode2.subProcesses = this.getSubProcessNodes(includeSubProcess2.id, graph, modelsCache);
+            //   }
+            // }
+          } else if (node instanceof DDeiFlowGroup) {
+            groups.push(node)
+            let model = modelsCache[node.id]
+            
+            model.includeModels?.forEach(im => {
+              node.nodes.set(im, graph.nodes.get(im))
+            });
+          } else {
+            //获取连线,连线区分方向，以开始->结束为方向
+            let nodeLinks = stage.getSourceModelLinks(node.id)
+            nodeLinks?.forEach(link => {
+              //连线上的pv
+              let linePV = link.getDistPV();
+              //线图形对应的json对象
+              let lineSequenceNode = graph.nodes.get(link.dm.id)
+              //线的开始节点在图形上
+              if (linePV == link.dm.startPoint) {
+                node.nextNodes.push(lineSequenceNode)
+              }
+              //线的结束节点在图形上
+              else if (linePV == link.dm.endPoint) {
+                node.prevNodes.push(lineSequenceNode)
+              }
+
+            })
+          } 
+        });
+        graph.groups = groups;
+
+        
+        //识别开始于结束节点
+        graph.nodes.forEach(node => {
+          let model = modelsCache[node.id]
+          if (node.bpmnType == 'StartEvent') {
+            if (!model.includePModelId){
+              graph.startNodes.push(node)
+            }else{
+              
+              graph.nodes.get(model.includePModelId)?.startNodes.push(node)
+            }
+            
+          } else if (node.bpmnType == 'EndEvent') {
+            if (!model.includePModelId) {
+              graph.endNodes.push(node)
+            } else {
+              
+              graph.nodes.get(model.includePModelId)?.endNodes.push(node)
+            }
+          }
+        })
+        //识别出孤立节点
+        graph.nodes.forEach(node => {
+          if (node instanceof DDeiFlowSequence ){
+            if (!node.prevNode && !node.nextNode){
+              isolatedNodes.push(node)
+            }
+          }
+          else if (node.prevNodes?.length == 0 && node.bpmnType != 'StartEvent' && node.bpmnType != 'Group' && node.bpmnType != 'Comment') {
+            if (node.bpmnType != 'SubProcess') {
+              isolatedNodes.push(node)
+            } else {
+              //寻找subprocess是否被引用
+              let isolated = true
+              graph.nodes.forEach(n1 => {
+                if (n1.subProcesses && n1.subProcesses.indexOf(node) != -1) {
+                  isolated = false
+                }
+              })
+              if (isolated) {
+                isolatedNodes.push(node)
+              }
+            }
+          } 
+          else if (node.prevNodes?.length == 0 && node.nextNodes?.length == 0) {
+            if (node.bpmnType != 'SubProcess'){
+              isolatedNodes.push(node)
+            }else{
+              //寻找subprocess是否被引用
+              let isolated = true
+              graph.nodes.forEach(n1 => {
+                if (n1.subProcesses && n1.subProcesses.indexOf(node) != -1){
+                  isolated = false
+                }
+              })
+              if (isolated){
+                isolatedNodes.push(node)
+              }
+            }
+            
+          }
+        })
+        graph.isolatedNodes = isolatedNodes
+
+        deletedNodes.forEach(id=>{
+          graph.nodes.delete(id)
+        })
+
+        returnArray.push(graph)
+      }
+
+      return returnArray;
+    } else {
+      return null;
+    }
+  }
+
+  private getSubProcessNodes(includePModelId, graph, modelsCache): DDeiFlowSubProcess[] {
+    let returnNodes: DDeiFlowSubProcess[] = []
+    while (includePModelId){
+      let subProcessesNode = this.getSubProcessNode(includePModelId,graph,modelsCache)
+      if (subProcessesNode){
+        returnNodes.splice(0, 0, subProcessesNode)
+        let subProcessModel = modelsCache[subProcessesNode.id]
+        includePModelId = subProcessModel?.includePModelId
+      }else{
+        break;
+      }
+      
+    }
+    return returnNodes;
+  }
+
+  private getSubProcessNode(includePModelId, graph, modelsCache):DDeiFlowSubProcess|null{
+    let pNode = graph.nodes.get(includePModelId);
+    if(pNode){
+      let pNodeModel = modelsCache[pNode.id]
+      if (pNode.bpmnType == 'SubProcess'){
+        return pNode;
+      } else if (pNode.bpmnType == 'Group' && pNodeModel.includePModelId){
+        return this.getSubProcessNode(pNodeModel.includePModelId, graph, modelsCache)
+      }
+    }
+    return null;
+  }
+
+
+  /**
+   * 转换model为node
+   * @param model model
+   * @returns node
+   */
+  private parseModelToFlowNode(model:DDeiAbstractShape):DDeiFlowNode{
+    let returnNode = null;
+    let modelJson = {}
+    this.jsonField.forEach(field=>{
+      if (model[field] != undefined && model[field] != null){
+        modelJson[field] = model[field];
+      }
+    })
+    switch (model.bpmnBaseType){
+      case 'Event':{
+        returnNode = new DDeiFlowNode(modelJson)
+      }
+        break;
+      case 'Activity':{
+        if(model.bpmnType == 'SubProcess'){
+          returnNode = new DDeiFlowSubProcess(modelJson)
+        }else{
+          returnNode = new DDeiFlowNode(modelJson)
+        }
+
+      }
+        break;
+      case 'Group':{
+        returnNode = new DDeiFlowGroup(modelJson)
+      }
+        break;
+      case 'Sequence':{
+        returnNode = new DDeiFlowSequence(modelJson)
+      }
+        break;
+      case 'Comment':{
+        returnNode = new DDeiFlowNode(modelJson)
+      }
+        break;
+    }
+
+    if (!returnNode){
+      returnNode = new DDeiFlowNode(modelJson)
+    }
+    //缺省类型
+    return returnNode;
+  }
+
+  /**
+   * 将当前文档转换为符合bpmn规范的xml文档
+   */
+  toBPMNXML(allSheets: boolean = false):string{
+    let returnStr = `<?xml version="1.0" encoding="UTF-8"?>
+    <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn"
+      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+      xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+      expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">`
+    //转换为中间对象
+    let flowObject = this.toFlowObject(true, allSheets)
+    for (let gi = 0; gi < flowObject.graphics.length;gi++){
+      let flowGraph = flowObject.graphics[gi];
+      let processXML = this.flowGraph2BPMNXML(flowGraph)
+      if (processXML){
+        returnStr += processXML+"\n"
+      }
+    }
+
+// 	<process id="my-process">
+// 		<startEvent id="startEvent" name="startEvent"/>
+// 		<userTask id="commonTask" name="Common Task"/>
+// 		<boundaryEvent attachedToRef="commonTask" id="boundaryEvent"
+// 					   name="Timer" cancelActivity="true">   <!-- 定义边界事件，并且可以取消这个流程 -->
+// 			<timerEventDefinition>  <!-- 定义时间定义器 -->
+// 				<timeDuration>PT5S</timeDuration>    <!-- 流程部署后5秒再执行 -->
+// 			</timerEventDefinition>
+// 		</boundaryEvent>
+// 		<userTask id="timeoutTask" name="Timeout Task"></userTask>   <!-- 如果commonTask没有在规定时间内完成，则执行这个userTask -->
+// 		<endEvent id="end1"></endEvent>
+// 		<endEvent id="end2"></endEvent>
+ 
+// 		<!-- 然后将事件相连，使用sequenceFlow -->
+// 		<sequenceFlow sourceRef="startEvent" targetRef="commonTask"/>
+// 		<sequenceFlow sourceRef="commonTask" targetRef="end1"/>
+// 		<sequenceFlow sourceRef="boundaryEvent" targetRef="timeoutTask"/>
+// 		<sequenceFlow sourceRef="timeoutTask" targetRef="end2"/>
+// 	</process>
+ 
+// </definitions>`
+    
+    returnStr += '</definitions>'
+    return returnStr;
+  }
+
+  /**
+   * 将舞台对象转换为bpmn规范的xml字符串
+   * @param stage 舞台对象
+   * @returns xml字符串
+   */
+  private flowGraph2BPMNXML(graph: DDeiFlowGraph): string {
+    let returnStr = ''
+    if (graph) {
+      returnStr += '<process id="' + graph.id + '">'
+      //遍历所有节点生成
+      graph.nodes.forEach(node=>{
+        let nodeXML = this.node2BPMNXML(node)
+        if (nodeXML){
+          returnStr += nodeXML+"\n"
+        }
+      })
+      returnStr += '</process>\n'
+    }
+    return returnStr;
+  }
+
+  private node2BPMNXML(node): string {
+    if (node){
+      //连接线
+      if(node instanceof DDeiFlowSequence){
+
+      } 
+      //节点
+      else if (node instanceof DDeiFlowNode) {
+        
+        if(node.bpmnType == 'StartEvent'){
+          return this.startEvent2BPMNXML(node);
+        } else if (node.bpmnType == 'IntermediateEvent') {
+          return this.intermediaEvent2BPMNXML(node);
+        } else if (node.bpmnType == 'EndEvent') {
+          return this.endEvent2BPMNXML(node);
+        } else if (node.bpmnType == 'UserTask') {
+          return this.userTask2BPMNXML(node);
+        } else if (node.bpmnType == 'ServiceTask') {
+          return this.serviceTask2BPMNXML(node);
+        } else if (node.bpmnType == 'SendTask') {
+          return this.sendTask2BPMNXML(node);
+        } else if (node.bpmnType == 'ScriptTask') {
+          return this.scriptTask2BPMNXML(node);
+        } else if (node.bpmnType == 'ManualTask') {
+          return this.manualTask2BPMNXML(node);
+        } else if (node.bpmnType == 'ReceiveTask') {
+          return this.receiveTask2BPMNXML(node);
+        } else if (node.bpmnType == 'BusinessTask') {
+          return this.businessTask2BPMNXML(node);
+        } else if (node.bpmnType == 'SubProcess') {
+          return this.subProcess2BPMNXML(node);
+        }
+      }
+      //分组
+      else if (node instanceof DDeiFlowGroup) {
+
+      }
+    }
+    return null;
+  }
+
+  /**
+   * 将对象转换为bpmn规范的xml字符串
+   * @param node 对象
+   * @returns xml字符串
+   */
+  private startEvent2BPMNXML(node: DDeiFlowNode): string {
+    let returnStr = ''
+    if (node) {
+      returnStr += '<startEvent id="' + node.id + '"'
+      if (node.name) {
+        returnStr += 'name="' + node.name + '"'
+      }
+      returnStr += '>'
+      if (node.bpmnSubType == 4 || node.bpmnSubType == 5) {
+        returnStr += '<timerEventDefinition>'
+        returnStr += '<timeCycle>R5/PT5M</timeCycle>'
+        returnStr += '</timerEventDefinition>'
+      }
+      returnStr += '</startEvent>'
+    }
+    return returnStr;
+  }
+
+  /**
+   * 将对象转换为bpmn规范的xml字符串
+   * @param node 对象
+   * @returns xml字符串
+   */
+  private intermediaEvent2BPMNXML(node: DDeiFlowNode): string {
+    let returnStr = ''
+
+    return returnStr;
+  }
+
+  /**
+   * 将对象转换为bpmn规范的xml字符串
+   * @param node 对象
+   * @returns xml字符串
+   */
+  private endEvent2BPMNXML(node: DDeiFlowNode): string {
+    let returnStr = ''
+    if (node) {
+      returnStr += '<endEvent id="' + node.id + '"'
+      if (node.name) {
+        returnStr += 'name="' + node.name + '"'
+      }
+      returnStr += '>'
+      returnStr += '</endEvent>'
+    }
+    return returnStr;
+  }
+
+  /**
+   * 将对象转换为bpmn规范的xml字符串
+   * @param node 对象
+   * @returns xml字符串
+   */
+  private userTask2BPMNXML(node: DDeiFlowNode): string {
+    let returnStr = ''
+    if (node) {
+      returnStr += '<userTask id="' + node.id + '"'
+      if (node.name) {
+        returnStr += 'name="' + node.name + '"'
+      }
+      returnStr += '>'
+      returnStr += '</userTask>'
+    }
+    return returnStr;
+  }
+
+  /**
+   * 将对象转换为bpmn规范的xml字符串
+   * @param node 对象
+   * @returns xml字符串
+   */
+  private scriptTask2BPMNXML(node: DDeiFlowNode): string {
+    let returnStr = ''
+    if (node) {
+      returnStr += '<scriptTask id="' + node.id + '"'
+      if (node.name) {
+        returnStr += 'name="' + node.name + '"'
+      }
+      returnStr += '>'
+      returnStr += '</scriptTask>'
+    }
+    return returnStr;
+  }
+
+  /**
+   * 将对象转换为bpmn规范的xml字符串
+   * @param node 对象
+   * @returns xml字符串
+   */
+  private serviceTask2BPMNXML(node: DDeiFlowNode): string {
+    let returnStr = ''
+    if (node) {
+      returnStr += '<serviceTask id="' + node.id + '"'
+      if (node.name) {
+        returnStr += 'name="' + node.name + '"'
+      }
+      returnStr += '>'
+      returnStr += '</serviceTask>'
+    }
+    return returnStr;
+  }
+
+  /**
+   * 将对象转换为bpmn规范的xml字符串
+   * @param node 对象
+   * @returns xml字符串
+   */
+  private sendTask2BPMNXML(node: DDeiFlowNode): string {
+    let returnStr = ''
+    if (node) {
+      returnStr += '<sendTask id="' + node.id + '"'
+      if (node.name) {
+        returnStr += 'name="' + node.name + '"'
+      }
+      returnStr += '>'
+      returnStr += '</sendTask>'
+    }
+    return returnStr;
+  }
+
+
+  /**
+   * 将对象转换为bpmn规范的xml字符串
+   * @param node 对象
+   * @returns xml字符串
+   */
+  private manualTask2BPMNXML(node: DDeiFlowNode): string {
+    let returnStr = ''
+    if (node) {
+      returnStr += '<manualTask id="' + node.id + '"'
+      if (node.name) {
+        returnStr += 'name="' + node.name + '"'
+      }
+      returnStr += '>'
+      returnStr += '</manualTask>'
+    }
+    return returnStr;
+  }
+
+  /**
+   * 将对象转换为bpmn规范的xml字符串
+   * @param node 对象
+   * @returns xml字符串
+   */
+  private receiveTask2BPMNXML(node: DDeiFlowNode): string {
+    let returnStr = ''
+    if (node) {
+      returnStr += '<receiveTask id="' + node.id + '"'
+      if (node.name) {
+        returnStr += 'name="' + node.name + '"'
+      }
+      returnStr += '>'
+      returnStr += '</receiveTask>'
+    }
+    return returnStr;
+  }
+
+  /**
+   * 将对象转换为bpmn规范的xml字符串
+   * @param node 对象
+   * @returns xml字符串
+   */
+  private businessTask2BPMNXML(node: DDeiFlowNode): string {
+    let returnStr = ''
+    if (node) {
+      returnStr += '<businessTask id="' + node.id + '"'
+      if (node.name) {
+        returnStr += 'name="' + node.name + '"'
+      }
+      returnStr += '>'
+      returnStr += '</businessTask>'
+    }
+    return returnStr;
+  }
+
+  /**
+   * 将对象转换为bpmn规范的xml字符串
+   * @param node 对象
+   * @returns xml字符串
+   */
+  private subProcess2BPMNXML(node: DDeiFlowNode): string {
+    let returnStr = ''
+    if (node) {
+      returnStr += '<subProcess id="' + node.id + '"'
+      if (node.name) {
+        returnStr += 'name="' + node.name + '"'
+      }
+      returnStr += '>'
+      returnStr += '</subProcess>'
+    }
+    return returnStr;
+  }
+
+  
 }
 
 export { DDeiFlowAPI }
