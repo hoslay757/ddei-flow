@@ -44,28 +44,28 @@ const options = {
         }
       ]
     }),
-    DDeiFlowSettingButtonDialog.configuration({
-      buttons:[
-        {
-          id: 'ddei-flow-change-bpmnsubtype'
-        },
-        {
-          id: 'ddei-flow-choose-activity'
-        },
-        {
-          id: 'ddei-flow-expand-or-not'
-        },
-        {
-          id: 'ddei-flow-lock-or-unlock'
-        },
-        {
-          viewer: buttondemo
-        },
-        {
-          id: 'ddei-flow-remove-control'
-        }
-      ],
-    }),
+    // DDeiFlowSettingButtonDialog.configuration({
+    //   buttons:[
+    //     {
+    //       id: 'ddei-flow-change-bpmnsubtype'
+    //     },
+    //     {
+    //       id: 'ddei-flow-choose-activity'
+    //     },
+    //     {
+    //       id: 'ddei-flow-expand-or-not'
+    //     },
+    //     {
+    //       id: 'ddei-flow-lock-or-unlock'
+    //     },
+    //     {
+    //       viewer: buttondemo
+    //     },
+    //     {
+    //       id: 'ddei-flow-remove-control'
+    //     }
+    //   ],
+    // }),
   ],
 }
 </script>

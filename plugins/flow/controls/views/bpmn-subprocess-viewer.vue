@@ -15,33 +15,54 @@ export default {
     }
   },
 
+  data(){
+    return {
+      eventSubProcess:false
+    }
+  },
+
+
+
   methods:{
     refreshDragState(type){
       if (type == 1){
-        this.$refs['divElement'].style.border = "1px solid green"
+        this.$refs['divElement'].style.borderColor = "green"
+        if (this.$refs['transactionBorderElement']){
+          this.$refs['transactionBorderElement'].style.borderColor = "green"
+        }
       }else{
-        this.$refs['divElement'].style.border = ""
+        this.$refs['divElement'].style.borderColor = ""
+        if (this.$refs['transactionBorderElement']){
+          this.$refs['transactionBorderElement'].style.borderColor = ""
+        }
+      }
+      if(this.model.isTransaction == 1){
+        this.eventSubProcess = true
+      }else{
+        this.eventSubProcess = false
       }
     }
   }
 };
 </script>
 <template>
-  <div ref="divElement" class="ddei-flow-bpmn-viewer-subprocess">
+  <div ref="divElement" :class="{ 'ddei-flow-bpmn-viewer-subprocess': true, 'ddei-flow-bpmn-viewer-subprocess-event':eventSubProcess }">
+    <div ref="transactionBorderElement" v-if="model.isTransaction == 1" class="trans">
+    </div>
     <div class="title" v-if="!model.isExpand">
-      {{ model.name ? model.name : "嵌入子流程" }}
+      {{ model.name ? model.name : model?.isTransaction == 1 ?"事务子流程":"子流程" }}
     </div>
     <div ref="content" class="content" v-if="model.isExpand">
       <div class="content-header">
         <div class="content-header-title">
-          {{ model.name ? model.name : "嵌入子流程" }}
+          {{ model.name ? model.name : model?.isTransaction == 1 ? "事务子流程" : "子流程" }}
         </div>
         <svg class="icon-ddei-flow content-header-locked" v-if="model.lock == 1" aria-hidden="true">
           <use xlink:href="#icon-ddei-flow-lock"></use>
         </svg>
       </div>
       <div class="content-elements">
-     
+
       </div>
     </div>
     <div class="markers">
@@ -80,12 +101,29 @@ export default {
   pointer-events:none;
   user-select: none;
   display: none;
+
+  &-event{
+    border-style:dashed !important;
+    .trans {
+      border-style: dashed !important;
+    }
+  }
+
+  .trans{
+    width:calc(100% - 10px);
+    height:calc(100% - 10px);
+    position: absolute;
+    border: var(--borderWidth) var(--borderType) var(--borderColor);
+    border-radius: var(--borderRound);
+    left:5px;
+    top:5px;
+  }
   .markers{
     height:24px;
     width:100%;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: start;
     .icon-ddei-flow {
       width: 18px;
       height: 18px;
@@ -95,6 +133,8 @@ export default {
     .title {
       font-size: 13px;
       height: calc(100% - 24px);
+      width:calc(100% - 10px);
+      margin-left: 5px;
       display: flex;
       border-bottom: var(--borderWidth) var(--borderType) var(--borderColor);
       justify-content: center;
@@ -117,8 +157,8 @@ export default {
       align-items: center;
       flex-direction: column;
       &-header {
-        padding:2px 5px;
-        flex: 0 0 20px;
+        padding:10px;
+        flex: 0 0 30px;
         height: 20px;
         width: 100%;
         display: flex;

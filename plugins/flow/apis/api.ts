@@ -7,6 +7,7 @@ import DDeiFlowNode from "./node";
 import DDeiFlowGroup from "./group";
 import DDeiFlowSequence from "./sequence"
 import DDeiFlowSubProcess from "./subprocess"
+import { table } from "console";
 /**
  * DDeiFlow插件的API方法包，提供了API以及工具函数
  * 初始化时挂载到editor的flow属性上
@@ -18,18 +19,32 @@ class DDeiFlowAPI {
   /**
    * 配置的属性
    */
-  jsonField: string[] = ["id", "name", "code", "text", "desc", "condition", "default", "bpmnType", "bpmnSubType", "bpmnBaseType", "isLoop", "isLoop", "multiInstance", "isParallel", "isCompensation","isAdHoc","essBounds"]
+  jsonField: string[] = ["id", "name", "code", "text", "ep", "sp", "desc", "condition", "default", "bpmnType", "bpmnSubType", "bpmnBaseType", "isLoop", "isLoop","isTransaction", "multiInstance", "isParallel", "isCompensation","isAdHoc","essBounds"]
 
+  /**
+   * json中以哪个字段作为key，默认为id，可以指定为code或其他字段
+   */
+  jsonKeyField:string = 'id'
 
   constructor(editor:DDeiEditor){
     this.editor = editor
   }
 
   /**
+   * 设置键字段
+   * @param field 字段名称
+   */
+  setJsonKeyField(field:string):void{
+    if(field){
+      this.jsonKeyField = field
+    }
+  }
+
+  /**
    * 配置返回的json数据字段
    * @param fn 外部方法，用来修改jsonField
    */
-  configJsonField(fn) {
+  configJsonField(fn):void{
     fn(this.jsonField)
   }
 
@@ -548,14 +563,11 @@ class DDeiFlowAPI {
    * 将当前文档转换为符合bpmn规范的xml文档
    */
   toBPMNXML(allSheets: boolean = false):string{
-    let returnStr = `<?xml version="1.0" encoding="UTF-8"?>
-    <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn"
-      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
-      xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
-      expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">`
     //转换为中间对象
     let flowObject = this.toFlowObject(true, allSheets)
+    //生成xml
+    let returnStr = `<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions id="`+ flowObject.id +`" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" targetNamespace="http://bpmn.io/schema/bpmn">\n`
     for (let gi = 0; gi < flowObject.graphics.length;gi++){
       let flowGraph = flowObject.graphics[gi];
       let processXML = this.flowGraph2BPMNXML(flowGraph)
@@ -563,30 +575,7 @@ class DDeiFlowAPI {
         returnStr += processXML+"\n"
       }
     }
-
-// 	<process id="my-process">
-// 		<startEvent id="startEvent" name="startEvent"/>
-// 		<userTask id="commonTask" name="Common Task"/>
-// 		<boundaryEvent attachedToRef="commonTask" id="boundaryEvent"
-// 					   name="Timer" cancelActivity="true">   <!-- 定义边界事件，并且可以取消这个流程 -->
-// 			<timerEventDefinition>  <!-- 定义时间定义器 -->
-// 				<timeDuration>PT5S</timeDuration>    <!-- 流程部署后5秒再执行 -->
-// 			</timerEventDefinition>
-// 		</boundaryEvent>
-// 		<userTask id="timeoutTask" name="Timeout Task"></userTask>   <!-- 如果commonTask没有在规定时间内完成，则执行这个userTask -->
-// 		<endEvent id="end1"></endEvent>
-// 		<endEvent id="end2"></endEvent>
- 
-// 		<!-- 然后将事件相连，使用sequenceFlow -->
-// 		<sequenceFlow sourceRef="startEvent" targetRef="commonTask"/>
-// 		<sequenceFlow sourceRef="commonTask" targetRef="end1"/>
-// 		<sequenceFlow sourceRef="boundaryEvent" targetRef="timeoutTask"/>
-// 		<sequenceFlow sourceRef="timeoutTask" targetRef="end2"/>
-// 	</process>
- 
-// </definitions>`
-    
-    returnStr += '</definitions>'
+    returnStr += '</bpmn:definitions>'
     return returnStr;
   }
 
@@ -598,50 +587,42 @@ class DDeiFlowAPI {
   private flowGraph2BPMNXML(graph: DDeiFlowGraph): string {
     let returnStr = ''
     if (graph) {
-      returnStr += '<process id="' + graph.id + '">'
+      returnStr += '  <bpmn:process id="' + graph.id + '">\n'
       //遍历所有节点生成
       graph.nodes.forEach(node=>{
-        let nodeXML = this.node2BPMNXML(node)
+        let nodeXML = this.node2BPMNXML(node,3)
         if (nodeXML){
-          returnStr += nodeXML+"\n"
+          returnStr += nodeXML
         }
       })
-      returnStr += '</process>\n'
+      returnStr += '  </bpmn:process>'
     }
     return returnStr;
   }
 
-  private node2BPMNXML(node): string {
+  private node2BPMNXML(node,tabLevel:number = 0): string {
     if (node){
       //连接线
       if(node instanceof DDeiFlowSequence){
-
+        return this.sequence2BPMNXML(node,3)
       } 
       //节点
       else if (node instanceof DDeiFlowNode) {
         
         if(node.bpmnType == 'StartEvent'){
-          return this.startEvent2BPMNXML(node);
+          return this.startEvent2BPMNXML(node, tabLevel);
         } else if (node.bpmnType == 'IntermediateEvent') {
-          return this.intermediaEvent2BPMNXML(node);
+          return this.intermediaEvent2BPMNXML(node, tabLevel);
         } else if (node.bpmnType == 'EndEvent') {
-          return this.endEvent2BPMNXML(node);
-        } else if (node.bpmnType == 'UserTask') {
-          return this.userTask2BPMNXML(node);
-        } else if (node.bpmnType == 'ServiceTask') {
-          return this.serviceTask2BPMNXML(node);
-        } else if (node.bpmnType == 'SendTask') {
-          return this.sendTask2BPMNXML(node);
-        } else if (node.bpmnType == 'ScriptTask') {
-          return this.scriptTask2BPMNXML(node);
-        } else if (node.bpmnType == 'ManualTask') {
-          return this.manualTask2BPMNXML(node);
-        } else if (node.bpmnType == 'ReceiveTask') {
-          return this.receiveTask2BPMNXML(node);
-        } else if (node.bpmnType == 'BusinessTask') {
-          return this.businessTask2BPMNXML(node);
+          return this.endEvent2BPMNXML(node, tabLevel);
         } else if (node.bpmnType == 'SubProcess') {
-          return this.subProcess2BPMNXML(node);
+          return this.subProcess2BPMNXML(node, tabLevel);
+        } else if (node.bpmnBaseType == 'Gateway'){
+          return this.gateway2BPMNXML(node, tabLevel)
+        }else if(node.bpmnType == 'Comment'){
+          return this.comment2BPMNXML(node, tabLevel)
+        } else {
+          return this.task2BPMNXML(node,tabLevel)
         }
       }
       //分组
@@ -657,20 +638,45 @@ class DDeiFlowAPI {
    * @param node 对象
    * @returns xml字符串
    */
-  private startEvent2BPMNXML(node: DDeiFlowNode): string {
+  private startEvent2BPMNXML(node: DDeiFlowNode,tabLevel:number = 0): string {
     let returnStr = ''
+    let tabStr = ""
+    for (let i = 0; i < tabLevel; i++) {
+      tabStr += " "
+    }
     if (node) {
-      returnStr += '<startEvent id="' + node.id + '"'
+      returnStr += tabStr +'<bpmn:startEvent id="' + node.id + '"'
       if (node.name) {
         returnStr += 'name="' + node.name + '"'
       }
-      returnStr += '>'
-      if (node.bpmnSubType == 4 || node.bpmnSubType == 5) {
-        returnStr += '<timerEventDefinition>'
-        returnStr += '<timeCycle>R5/PT5M</timeCycle>'
-        returnStr += '</timerEventDefinition>'
+      let childXML = ''
+      if (node.bpmnSubType == 2 || node.bpmnSubType == 3) {
+        childXML += tabStr + ' <bpmn:messageEventDefinition>\n'
+        childXML += tabStr + ' </bpmn:messageEventDefinition>\n'
+      }else if (node.bpmnSubType == 4 || node.bpmnSubType == 5) {
+        childXML += tabStr + ' <bpmn:timerEventDefinition>\n'
+        childXML += tabStr + '   <bpmn:timeCycle>R5/PT5M</timeCycle>\n'
+        //持续
+        //<bpmn:timeDuration xsi:type="bpmn:tFormalExpression">a&gt;1</bpmn:timeDuration>
+        //循环
+        //<bpmn:timeCycle xsi:type="bpmn:tFormalExpression">loop&gt;100</bpmn:timeCycle>
+        //固定
+        //<bpmn:timeCycle xsi:type="bpmn:tFormalExpression">loop&gt;100</bpmn:timeCycle>
+        childXML += tabStr + ' </bpmn:timerEventDefinition>\n'
+      } else if (node.bpmnSubType == 6 || node.bpmnSubType == 7) {
+        childXML += tabStr + ' <bpmn:conditionalEventDefinition>\n'
+        childXML += tabStr + '  <bpmn:condition xsi:type="bpmn:tFormalExpression">${1+1&gt;2}</bpmn:condition>\n'
+        childXML += tabStr + ' </bpmn:conditionalEventDefinition>\n'
+      } else if (node.bpmnSubType == 8 || node.bpmnSubType == 9) {
+        childXML += tabStr + ' <bpmn:signalEventDefinition>\n'
+        childXML += tabStr + ' </bpmn:signalEventDefinition>\n'
       }
-      returnStr += '</startEvent>'
+      
+      if (childXML){
+        returnStr += '>\n' + childXML + tabStr +'</bpmn:startEvent>\n'
+      }else{
+        returnStr += '/>\n'
+      }
     }
     return returnStr;
   }
@@ -680,7 +686,7 @@ class DDeiFlowAPI {
    * @param node 对象
    * @returns xml字符串
    */
-  private intermediaEvent2BPMNXML(node: DDeiFlowNode): string {
+  private intermediaEvent2BPMNXML(node: DDeiFlowNode,tabLevel:number = 0): string {
     let returnStr = ''
 
     return returnStr;
@@ -691,15 +697,25 @@ class DDeiFlowAPI {
    * @param node 对象
    * @returns xml字符串
    */
-  private endEvent2BPMNXML(node: DDeiFlowNode): string {
+  private endEvent2BPMNXML(node: DDeiFlowNode,tabLevel:number = 0): string {
     let returnStr = ''
+    let tabStr = ""
+    for (let i = 0; i < tabLevel; i++) {
+      tabStr += " "
+    }
     if (node) {
-      returnStr += '<endEvent id="' + node.id + '"'
+      returnStr += tabStr +'<bpmn:endEvent id="' + node[this.jsonKeyField] + '"'
       if (node.name) {
-        returnStr += 'name="' + node.name + '"'
+        returnStr += ' name="' + node.name + '"'
       }
-      returnStr += '>'
-      returnStr += '</endEvent>'
+      let childXML = ''
+     
+
+      if (childXML) {
+        returnStr += '>\n' + childXML + tabStr +'</bpmn:endEvent>\n'
+      } else {
+        returnStr += '/>\n'
+      }
     }
     return returnStr;
   }
@@ -709,15 +725,53 @@ class DDeiFlowAPI {
    * @param node 对象
    * @returns xml字符串
    */
-  private userTask2BPMNXML(node: DDeiFlowNode): string {
+  private task2BPMNXML(node: DDeiFlowNode,tabLevel:number = 0): string {
     let returnStr = ''
+    let tabStr = ""
+    for (let i = 0; i < tabLevel; i++) {
+      tabStr += " "
+    }
     if (node) {
-      returnStr += '<userTask id="' + node.id + '"'
+      let nodeTag = "bpmn:task"
+      if (node.bpmnType == 'UserTask') {
+        nodeTag = "bpmn:userTask"
+      } else if (node.bpmnType == 'ServiceTask') {
+        nodeTag = "bpmn:serviceTask"
+      } else if (node.bpmnType == 'SendTask') {
+        nodeTag = "bpmn:sendTask"
+      } else if (node.bpmnType == 'ScriptTask') {
+        nodeTag = "bpmn:scriptTask"
+      } else if (node.bpmnType == 'ManualTask') {
+        nodeTag = "bpmn:manualTask"
+      } else if (node.bpmnType == 'ReceiveTask') {
+        nodeTag = "bpmn:receiveTask"
+      } else if (node.bpmnType == 'CallActivityTask') {
+        nodeTag = "bpmn:callActivity"
+      } 
+      returnStr += tabStr + '<' + nodeTag +' id="' + node[this.jsonKeyField] + '"'
       if (node.name) {
-        returnStr += 'name="' + node.name + '"'
+        returnStr += ' name="' + node.name + '"'
       }
-      returnStr += '>'
-      returnStr += '</userTask>'
+      if (node.scriptFormat) {
+        returnStr += ' scriptFormat="' + node.scriptFormat + '"'
+      }
+      if (node.script) {
+        returnStr += ' script="' + node.script + '"'
+      }
+
+      let childXML = ''
+
+      //描述
+      childXML += this.bpmnXmlSubDocumentation(node, tabLevel + 1) 
+      //进出属性
+      childXML += this.bpmnXmlSubInOut(node,tabLevel+1)
+      //多实例
+      childXML += this.bpmnXmlSubMultiInstance(node,tabLevel+1)
+      if (childXML) {
+        returnStr += '>\n' + childXML + tabStr + '</' + nodeTag +'>\n'
+      } else {
+        returnStr += '/>\n'
+      }
     }
     return returnStr;
   }
@@ -727,15 +781,26 @@ class DDeiFlowAPI {
    * @param node 对象
    * @returns xml字符串
    */
-  private scriptTask2BPMNXML(node: DDeiFlowNode): string {
+  private comment2BPMNXML(node: DDeiFlowNode, tabLevel: number = 0): string {
     let returnStr = ''
+    let tabStr = ""
+    for (let i = 0; i < tabLevel; i++) {
+      tabStr += " "
+    }
     if (node) {
-      returnStr += '<scriptTask id="' + node.id + '"'
-      if (node.name) {
-        returnStr += 'name="' + node.name + '"'
+      let nodeTag = "bpmn:textAnnotation"
+      
+      returnStr += tabStr + '<' + nodeTag + ' id="' + node[this.jsonKeyField] + '"'
+      let childXML = ''
+      if(node.text){
+        childXML += tabStr +'  <bpmn:text>'+node.text+'</bpmn:text>\n'
       }
-      returnStr += '>'
-      returnStr += '</scriptTask>'
+      
+      if (childXML) {
+        returnStr += '>\n' + childXML + tabStr + '</' + nodeTag + '>\n'
+      } else {
+        returnStr += '/>\n'
+      }
     }
     return returnStr;
   }
@@ -745,33 +810,89 @@ class DDeiFlowAPI {
    * @param node 对象
    * @returns xml字符串
    */
-  private serviceTask2BPMNXML(node: DDeiFlowNode): string {
+  private gateway2BPMNXML(node: DDeiFlowNode, tabLevel: number = 0): string {
     let returnStr = ''
+    let tabStr = ""
+    for (let i = 0; i < tabLevel; i++) {
+      tabStr += " "
+    }
     if (node) {
-      returnStr += '<serviceTask id="' + node.id + '"'
+      let nodeTag = ""
+      if (node.bpmnType == 'ExclusiveGateway') {
+        nodeTag = "bpmn:exclusiveGateway"
+      } else if (node.bpmnType == 'ParallelGateway') {
+        nodeTag = "bpmn:parallelGateway"
+      } else if (node.bpmnType == 'ComplexGateway') {
+        nodeTag = "bpmn:complexGateway"
+      } else if (node.bpmnType == 'EventBasedGateway') {
+        nodeTag = "bpmn:eventBasedGateway"
+      } else if (node.bpmnType == 'InclusiveGateway') {
+        nodeTag = "bpmn:inclusiveGateway"
+      } 
+      returnStr += tabStr + '<' + nodeTag + ' id="' + node[this.jsonKeyField] + '"'
       if (node.name) {
-        returnStr += 'name="' + node.name + '"'
+        returnStr += ' name="' + node.name + '"'
       }
-      returnStr += '>'
-      returnStr += '</serviceTask>'
+
+      //默认
+      if (node.bpmnType == 'ExclusiveGateway') {
+        let defSeqs = this.getDefaultSequenceNodes(node)
+        if (defSeqs?.length > 0){
+          returnStr += ' default="' + defSeqs[0][this.jsonKeyField] + '"'
+        }
+      }
+
+      let childXML = ''
+
+      //描述
+      childXML += this.bpmnXmlSubDocumentation(node, tabLevel + 1)
+      //进出属性
+      childXML += this.bpmnXmlSubInOut(node, tabLevel + 1)
+  
+      if (childXML) {
+        returnStr += '>\n' + childXML + tabStr + '</' + nodeTag + '>\n'
+      } else {
+        returnStr += '/>\n'
+      }
     }
     return returnStr;
   }
+
 
   /**
    * 将对象转换为bpmn规范的xml字符串
    * @param node 对象
    * @returns xml字符串
    */
-  private sendTask2BPMNXML(node: DDeiFlowNode): string {
+  private subProcess2BPMNXML(node: DDeiFlowNode,tabLevel:number = 0): string {
     let returnStr = ''
+    let tabStr = ""
+    for (let i = 0; i < tabLevel; i++) {
+      tabStr += " "
+    }
     if (node) {
-      returnStr += '<sendTask id="' + node.id + '"'
-      if (node.name) {
-        returnStr += 'name="' + node.name + '"'
+      let nodeTag = "bpmn:subProcess"
+      if (node.isTransaction == 1) {
+        nodeTag = "bpmn:transaction"
       }
-      returnStr += '>'
-      returnStr += '</sendTask>'
+      returnStr += tabStr + '<' + nodeTag +' id="' + node[this.jsonKeyField] + '"'
+      if (node.name) {
+        returnStr += ' name="' + node.name + '"'
+      }
+      //TODO name = "事件子流程" triggeredByEvent = "true"
+      let childXML = ''
+      node.nodes?.forEach(subNode => {
+        let nodeXML = this.node2BPMNXML(subNode, tabLevel+1)
+        if (nodeXML) {
+          childXML += nodeXML
+        }
+      })
+      
+      if (childXML) {
+        returnStr += '>\n' + childXML + tabStr + '<' + nodeTag +'/>\n'
+      } else {
+        returnStr += '/>\n'
+      }
     }
     return returnStr;
   }
@@ -782,73 +903,172 @@ class DDeiFlowAPI {
    * @param node 对象
    * @returns xml字符串
    */
-  private manualTask2BPMNXML(node: DDeiFlowNode): string {
+  private sequence2BPMNXML(sequence: DDeiFlowSequence,tabLevel:number = 0): string {
     let returnStr = ''
-    if (node) {
-      returnStr += '<manualTask id="' + node.id + '"'
-      if (node.name) {
-        returnStr += 'name="' + node.name + '"'
+    let tabStr = ""
+    for (let i = 0; i < tabLevel; i++) {
+      tabStr += " "
+    }
+    if (sequence) {
+      let noneDirection = false
+      let nodeTag = "bpmn:sequenceFlow"
+      if (sequence.bpmnSubType == 5) {
+        nodeTag = "bpmn:association"
+        noneDirection = true
       }
-      returnStr += '>'
-      returnStr += '</manualTask>'
+      returnStr += tabStr + '<' + nodeTag +' id="' + sequence[this.jsonKeyField] + '"' 
+      if (sequence.name) {
+        returnStr += ' name="' + sequence.name + '"'
+      }
+      // <bpmn:association id = "Association_14lyaze" associationDirection = "None" sourceRef = "Activity_0vhc61s" targetRef = "TextAnnotation_0u08dx5" />
+      //对注释的特别处理
+      if (sequence.prevNode?.bpmnType == 'Comment' || sequence.nextNode.bpmnType == 'Comment'){
+        let commentNode,otherNode
+        if (sequence.prevNode && sequence.nextNode){
+          if (sequence.prevNode.bpmnType == 'Comment') {
+            commentNode = sequence.prevNode
+            otherNode = sequence.nextNode
+          } else {
+            commentNode = sequence.nextNode
+            otherNode = sequence.prevNode
+          }
+        } else if (sequence.prevNode?.bpmnType == 'Comment'){
+          commentNode = sequence.prevNode
+          otherNode = sequence.nextNode
+        } else if (sequence.nextNode?.bpmnType == 'Comment') {
+          commentNode = sequence.nextNode
+          otherNode = sequence.prevNode
+        }
+        returnStr += ' targetRef="' + commentNode[this.jsonKeyField]+'"'
+        if(otherNode){
+          returnStr += ' sourceRef="'+otherNode[this.jsonKeyField]+'"'
+        }
+        noneDirection = true
+      }else{
+        if (sequence.prevNode) {
+          returnStr += ' sourceRef="' + sequence.prevNode[this.jsonKeyField] + '"'
+        }
+        if (sequence.nextNode) {
+          returnStr += ' targetRef="' + sequence.nextNode[this.jsonKeyField] + '"'
+        }
+      }
+      if (!noneDirection){
+        //判定箭头是否都为空，如果都是空则noneDirection=true
+        let spNone = !(sequence.sp && sequence.sp.type != 0)
+        let epNone = !(sequence.ep && sequence.ep.type != 0)
+        if (spNone && epNone){
+          noneDirection = true
+        }
+      }
+      if(noneDirection){
+        returnStr += ' associationDirection="None"'
+      }
+     
+      let childXML = ''
+      //条件
+      if (sequence.condition){
+        childXML += tabStr +' <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">'+sequence.condition+'</bpmn:conditionExpression>'
+      }
+      if (childXML){
+        returnStr += '>\n' + childXML + tabStr + '</' + nodeTag +'>\n'
+      }else{
+        returnStr += '/>\n'
+      }
     }
     return returnStr;
+  }
+
+
+  /**
+   * 处理多实例
+   * @param node 
+   * @param tabLevel 
+   * @returns 
+   */
+  private bpmnXmlSubMultiInstance(node,tabLevel:number = 0){
+    let returnStr = ''
+    let tabStr = ""
+    for (let i = 0; i < tabLevel; i++) {
+      tabStr += " "
+    }
+    if (node.multiInstance){
+      returnStr += tabStr + '<bpmn:multiInstanceLoopCharacteristics'
+      if (!node.isParallel){
+        returnStr += ' isSequential = "true"'
+      }
+      returnStr += '>\n'
+      //实例数量
+      returnStr += tabStr+' <bpmn:loopCardinality xsi:type="bpmn:tFormalExpression">3</bpmn:loopCardinality>\n'
+      returnStr += tabStr + '</bpmn:multiInstanceLoopCharacteristics>\n'
+    }
+
+    return returnStr
   }
 
   /**
-   * 将对象转换为bpmn规范的xml字符串
-   * @param node 对象
-   * @returns xml字符串
+   * 获取缺省连线节点
+   * @param gateway 网关
+   * @returns 缺省连线
    */
-  private receiveTask2BPMNXML(node: DDeiFlowNode): string {
-    let returnStr = ''
-    if (node) {
-      returnStr += '<receiveTask id="' + node.id + '"'
-      if (node.name) {
-        returnStr += 'name="' + node.name + '"'
+  private getDefaultSequenceNodes(gateway) {
+    let returnSequences = []
+    gateway.graph.nodes.forEach(subNode => {
+      if (subNode instanceof DDeiFlowSequence) {
+        if (subNode.prevNode == gateway && subNode.bpmnSubType == 3) {
+          returnSequences.push(subNode)
+        }
       }
-      returnStr += '>'
-      returnStr += '</receiveTask>'
-    }
-    return returnStr;
+    });
+
+
+    return returnSequences
   }
 
   /**
-   * 将对象转换为bpmn规范的xml字符串
-   * @param node 对象
-   * @returns xml字符串
+   * 处理进出引用
+   * @param node 
+   * @param tabLevel 
+   * @returns 
    */
-  private businessTask2BPMNXML(node: DDeiFlowNode): string {
+  private bpmnXmlSubInOut(node, tabLevel: number = 0) {
     let returnStr = ''
-    if (node) {
-      returnStr += '<businessTask id="' + node.id + '"'
-      if (node.name) {
-        returnStr += 'name="' + node.name + '"'
-      }
-      returnStr += '>'
-      returnStr += '</businessTask>'
+    let tabStr = ""
+    for (let i = 0; i < tabLevel; i++) {
+      tabStr += " "
     }
-    return returnStr;
+    node.graph.nodes.forEach(subNode => {
+      if (subNode instanceof DDeiFlowSequence) {
+        if (subNode.nextNode == node) {
+          returnStr += tabStr + '<bpmn:incoming>' + subNode[this.jsonKeyField] + '</bpmn:incoming>\n'
+        }
+        if (subNode.prevNode == node) {
+          returnStr += tabStr + '<bpmn:outgoing>' + subNode[this.jsonKeyField] + '</bpmn:outgoing>\n'
+        }
+      }
+    });
+
+
+    return returnStr
   }
 
   /**
-   * 将对象转换为bpmn规范的xml字符串
-   * @param node 对象
-   * @returns xml字符串
+   * 处理进出引用
+   * @param node 
+   * @param tabLevel 
+   * @returns 
    */
-  private subProcess2BPMNXML(node: DDeiFlowNode): string {
+  private bpmnXmlSubDocumentation(node, tabLevel: number = 0) {
     let returnStr = ''
-    if (node) {
-      returnStr += '<subProcess id="' + node.id + '"'
-      if (node.name) {
-        returnStr += 'name="' + node.name + '"'
-      }
-      returnStr += '>'
-      returnStr += '</subProcess>'
+    let tabStr = ""
+    for (let i = 0; i < tabLevel; i++) {
+      tabStr += " "
     }
-    return returnStr;
-  }
+    if (node.desc?.trim()){
+      returnStr += tabStr +'<bpmn:documentation>'+node.desc.trim()+'</bpmn:documentation>\n'
+    }
 
+    return returnStr
+  }
   
 }
 

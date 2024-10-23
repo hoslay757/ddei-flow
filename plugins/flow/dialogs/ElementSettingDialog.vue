@@ -88,6 +88,15 @@
           </div>
         </div>
         <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnType == 'SubProcess'">
+          <div class="change-bpmn-marker" @click="changeBpmnLabel('isTransaction')">
+            <div :class="{ 'chk_state': model?.isTransaction != 1, 'chk_state_checked': model?.isTransaction == 1 }">
+              <span>{{ model?.isTransaction == 1 ? '✓' : '' }}</span>
+            </div>
+            事务
+          </div>
+        </div>
+        <div class="row"
           v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnBaseType == 'Activity'">
           <div class="change-bpmn-marker" @click="changeBpmnLabel('isLoop')">
             <div :class="{ 'chk_state': model?.isLoop != 1, 'chk_state_checked': model?.isLoop == 1 }">
