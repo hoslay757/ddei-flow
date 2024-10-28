@@ -46,10 +46,11 @@ export default {
 };
 </script>
 <template>
-  <div ref="divElement" :class="{ 'ddei-flow-bpmn-viewer-subprocess': true, 'ddei-flow-bpmn-viewer-subprocess-event':eventSubProcess }">
+  <div ref="divElement"
+    :class="{ 'ddei-flow-bpmn-viewer-subprocess': true, 'ddei-flow-bpmn-viewer-subprocess-event':eventSubProcess }">
     <div ref="transactionBorderElement" v-if="model.isTransaction == 1" class="trans">
     </div>
-    <div class="title" v-if="!model.isExpand">
+    <div :class="{ 'title': true, 'title-transaction': model?.isTransaction == 1 }" v-if="!model.isExpand">
       {{ model.name ? model.name : model?.isTransaction == 1 ?"事务子流程":"子流程" }}
     </div>
     <div ref="content" class="content" v-if="model.isExpand">
@@ -65,7 +66,7 @@ export default {
 
       </div>
     </div>
-    <div class="markers">
+    <div :class="{ 'markers': true, 'markers-transaction': model?.isTransaction == 1 }">
       <svg class="icon-ddei-flow" v-if="model.isLoop == 1" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-loop-marker"></use>
       </svg>
@@ -124,17 +125,20 @@ export default {
     display: flex;
     justify-content: center;
     align-items: start;
+    padding-top:4px;
+    &-transaction{
+      padding-top: 2px !important;
+    }
     .icon-ddei-flow {
-      width: 18px;
-      height: 18px;
+      width: 14px;
+      height: 14px;
     }
   }
   
     .title {
       font-size: 13px;
       height: calc(100% - 24px);
-      width:calc(100% - 10px);
-      margin-left: 5px;
+      width:100%;
       display: flex;
       border-bottom: var(--borderWidth) var(--borderType) var(--borderColor);
       justify-content: center;
@@ -149,6 +153,11 @@ export default {
       font-style: var(--fontStyle);
       font-weight: var(--fontWeight);
       text-decoration: var(--textDecoration);
+
+      &-transaction{
+        width: calc(100% - 10px) !important;
+        margin-left: 5px !important;  
+      }
     }
     .content {
       height: calc(100% - 24px);

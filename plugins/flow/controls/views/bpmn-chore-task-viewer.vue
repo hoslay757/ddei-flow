@@ -16,13 +16,44 @@ export default {
     }
   },
 
+  data() {
+    return {
+      topUsers: null,
+      bottomUsers: null,
+    }
+  },
+  methods:{
+    refreshView() {
+      if (this.model.topUser) {
+        let users = this.model.topUser.split(",")
+        let topUsers = []
+        users?.forEach(user => {
+          if (user) {
+            topUsers.push({ name: user })
+          }
+        });
+        this.topUsers = topUsers
+      }
+      if (this.model.bottomUser) {
+        let users = this.model.bottomUser.split(",")
+        let bottomUsers = []
+        users?.forEach(user => {
+          if (user) {
+            bottomUsers.push({ name: user })
+          }
+        });
+        this.bottomUsers = bottomUsers
+      }
+    },
+  }
+
   
 };
 </script>
 <template>
   <div ref="divElement" class="ddei-flow-bpmn-viewer-chore-task">
     <div class="content">
-      <div class="top" v-for="user in model.topUsers">
+      <div class="top" v-for="user in topUsers">
         <div class="text">{{ user.name }}</div>
       </div>
       <div class="middle">
@@ -44,7 +75,7 @@ export default {
           </svg>
         </div>
       </div>
-      <div class="bottom" v-for="user in model.bottomUsers">
+      <div class="bottom" v-for="user in bottomUsers">
         <div class="text">{{ user.name }}</div>
       </div>
     </div>
@@ -117,8 +148,8 @@ export default {
         align-items: center;
     
         .icon-ddei-flow {
-          width: 18px;
-          height: 18px;
+          width: 16px;
+          height: 16px;
         }
       }
     }

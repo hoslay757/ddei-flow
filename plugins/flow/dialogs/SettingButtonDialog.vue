@@ -18,7 +18,8 @@
         <svg class="icon-ddei-flow"
           v-if="!btn.viewer && btn.id == 'ddei-flow-expand-or-not' && validItemCondition(btn) && model?.allowIncludeModel"
           @click="expandOrNotSubProcess()" aria-hidden="true">
-          <use xlink:href="#icon-ddei-flow-sub-process-marker"></use>
+          <use v-if="!model?.isExpand" xlink:href="#icon-ddei-flow-sub-process-marker"></use>
+          <use v-if="model?.isExpand" xlink:href="#icon-ddei-flow-sub-process-expand-marker"></use>
         </svg>
         <svg class="icon-ddei-flow"
           v-if="!btn.viewer && btn.id == 'ddei-flow-lock-or-unlock' && validItemCondition(btn) && model?.allowIncludeModel && model.isExpand == 1 && !model.lock"

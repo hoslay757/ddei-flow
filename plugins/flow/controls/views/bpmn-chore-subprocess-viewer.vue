@@ -15,6 +15,13 @@ export default {
       default: null
     }
   },
+  data(){
+    return {
+      topUsers: null,
+      bottomUsers: null,
+    }
+  },
+  
   methods: {
     refreshDragState(type) {
       if (type == 1) {
@@ -39,7 +46,30 @@ export default {
       }
       
       return false
-    }
+    },
+
+    refreshView(){
+      if (this.model.topUser) {
+        let users = this.model.topUser.split(",")
+        let topUsers = []
+        users?.forEach(user => {
+          if (user){
+            topUsers.push({ name: user })
+          }
+        });
+        this.topUsers = topUsers
+      }
+      if (this.model.bottomUser) {
+        let users = this.model.bottomUser.split(",")
+        let bottomUsers = []
+        users?.forEach(user => {
+          if (user) {
+            bottomUsers.push({ name: user })
+          }
+        });
+        this.bottomUsers = bottomUsers
+      }
+    },
   }
 
   
@@ -48,13 +78,16 @@ export default {
 <template>
   <div ref="divElement" class="ddei-flow-bpmn-viewer-chore-subprocess">
     <div class="content">
-      <div class="top" v-for="user in model.topUsers">
+      <div class="top" v-for="user in topUsers">
         <div class="text">{{ user.name }}</div>
       </div>
       <div class="middle" ref="content">
         <div class="text" v-if="!model.isExpand">
           {{ model.name ? model.name : "编排子流程" }}
         </div>
+        <svg class="icon-ddei-flow middle-locked" v-if="model.lock == 1" aria-hidden="true">
+          <use xlink:href="#icon-ddei-flow-lock"></use>
+        </svg>
         <div class="markers">
           <svg class="icon-ddei-flow" v-if="model.isLoop == 1" aria-hidden="true">
             <use xlink:href="#icon-ddei-flow-loop-marker"></use>
@@ -76,7 +109,7 @@ export default {
           </svg>
         </div>
       </div>
-      <div class="bottom" v-for="user in model.bottomUsers">
+      <div class="bottom" v-for="user in bottomUsers">
         <div class="text">{{ user.name }}</div>
       </div>
     </div>
@@ -138,6 +171,19 @@ export default {
       justify-content: center;
       align-items: center;
       position: relative;
+
+
+      &-locked {
+        width: 12px;
+        height: 12px;
+        font-size: 12px;
+        opacity: 0.5;
+        right:10px;
+        top:10px;
+        position: absolute;
+        color: var(--fontColor);
+      }
+
       .markers {
         position: absolute;
         left: 0px;
@@ -149,8 +195,8 @@ export default {
         align-items: center;
     
         .icon-ddei-flow {
-          width: 18px;
-          height: 18px;
+          width: 14px;
+          height: 14px;
         }
       }
     }

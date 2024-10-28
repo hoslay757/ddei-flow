@@ -151,6 +151,7 @@
             </div>
           </div>
         </div>
+        
         <div class="row"
           v-if="!item.viewer && item.id == 'ddei-flow-property-editor-textarea' && validItemCondition(item) ">
           <div class="change-property-textarea" :title="item.desc">

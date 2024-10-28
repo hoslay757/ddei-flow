@@ -99,8 +99,8 @@ export default {
     align-items: center;
 
     .icon-ddei-flow {
-      width: 18px;
-      height: 18px;
+      width: 14px;
+      height: 14px;
     }
   }
 }

@@ -17,12 +17,8 @@ export default {
     border:{
       round:5
     },
-    topUsers: [{
-      name: "参与者A"
-    }],
-    bottomUsers: [{
-      name: "参与者B"
-    }],
+    topUser: "发送人",
+    bottomUser: "接收人",
     ext: {
       attrs: [
         {

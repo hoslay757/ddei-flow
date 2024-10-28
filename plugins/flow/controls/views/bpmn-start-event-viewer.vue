@@ -49,8 +49,10 @@ export default {
   user-select: none;
   display:none;
   .icon-ddei-flow {
-    width: 100%;
-    height: 100%;
+    margin-left: -3px;
+    margin-top: -3px;
+    width: calc(100% + 6px);
+    height: calc(100% + 6px);
     fill:var(--borderColor);
   }
   

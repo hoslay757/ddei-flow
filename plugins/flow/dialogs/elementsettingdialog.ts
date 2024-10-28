@@ -19,7 +19,21 @@ class DDeiFlowElementSettingDialog extends DDeiPluginBase{
         label: "名称",
         desc: "名称",
         property: 'name',
-        condition:"model.bpmnBaseType != 'Event'"
+        condition: "model.bpmnBaseType != 'Event'"
+      },
+      {
+        id: 'ddei-flow-property-editor-text',
+        label: "发送人",
+        desc: "上方参与人，用逗号隔开多个参与人",
+        property: 'topUser',
+        condition: "model.bpmnType == 'ChoreographyTask' || model.bpmnType == 'ChoreographySubProcess'"
+      },
+      {
+        id: 'ddei-flow-property-editor-text',
+        label: "接收人",
+        desc: "下方参与人，用逗号隔开多个参与人",
+        property: 'bottomUser',
+        condition: "model.bpmnType == 'ChoreographyTask' || model.bpmnType == 'ChoreographySubProcess'"
       },
       {
         id: 'ddei-flow-property-editor-textarea',
