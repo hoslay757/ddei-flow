@@ -686,8 +686,10 @@ class DDeiFlowAPI {
           return this.startEvent2BPMNXML(node, tabLevel);
         } else if (node.bpmnType == 'BoundaryEvent') {
           return this.boundaryEvent2BPMNXML(node, tabLevel);
-        } else if (node.bpmnType == 'IntermediateEvent') {
-          return this.intermediaEvent2BPMNXML(node, tabLevel);
+        } else if (node.bpmnType == 'IntermediateCatchEvent') {
+          return this.intermediaCatchEvent2BPMNXML(node, tabLevel);
+        } else if (node.bpmnType == 'IntermediateThrowEvent') {
+          return this.intermediaThrowEvent2BPMNXML(node, tabLevel);
         } else if (node.bpmnType == 'EndEvent') {
           return this.endEvent2BPMNXML(node, tabLevel);
         } else if (node.bpmnType == 'SubProcess') {
@@ -740,14 +742,23 @@ class DDeiFlowAPI {
         if (node.name) {
           contentStr += 'name="' + node.name + '"'
         }
+
+        if (node.bpmnSubType != 9 && node.bpmnSubType != 10 && !node.notInterrupting) {
+          //TODO 事件子流程
+          if (node.subProcesses?.length > 0 && node.subProcesses[0]?.isTransaction) {
+            contentStr += ' isInterrupting="true"'
+          }
+          
+        }
+        
         let childXML = ''
         //消息
-        if (node.bpmnSubType == 2 || node.bpmnSubType == 3) {
+        if (node.bpmnSubType == 2) {
           defineStr += '  <bpmn:message id="' + node.id + '_msg" name="' + (node.messageName ? node.messageName : '') +'" />\n'
           childXML += tabStr + ' <bpmn:messageEventDefinition messageRef="'+node.id+'_msg" />\n'
         }
         //定时器
-        else if (node.bpmnSubType == 4 || node.bpmnSubType == 5) {
+        else if (node.bpmnSubType == 3) {
           childXML += tabStr + ' <bpmn:timerEventDefinition>\n'
           if (node.timeType == 'timeDuration') {
             childXML += tabStr + '   <bpmn:timeCycle>' + (node.timeValue ? node.timeValue : '') + '</timeCycle>\n'
@@ -759,18 +770,18 @@ class DDeiFlowAPI {
           childXML += tabStr + ' </bpmn:timerEventDefinition>\n'
         }
         //条件
-        else if (node.bpmnSubType == 6 || node.bpmnSubType == 7) {
+        else if (node.bpmnSubType == 4) {
           childXML += tabStr + ' <bpmn:conditionalEventDefinition>\n'
           childXML += tabStr + '  <bpmn:condition xsi:type="bpmn:tFormalExpression">${1+1&gt;2}</bpmn:condition>\n'
           childXML += tabStr + ' </bpmn:conditionalEventDefinition>\n'
         }
         //信号
-        else if (node.bpmnSubType == 8 || node.bpmnSubType == 9) {
+        else if (node.bpmnSubType == 5) {
           defineStr += '  <bpmn:signal id="' + node.id + '_signal" name="' + (node.signalName ? node.signalName : '') + '" />\n'
           childXML += tabStr + ' <bpmn:signalEventDefinition id="'+node.id+'_signal_def" signalRef="'+node.id+'_signal">\n'
         }
         //错误
-        else if (node.bpmnSubType == 16) {
+        else if (node.bpmnSubType == 9) {
           if (node.errorCode) {
             defineStr += '  <bpmn:error id="' + node.id + '_error" errorCode="' + node.errorCode + '" />\n'
             childXML += tabStr + ' <bpmn:errorEventDefinition errorRef="' + node.id + '_error" />\n'
@@ -820,7 +831,7 @@ class DDeiFlowAPI {
         if (node.name) {
           contentStr += 'name="' + node.name + '"'
         }
-        if ((!node.bpmnSubType || node.bpmnSubType == 1 || node.bpmnSubType == 2)  && node.notInterrupting == 1) {
+        if ((!node.bpmnSubType || node.bpmnSubType == 1 || node.bpmnSubType == 2 || node.bpmnSubType == 7 || node.bpmnSubType == 8 || node.bpmnSubType == 9)  && node.notInterrupting == 1) {
           contentStr += ' cancelActivity="false"'
         } else if (node.bpmnSubType == 6 || node.bpmnSubType == 5){
 
@@ -870,6 +881,11 @@ class DDeiFlowAPI {
         else if (node.bpmnSubType == 5) {
           childXML += tabStr + ' <bpmn:compensateEventDefinition />\n'
         }
+        //多次
+        else if (node.bpmnSubType == 9) {
+          contentStr += ' parallelMultiple="true"'
+        }
+        
         
       
 
@@ -890,19 +906,130 @@ class DDeiFlowAPI {
    * @param node 对象
    * @returns xml字符串
    */
-  private intermediaEvent2BPMNXML(node: DDeiFlowNode, tabLevel: number = 0): DDeiFlowBpmnXmlNode {
-    let returnStr = ''
+  private intermediaCatchEvent2BPMNXML(node: DDeiFlowNode, tabLevel: number = 0): DDeiFlowBpmnXmlNode {
+    let returnData;
+    let contentStr = ''
+    let defineStr = ''
+    let processStr = ''
+    let currentProcessStr = ''
     let skip = false
     if (this.bpmnProcessorFN) {
       let fnResult = this.bpmnProcessorFN(node, tabLevel);
       if (fnResult !== false) {
-        returnStr = fnResult
+        returnData = fnResult
         skip = true;
       }
     }
     if (!skip) {
+      let tabStr = ""
+      for (let i = 0; i < tabLevel; i++) {
+        tabStr += " "
+      }
+      if (node) {
+        contentStr += tabStr + '<bpmn:intermediateCatchEvent id="' + node.id + '"'
+        if (node.name) {
+          contentStr += 'name="' + node.name + '"'
+        }
+
+        let childXML = ''
+        //消息
+        if (node.bpmnSubType == 2) {
+          defineStr += '  <bpmn:message id="' + node.id + '_msg" name="' + (node.messageName ? node.messageName : '') + '" />\n'
+          childXML += tabStr + ' <bpmn:messageEventDefinition messageRef="' + node.id + '_msg" />\n'
+
+        }
+        //定时器
+        else if (!node.bpmnSubType || node.bpmnSubType == 1) {
+          childXML += tabStr + ' <bpmn:timerEventDefinition>\n'
+          if (node.timeType == 'timeDuration') {
+            childXML += tabStr + '   <bpmn:timeCycle>' + (node.timeValue ? node.timeValue : '') + '</timeCycle>\n'
+          } else if (node.timeType == 'CRON') {
+            childXML += tabStr + '   <bpmn:timeCycle>' + (node.timeValue ? node.timeValue : '') + '</timeCycle>\n'
+          } else {
+            childXML += tabStr + '   <bpmn:timeDate>' + (node.timeValue ? node.timeValue : '') + '</timeDate>\n'
+          }
+          childXML += tabStr + ' </bpmn:timerEventDefinition>\n'
+        }
+        //信号
+        else if (node.bpmnSubType == 3) {
+          defineStr += '  <bpmn:signal id="' + node.id + '_signal" name="' + (node.signalName ? node.signalName : '') + '" />\n'
+          childXML += tabStr + ' <bpmn:signalEventDefinition id="' + node.id + '_signal_def" signalRef="' + node.id + '_signal" />\n'
+        }
+        //多次
+        else if (node.bpmnSubType == 6) {
+          contentStr += ' parallelMultiple="true"'
+        }
+
+
+        if (childXML) {
+          contentStr += '>\n' + childXML + tabStr + '</bpmn:intermediateCatchEvent>\n'
+        } else {
+          contentStr += '/>\n'
+        }
+
+      }
+      returnData = new DDeiFlowBpmnXmlNode(contentStr, defineStr, processStr, currentProcessStr)
     }
-    return null;
+    return returnData;
+  }
+
+  /**
+   * 将对象转换为bpmn规范的xml字符串
+   * @param node 对象
+   * @returns xml字符串
+   */
+  private intermediaThrowEvent2BPMNXML(node: DDeiFlowNode, tabLevel: number = 0): DDeiFlowBpmnXmlNode {
+    let returnData;
+    let contentStr = ''
+    let defineStr = ''
+    let processStr = ''
+    let currentProcessStr = ''
+    let skip = false
+    if (this.bpmnProcessorFN) {
+      let fnResult = this.bpmnProcessorFN(node, tabLevel);
+      if (fnResult !== false) {
+        returnData = fnResult
+        skip = true;
+      }
+    }
+    if (!skip) {
+      let tabStr = ""
+      for (let i = 0; i < tabLevel; i++) {
+        tabStr += " "
+      }
+      if (node) {
+        contentStr += tabStr + '<bpmn:intermediateThrowEvent id="' + node.id + '"'
+        if (node.name) {
+          contentStr += 'name="' + node.name + '"'
+        }
+
+        let childXML = ''
+        //消息
+        if (node.bpmnSubType == 2) {
+          defineStr += '  <bpmn:message id="' + node.id + '_msg" name="' + (node.messageName ? node.messageName : '') + '" />\n'
+          childXML += tabStr + ' <bpmn:messageEventDefinition messageRef="' + node.id + '_msg" />\n'
+        }
+        //信号
+        else if (node.bpmnSubType == 3) {
+          defineStr += '  <bpmn:signal id="' + node.id + '_signal" name="' + (node.signalName ? node.signalName : '') + '" />\n'
+          childXML += tabStr + ' <bpmn:signalEventDefinition id="' + node.id + '_signal_def" signalRef="' + node.id + '_signal" />\n'
+        }
+        //补偿
+        else if (node.bpmnSubType == 4) {
+          childXML += tabStr + ' <bpmn:compensateEventDefinition />\n'
+        }
+
+
+        if (childXML) {
+          contentStr += '>\n' + childXML + tabStr + '</bpmn:intermediateCatchEvent>\n'
+        } else {
+          contentStr += '/>\n'
+        }
+
+      }
+      returnData = new DDeiFlowBpmnXmlNode(contentStr, defineStr, processStr, currentProcessStr)
+    }
+    return returnData;
   }
 
   /**
@@ -937,8 +1064,12 @@ class DDeiFlowAPI {
         let childXML = ''
         //错误
         if (node.bpmnSubType == 6) {
-          defineStr += '  <bpmn:error id="' + node.id + '_error" errorCode="' + node.errorCode + '" />\n'
-          childXML += tabStr + ' <bpmn:errorEventDefinition errorRef="' + node.id + '_error">\n'
+          if (node.errorCode){
+            defineStr += '  <bpmn:error id="' + node.id + '_error" errorCode="' + node.errorCode + '" />\n'
+            childXML += tabStr + ' <bpmn:errorEventDefinition errorRef="' + node.id + '_error">\n'
+          } else {
+            childXML += tabStr + ' <bpmn:errorEventDefinition />\n'
+          }
         }
         //中断
         else if (node.bpmnSubType == 9) {
@@ -948,6 +1079,26 @@ class DDeiFlowAPI {
         else if (node.bpmnSubType == 8) {
           childXML += tabStr + ' <bpmn:cancelEventDefinition/>\n'
         }
+        //信号
+        else if (node.bpmnSubType == 3) {
+          defineStr += '  <bpmn:signal id="' + node.id + '_signal" name="' + (node.signalName ? node.signalName : '') + '" />\n'
+          childXML += tabStr + ' <bpmn:signalEventDefinition id="' + node.id + '_signal_def" signalRef="' + node.id + '_signal">\n'
+        }
+       
+        //补偿
+        else if (node.bpmnSubType == 7) {
+          childXML += tabStr + ' <bpmn:compensateEventDefinition />\n'
+        }
+        //多次
+        else if (node.bpmnSubType == 4) {
+          contentStr += ' parallelMultiple="true"'
+        } 
+        //消息
+        else if (node.bpmnSubType == 2) {
+            defineStr += '  <bpmn:message id="' + node.id + '_msg" name="' + (node.messageName ? node.messageName : '') + '" />\n'
+            childXML += tabStr + ' <bpmn:messageEventDefinition messageRef="' + node.id + '_msg" />\n'
+          }
+
         
 
         if (childXML) {

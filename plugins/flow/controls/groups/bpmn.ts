@@ -19,13 +19,18 @@ export default {
     },
     {
       'id': '1000002',
-      'name': '中间事件',
+      'name': '中间捕获',
       'orderNo': 3
+    },
+    {
+      'id': '1000005',
+      'name': '中间抛出',
+      'orderNo': 4
     },
     {
       'id': '1000003',
       'name': '结束事件',
-      'orderNo': 4
+      'orderNo': 5
     },
     {
       'id': '1000011',

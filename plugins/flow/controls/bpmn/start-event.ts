@@ -42,15 +42,25 @@ export default {
           'controlType': 'combox',
           'dataType': 'integer',
           'dataSource': [
-            { 'text': '默认', 'value': 1 }, { 'text': '中断-消息', 'value': 2 }, { 'text': '非中断-消息', 'value': 3 },
-            { 'text': '中断-定时器', 'value': 4 }, { 'text': '非中断-定时器', 'value': 5 }, { 'text': '中断-条件', 'value': 6 },
-            { 'text': '非中断-条件', 'value': 7 }, { 'text': '中断-信号', 'value': 8 }, { 'text': '非中断-信号', 'value': 9 },
-            { 'text': '中断-多次', 'value': 10 }, { 'text': '非中断-多次', 'value': 11 }, { 'text': '中断-并行', 'value': 12 },
-            { 'text': '非中断-并行', 'value': 13 }, { 'text': '中断-升级', 'value': 14 }, { 'text': '非中断-升级', 'value': 15 },
-            { 'text': '中断-错误', 'value': 16 }, { 'text': '中断-补偿', 'value': 17 }
+            { 'text': '默认', 'value': 1 }, { 'text': '消息', 'value': 2 },
+            { 'text': '定时器', 'value': 3 }, { 'text': '条件', 'value': 4 },
+            { 'text': '信号', 'value': 5 }, { 'text': '多次', 'value': 6 },
+            { 'text': '并行', 'value': 7 }, { 'text': '升级', 'value': 8 },
+            { 'text': '错误', 'value': 9 }, { 'text': '补偿', 'value': 10 }
           ],
           'itemStyle': { width: 100, height: 25, col: 2, row: 0},
           'defaultValue': 1,
+          'type': [1, 2], //类别，1图形，2业务，3事件
+        },
+        {
+          'code': 'notInterrupting',
+          'name': '非中断',
+          'desc': '非中断将不会终止运行，默认中断',
+          'controlType': 'switch-checkbox',
+          'dataType': 'integer',
+          'display': 'column',
+          'hiddenTitle': true,
+          'defaultValue': 0,
           'type': [1, 2], //类别，1图形，2业务，3事件
         },
         {

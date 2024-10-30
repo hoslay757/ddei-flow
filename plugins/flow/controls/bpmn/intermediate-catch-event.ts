@@ -1,11 +1,11 @@
 import { showSettingButton } from "../util"
-import BpmnBoundaryEventViewer from "../views/bpmn-boundary-event-viewer.vue"
+import BpmnIntermediateCatchEventViewer from "../views/bpmn-intermediate-catch-event-viewer.vue"
 
 export default {
-  'id': '1000004',
-  'name': '边界事件',
-  'code': 'boundaryevent',
-  'desc': 'bpmn中的BoundaryEvent',
+  'id': '1000002',
+  'name': '中间捕获',
+  'code': 'icatchevt',
+  'desc': 'bpmn中的IntermediateCatchEvent',
   'from': '1000001',
   subject: 'bpmn',
   
@@ -14,7 +14,7 @@ export default {
     height: 40,
     bpmnBaseType: 'Event',
     bpmnSubType: 1,
-    bpmnType: 'BoundaryEvent',
+    bpmnType: 'IntermediateCatchEvent',
     ext: {
       attrs: [
         {
@@ -23,7 +23,7 @@ export default {
           'desc': '编码，一般用于业务标识',
           'controlType': 'text',
           'dataType': 'string',
-          'defaultValue': "boundaryevent",
+          'defaultValue': "icatchevt",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
         {
@@ -32,7 +32,7 @@ export default {
           'desc': '名称，一般用于显示',
           'controlType': 'text',
           'dataType': 'string',
-          'defaultValue': "边界事件",
+          'defaultValue': "中间捕获事件",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
         {
@@ -42,30 +42,15 @@ export default {
           'controlType': 'combox',
           'dataType': 'integer',
           'dataSource': [
-            { 'text': '消息', 'value': 1 }, 
-            { 'text': '定时器', 'value': 2 }, 
+            { 'text': '定时器', 'value': 1 },
+            { 'text': '消息', 'value': 2 },
             { 'text': '信号', 'value': 3 },
-            { 'text': '错误', 'value': 4 }, 
-            { 'text': '补偿', 'value': 5 },
-            { 'text': '取消', 'value': 6 },
-            { 'text': '升级', 'value': 7 },
-            { 'text': '并行', 'value': 8 }, 
-            { 'text': '多次', 'value': 9 }, 
+            { 'text': '链接', 'value': 4 },
+            { 'text': '并行', 'value': 5 },
+            { 'text': '多次', 'value': 6 },
           ],
           'itemStyle': { width: 130, height: 25, col: 2, row: 0 },
           'defaultValue': 1,
-          'type': [1, 2], //类别，1图形，2业务，3事件
-        },
-
-        {
-          'code': 'notInterrupting',
-          'name': '非中断',
-          'desc': '非中断将不会终止运行，默认中断',
-          'controlType': 'switch-checkbox',
-          'dataType': 'integer',
-          'display': 'column',
-          'hiddenTitle': true,
-          'defaultValue': 0,
           'type': [1, 2], //类别，1图形，2业务，3事件
         },
         {
@@ -89,9 +74,9 @@ export default {
     }
   },
 
-  viewer: BpmnBoundaryEventViewer,
+  viewer: BpmnIntermediateCatchEventViewer,
   icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
-        <use xlink:href="#icon-ddei-flow-boundary-event-message"></use>
+        <use xlink:href="#icon-ddei-flow-boundary-event-time"></use>
       </svg>`,
   EVENT_MOUSE_MOVE_IN_CONTROL: showSettingButton
 }

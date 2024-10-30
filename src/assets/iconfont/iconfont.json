@@ -392,8 +392,8 @@
     },
     {
       "icon_id": "42179412",
-      "name": "intermediate-event-t4",
-      "font_class": "intermediate-event-t4",
+      "name": "intermediate-throw-event-signal",
+      "font_class": "intermediate-throw-event-signal",
       "unicode": "e694",
       "unicode_decimal": 59028
     },
@@ -518,8 +518,8 @@
     },
     {
       "icon_id": "42179392",
-      "name": "intermediate-event-t2",
-      "font_class": "intermediate-event-t2-bak",
+      "name": "intermediate-throw-event-message",
+      "font_class": "intermediate-throw-event-message",
       "unicode": "e6a9",
       "unicode_decimal": 59049
     },
@@ -574,8 +574,8 @@
     },
     {
       "icon_id": "42179379",
-      "name": "intermediate-event-t",
-      "font_class": "intermediate-event-t",
+      "name": "intermediate-throw-event-compensation",
+      "font_class": "intermediate-throw-event-compensation",
       "unicode": "e6b0",
       "unicode_decimal": 59056
     },
