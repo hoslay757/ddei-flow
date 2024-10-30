@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             targetNamespace="http://bpmn.io/schema/bpmn">
+    
+    <process id="Process_1" isExecutable="true">
+        <!-- 1. 标准内嵌子流程 (Embedded SubProcess) -->
+        <subProcess id="EmbeddedSubProcess_1" name="标准内嵌子流程">
+            <startEvent id="Start_1"/>
+            <task id="Task_1"/>
+            <endEvent id="End_1"/>
+            <!-- 内部序列流 -->
+            <sequenceFlow id="SF_1" sourceRef="Start_1" targetRef="Task_1"/>
+            <sequenceFlow id="SF_2" sourceRef="Task_1" targetRef="End_1"/>
+        </subProcess>
+
+        <!-- 2. 事件子流程 (Event SubProcess) -->
+        <subProcess id="EventSubProcess_1" name="事件子流程" triggeredByEvent="true">
+            <startEvent id="ErrorStart_1" isInterrupting="true">
+                <errorEventDefinition errorRef="Error_1"/>
+            </startEvent>
+            <task id="ErrorHandler_1" name="错误处理任务"/>
+            <endEvent id="ErrorEnd_1"/>
+            <sequenceFlow id="SF_3" sourceRef="ErrorStart_1" targetRef="ErrorHandler_1"/>
+            <sequenceFlow id="SF_4" sourceRef="ErrorHandler_1" targetRef="ErrorEnd_1"/>
+        </subProcess>
+
+        <!-- 3. 事务子流程 (Transaction SubProcess) -->
+        <transaction id="Transaction_1" name="事务子流程">
+            <startEvent id="TransStart_1"/>
+            <task id="TransTask_1"/>
+            <endEvent id="TransEnd_1"/>
+            <sequenceFlow id="SF_5" sourceRef="TransStart_1" targetRef="TransTask_1"/>
+            <sequenceFlow id="SF_6" sourceRef="TransTask_1" targetRef="TransEnd_1"/>
+            <!-- 补偿处理器 -->
+            <boundaryEvent id="Compensation_1" attachedToRef="TransTask_1">
+                <compensateEventDefinition/>
+            </boundaryEvent>
+        </transaction>
+
+        <!-- 4. Ad-hoc子流程 -->
+        <adHocSubProcess id="AdHocSubProcess_1" name="即兴子流程">
+            <task id="AdHocTask_1"/>
+            <task id="AdHocTask_2"/>
+            <!-- Ad-hoc子流程可以没有序列流 -->
+        </adHocSubProcess>
+
+        <!-- 5. 调用活动（引用外部子流程） -->
+        <callActivity id="CallActivity_1" name="调用外部流程" 
+                     calledElement="ExternalProcess_1">
+            <!-- 数据输入映射 -->
+            <ioSpecification>
+                <dataInput id="Input_1"/>
+                <dataOutput id="Output_1"/>
+            </ioSpecification>
+        </callActivity>
+
+        <!-- 6. 多实例子流程 -->
+        <subProcess id="MultiInstance_1" name="多实例子流程">
+            <multiInstanceLoopCharacteristics isSequential="true">
+                <loopCardinality>3</loopCardinality>
+            </multiInstanceLoopCharacteristics>
+            <startEvent id="MI_Start"/>
+            <task id="MI_Task"/>
+            <endEvent id="MI_End"/>
+            <sequenceFlow id="SF_7" sourceRef="MI_Start" targetRef="MI_Task"/>
+            <sequenceFlow id="SF_8" sourceRef="MI_Task" targetRef="MI_End"/>
+        </subProcess>
+    </process>
+</definitions>
+
+
+子流程类型及其特性说明：
+标准内嵌子流程 (Embedded SubProcess)
+属性：
+id: 必需，唯一标识符
+name: 可选，描述性名称
+startQuantity: 可选，默认为1
+completionQuantity: 可选，默认为1
+约束：
+必须包含一个startEvent和至少一个endEvent
+所有内部元素必须通过序列流连接
+可以嵌套其他子流程
+事件子流程 (Event SubProcess)
+属性：
+triggeredByEvent="true": 必需
+isInterrupting: 在开始事件上定义是否中断父流程
+约束：
+必须有一个事件触发的开始事件
+不能有普通的入向和出向序列流
+只能在另一个流程或子流程的范围内定义
+事务子流程 (Transaction)
+属性：
+method: 可选，定义事务方法
+transactionProtocol: 可选
+约束：
+必须支持补偿处理
+可以有取消边界事件
+必须遵循事务ACID属性
+Ad-hoc子流程
+属性：
+ordering: 可选 (parallel/sequential)
+cancelRemainingInstances: 可选
+约束：
+内部活动可以无序执行
+不要求有开始和结束事件
+可以没有序列流
+调用活动 (Call Activity)
+属性：
+calledElement: 必需，引用外部流程定义
+binding: 可选 (latest/deployment/version)
+约束：
+必须指定有效的外部流程引用
+可以定义数据映射
+多实例子流程
+属性：
+isSequential: 定义是否顺序执行
+loopCardinality: 循环次数
+completionCondition: 完成条件
+约束：
+必须定义循环特性
+可以是并行或顺序执行
+通用约束和注意事项：
+嵌套规则:
+子流程可以无限嵌套
+每层嵌套必须有自己的开始和结束事件
+嵌套层次应考虑可读性和维护性
+数据处理:
+子流程可以访问父流程的变量
+可以定义本地变量
+支持数据对象和数据存储的引用
+错误处理:
+可以使用边界事件处理异常
+支持错误、取消、补偿等事件
+事件子流程可用于异常处理
+4. 执行控制:
+支持条件表达式
+可以定义完成条件
+支持并行和顺序执行控制
+这些子流程类型为不同的业务场景提供了灵活的解决方案，可以根据具体需求选择合适的类型。
+
+

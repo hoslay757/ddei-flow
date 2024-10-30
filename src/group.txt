@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+             id="Definitions_1"
+             targetNamespace="http://bpmn.io/schema/bpmn">
+
+    <!-- 定义分类 -->
+    <category id="Category_1">
+        <categoryValue id="CategoryValue_1" value="Group A"/>
+    </category>
+
+    <process id="Process_1" isExecutable="true">
+        <startEvent id="StartEvent_1"/>
+        
+        <!-- 这个group在视觉上会包含Task_1和Task_2 -->
+        <group id="Group_1" categoryValueRef="CategoryValue_1" name="分组A"/>
+        
+        <!-- 这些任务在视觉上属于Group_1 -->
+        <task id="Task_1" name="组内任务1"/>
+        <task id="Task_2" name="组内任务2"/>
+        
+        <subProcess id="SubProcess_1" name="子流程">
+            <startEvent id="SubProcess_StartEvent"/>
+            <task id="SubProcess_Task" name="子流程任务"/>
+            <endEvent id="SubProcess_EndEvent"/>
+            
+            <sequenceFlow id="SubFlow_1" sourceRef="SubProcess_StartEvent" targetRef="SubProcess_Task"/>
+            <sequenceFlow id="SubFlow_2" sourceRef="SubProcess_Task" targetRef="SubProcess_EndEvent"/>
+        </subProcess>
+        
+        <endEvent id="EndEvent_1"/>
+
+        <!-- 定义主流程的序列流 -->
+        <sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_1"/>
+        <sequenceFlow id="Flow_2" sourceRef="Task_1" targetRef="Task_2"/>
+        <sequenceFlow id="Flow_3" sourceRef="Task_2" targetRef="SubProcess_1"/>
+        <sequenceFlow id="Flow_4" sourceRef="SubProcess_1" targetRef="EndEvent_1"/>
+    </process>
+
+    <!-- BPMN图形信息定义 - 这部分定义了元素的视觉布局 -->
+    <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+            <!-- Group的图形信息 - 定义了一个包围Task_1和Task_2的矩形区域 -->
+            <bpmndi:BPMNShape id="Group_1_di" bpmnElement="Group_1">
+                <dc:Bounds x="160" y="100" width="300" height="200"/>
+            </bpmndi:BPMNShape>
+            
+            <!-- Task_1的图形信息 -->
+            <bpmndi:BPMNShape id="Task_1_di" bpmnElement="Task_1">
+                <dc:Bounds x="180" y="150" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            
+            <!-- Task_2的图形信息 -->
+            <bpmndi:BPMNShape id="Task_2_di" bpmnElement="Task_2">
+                <dc:Bounds x="320" y="150" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            
+            <!-- 其他元素的图形信息... -->
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</definitions>
+
+
+重要说明：
+Group的特殊性:
+Group在BPMN中是一个视觉概念，不是流程控制结构
+元素属于Group是通过图形边界（BPMNDI部分）来定义的，而不是XML的嵌套关系
+Group必须引用一个category值（通过categoryValueRef属性）
+图形信息的重要性:
+要使Group正确显示，必须在BPMNDiagram部分定义其边界
+Group的边界（Bounds）必须包含其要分组的元素
+被分组的元素的坐标必须在Group的边界范围内
+分类定义:
+需要定义category和categoryValue
+Group通过categoryValueRef引用categoryValue
+4. 约束补充:
+Group可以跨越多个流程元素，包括任务、子流程等
+Group可以与其他Group重叠
+Group不影响流程的执行逻辑
+被Group包含的元素仍然需要通过正常的序列流连接
+最佳实践:
+给Group添加name属性使其更容易识别
+确保Group的视觉边界足够大，能完整包含所有相关元素
+使用有意义的category值来标识Group的用途
+这个示例展示了如何通过图形信息来实现Group的分组效果，同时保持流程逻辑的完整性。

@@ -47,6 +47,7 @@ class DDeiFlow extends DDeiPluginBase {
               {
                 controls: [
                   "1000001",
+                  "1000004",
                   "1000002",
                   "1000003",
                 ]

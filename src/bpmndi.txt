@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+             targetNamespace="http://example.com/diagram">
+
+    <!-- 1. 流程定义 -->
+    <process id="Process_1" isExecutable="true">
+        <startEvent id="Start_1"/>
+        <task id="Task_1" name="任务1"/>
+        <subProcess id="SubProcess_1" name="子流程"/>
+        <endEvent id="End_1"/>
+        
+        <sequenceFlow id="Flow_1" sourceRef="Start_1" targetRef="Task_1"/>
+        <sequenceFlow id="Flow_2" sourceRef="Task_1" targetRef="SubProcess_1"/>
+        <sequenceFlow id="Flow_3" sourceRef="SubProcess_1" targetRef="End_1"/>
+    </process>
+
+    <!-- 2. 图形信息定义 -->
+    <bpmndi:BPMNDiagram id="Diagram_1">
+        <bpmndi:BPMNPlane id="Plane_1" bpmnElement="Process_1">
+            <!-- 2.1 开始事件图形 -->
+            <bpmndi:BPMNShape id="Start_1_di" bpmnElement="Start_1">
+                <!-- 位置和大小 -->
+                <dc:Bounds x="100" y="100" width="36" height="36"/>
+                <!-- 标签 -->
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="83" y="143" width="70" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+
+            <!-- 2.2 任务图形 -->
+            <bpmndi:BPMNShape id="Task_1_di" bpmnElement="Task_1">
+                <dc:Bounds x="200" y="78" width="100" height="80"/>
+                <!-- 自定义样式 -->
+                <bpmndi:BPMNStyle>
+                    <bpmndi:BPMNLabelStyle>
+                        <dc:Font name="Arial" size="12" isBold="true"/>
+                    </bpmndi:BPMNLabelStyle>
+                </bpmndi:BPMNStyle>
+            </bpmndi:BPMNShape>
+
+            <!-- 2.3 子流程图形（可展开） -->
+            <bpmndi:BPMNShape id="SubProcess_1_di" bpmnElement="SubProcess_1" 
+                             isExpanded="true">
+                <dc:Bounds x="360" y="40" width="350" height="200"/>
+                <!-- 子流程标签 -->
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="365" y="52" width="90" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+
+            <!-- 2.4 结束事件图形 -->
+            <bpmndi:BPMNShape id="End_1_di" bpmnElement="End_1">
+                <dc:Bounds x="772" y="100" width="36" height="36"/>
+            </bpmndi:BPMNShape>
+
+            <!-- 2.5 连接线图形 -->
+            <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+                <!-- 路径点 -->
+                <di:waypoint x="136" y="118"/>
+                <di:waypoint x="200" y="118"/>
+                <!-- 连接线标签 -->
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="150" y="100" width="36" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+
+            <!-- 2.6 带弯曲点的连接线 -->
+            <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+                <di:waypoint x="300" y="118"/>
+                <di:waypoint x="330" y="118"/>
+                <di:waypoint x="330" y="140"/>
+                <di:waypoint x="360" y="140"/>
+            </bpmndi:BPMNEdge>
+
+            <!-- 2.7 直线连接 -->
+            <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+                <di:waypoint x="710" y="118"/>
+                <di:waypoint x="772" y="118"/>
+            </bpmndi:BPMNEdge>
+
+            <!-- 2.8 数据对象图形 -->
+            <bpmndi:BPMNShape id="DataObject_1_di" bpmnElement="DataObject_1">
+                <dc:Bounds x="152" y="175" width="36" height="50"/>
+            </bpmndi:BPMNShape>
+
+            <!-- 2.9 数据关联线 -->
+            <bpmndi:BPMNEdge id="DataAssoc_1_di" bpmnElement="DataAssoc_1">
+                <di:waypoint x="188" y="200"/>
+                <di:waypoint x="200" y="158"/>
+            </bpmndi:BPMNEdge>
+
+            <!-- 2.10 泳道图形 -->
+            <bpmndi:BPMNShape id="Lane_1_di" bpmnElement="Lane_1" 
+                             isHorizontal="true">
+                <dc:Bounds x="50" y="0" width="800" height="150"/>
+            </bpmndi:BPMNShape>
+
+            <!-- 2.11 文本注释 -->
+            <bpmndi:BPMNShape id="TextAnnotation_1_di" 
+                             bpmnElement="TextAnnotation_1">
+                <dc:Bounds x="160" y="20" width="100" height="30"/>
+            </bpmndi:BPMNShape>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</definitions>
+
+关键元素和约束说明：
+  <bpmndi:BPMNShape id="元素ID_di" bpmnElement="对应流程元素ID">
+    <dc:Bounds x="x坐标" y="y坐标" width="宽度" height="高度"/>
+  </bpmndi:BPMNShape>
+  约束：
+  id必须唯一
+  bpmnElement必须引用有效的流程元素
+  坐标和尺寸必须是非负数
+连接线 (BPMNEdge)
+  <bpmndi:BPMNEdge id="连接线ID_di" bpmnElement="对应序列流ID">
+      <di:waypoint x="起点x" y="起点y"/>
+      <di:waypoint x="终点x" y="终点y"/>
+  </bpmndi:BPMNEdge>
+  约束：
+  至少需要两个waypoint
+  waypoint必须按顺序连接
+  坐标必须在画布范围内
+标签 (BPMNLabel)
+  <bpmndi:BPMNLabel>
+    <dc:Bounds x="x坐标" y="y坐标" width="宽度" height="高度"/>
+  </bpmndi:BPMNLabel>
+  约束：
+  可以附加到任何图形元素
+  位置不能超出父元素范围
+样式定义
+  <bpmndi:BPMNStyle>
+    <bpmndi:BPMNLabelStyle>
+        <dc:Font name="字体" size="大小" isBold="是否粗体"/>
+    </bpmndi:BPMNLabelStyle>
+</bpmndi:BPMNStyle>
+
+
+
+
+
+
+布局规则：
+  元素间距:
+    建议最小间距：40像素
+    避免元素重叠
+    保持适当的留白
+  连接线规则:
+    尽量避免交叉
+    使用直角转弯
+    保持方向一致性
+  子流程布局:
+    内部元素需在边界内
+    预留展开/折叠空间
+    考虑嵌套层次
+  泳道布局:
+    水平或垂直方向
+    等宽设计
+    合理分配空间
+  最佳实践：
+    坐标系统:
+    原点(0,0)在左上角
+    x向右增加
+    y向下增加
+  尺寸建议:
+    事件：36x36
+    任务：100x80
+    网关：50x50
+    子流程：根据内容自适应
+  可读性考虑:
+    合理使用空间
+    保持对齐
+    避免过度复杂的路径
+  性能优化:
+    减少不必要的弯点
+    避免过多装饰
+    控制图形复杂度
+这些规则和约束确保了BPMN图形的一致性和可读性。在实际应用中，还需要考虑具体建模工具的特性和限制。

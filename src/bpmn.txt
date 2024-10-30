@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             id="Definitions_1"
+             targetNamespace="http://bpmn.io/schema/bpmn">
+
+  <!-- 流程定义 -->
+  <process id="Process_1" name="采购申请流程">
+    
+    <!-- 开始事件 -->
+    <startEvent id="StartEvent_1" name="开始">
+      <!-- 表单属性 -->
+      <extensionElements>
+        <formProperty id="requestor" name="申请人" type="string"/>
+        <formProperty id="amount" name="金额" type="double"/>
+      </extensionElements>
+    </startEvent>
+
+    <!-- 用户任务 -->
+    <userTask id="Task_1" name="部门经理审批">
+      <!-- 多实例配置：会签情况 -->
+      <multiInstanceLoopCharacteristics isSequential="false">
+        <loopCardinality>3</loopCardinality>
+        <!-- 至少需要2人同意才能通过 -->
+        <completionCondition>${nrOfCompletedInstances/nrOfInstances >= 0.67}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+      <!-- 任务分配 -->
+      <potentialOwner>
+        <resourceAssignmentExpression>
+          <formalExpression>group(managers)</formalExpression>
+        </resourceAssignmentExpression>
+      </potentialOwner>
+    </userTask>
+
+    <!-- 排他网关 -->
+    <exclusiveGateway id="Gateway_1" name="金额判断">
+      <documentation>根据申请金额判断审批路径</documentation>
+    </exclusiveGateway>
+
+    <!-- 服务任务 -->
+    <serviceTask id="ServiceTask_1" name="发送邮件通知">
+      <extensionElements>
+        <!-- 自定义服务配置 -->
+        <camunda:properties>
+          <camunda:property name="mailTemplate" value="approval-notice"/>
+        </camunda:properties>
+      </extensionElements>
+    </serviceTask>
+
+    <!-- 子流程 -->
+    <subProcess id="SubProcess_1" name="财务审批子流程">
+      <!-- 边界事件：超时处理 -->
+      <boundaryEvent id="BoundaryEvent_1" attachedToRef="SubProcess_1">
+        <timerEventDefinition>
+          <timeDuration>P2D</timeDuration>
+        </timerEventDefinition>
+      </boundaryEvent>
+    </subProcess>
+
+    <!-- 结束事件 -->
+    <endEvent id="EndEvent_1" name="结束">
+      <!-- 结束时触发的消息事件 -->
+      <messageEventDefinition messageRef="Message_1"/>
+    </endEvent>
+
+    <!-- 顺序流 -->
+    <sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_1"/>
+    <sequenceFlow id="Flow_2" sourceRef="Task_1" targetRef="Gateway_1"/>
+    <!-- 条件顺序流 -->
+    <sequenceFlow id="Flow_3" sourceRef="Gateway_1" targetRef="ServiceTask_1">
+      <conditionExpression xsi:type="tFormalExpression">${amount > 10000}</conditionExpression>
+    </sequenceFlow>
+  </process>
+
+  <!-- 消息定义 -->
+  <message id="Message_1" name="ApprovalComplete"/>
+
+  <!-- 错误定义 -->
+  <error id="Error_1" name="InvalidAmount" errorCode="E001"/>
+
+</definitions>

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             targetNamespace="http://example.com/mixed">
+             
+    <!-- 参与者定义 -->
+    <participant id="Buyer" name="采购方"/>
+    <participant id="Seller" name="销售方"/>
+    <participant id="Shipper" name="物流方"/>
+    
+    <!-- 消息定义 -->
+    <message id="QuoteRequest" name="报价请求"/>
+    <message id="QuoteResponse" name="报价响应"/>
+    
+    <!-- 协作定义 - 用于关联编排和流程 -->
+    <collaboration id="MixedCollaboration">
+        <!-- 引用参与者的流程 -->
+        <participant id="BuyerParticipant" name="采购方" processRef="BuyerProcess"/>
+        <participant id="SellerParticipant" name="销售方" processRef="SellerProcess"/>
+        
+        <!-- 关联编排 -->
+        <choreographyRef>PurchaseChoreography</choreographyRef>
+        
+        <!-- 消息流定义 -->
+        <messageFlow id="msgFlow1" sourceRef="Buyer" targetRef="Seller" messageRef="QuoteRequest"/>
+        <messageFlow id="msgFlow2" sourceRef="Seller" targetRef="Buyer" messageRef="QuoteResponse"/>
+    </collaboration>
+
+    <!-- 编排流程定义 -->
+    <choreography id="PurchaseChoreography">
+        <!-- 编排任务 -->
+        <choreographyTask id="RequestQuote" name="请求报价"
+                         initiatingParticipantRef="Buyer">
+            <participantRef>Buyer</participantRef>
+            <participantRef>Seller</participantRef>
+            <messageFlowRef>msgFlow1</messageFlowRef>
+            <messageFlowRef>msgFlow2</messageFlowRef>
+        </choreographyTask>
+        
+        <!-- 编排子流程 -->
+        <subChoreography id="OrderHandling" name="订单处理"
+                        initiatingParticipantRef="Buyer">
+            <participantRef>Buyer</participantRef>
+            <participantRef>Seller</participantRef>
+            <startEvent id="Start_SubChoreography"/>
+            <endEvent id="End_SubChoreography"/>
+        </subChoreography>
+    </choreography>
+
+    <!-- 采购方的具体流程 -->
+    <process id="BuyerProcess" name="采购流程">
+        <startEvent id="Start_Buyer"/>
+        
+        <!-- 发送任务 - 对应编排中的RequestQuote -->
+        <sendTask id="Send_QuoteRequest" 
+                 messageRef="QuoteRequest"
+                 name="发送报价请求">
+            <incoming>Flow_1</incoming>
+            <outgoing>Flow_2</outgoing>
+        </sendTask>
+        
+        <!-- 接收任务 - 等待报价响应 -->
+        <receiveTask id="Receive_QuoteResponse"
+                    messageRef="QuoteResponse"
+                    name="接收报价响应">
+            <incoming>Flow_2</incoming>
+            <outgoing>Flow_3</outgoing>
+        </receiveTask>
+        
+        <!-- 连接到编排活动的任务 -->
+        <serviceTask id="Connect_To_Choreo"
+                    name="连接到编排流程"
+                    implementation="##WebService">
+            <incoming>Flow_3</incoming>
+            <outgoing>Flow_4</outgoing>
+        </serviceTask>
+        
+        <endEvent id="End_Buyer">
+            <incoming>Flow_4</incoming>
+        </endEvent>
+        
+        <!-- 序列流 -->
+        <sequenceFlow id="Flow_1" sourceRef="Start_Buyer" targetRef="Send_QuoteRequest"/>
+        <sequenceFlow id="Flow_2" sourceRef="Send_QuoteRequest" targetRef="Receive_QuoteResponse"/>
+        <sequenceFlow id="Flow_3" sourceRef="Receive_QuoteResponse" targetRef="Connect_To_Choreo"/>
+        <sequenceFlow id="Flow_4" sourceRef="Connect_To_Choreo" targetRef="End_Buyer"/>
+    </process>
+
+    <!-- 销售方的具体流程 -->
+    <process id="SellerProcess" name="销售流程">
+        <startEvent id="Start_Seller"/>
+        
+        <!-- 接收任务 - 接收报价请求 -->
+        <receiveTask id="Receive_QuoteRequest"
+                    messageRef="QuoteRequest"
+                    name="接收报价请求">
+            <incoming>Flow_5</incoming>
+            <outgoing>Flow_6</outgoing>
+        </receiveTask>
+        
+        <!-- 发送任务 - 发送报价响应 -->
+        <sendTask id="Send_QuoteResponse"
+                 messageRef="QuoteResponse"
+                 name="发送报价响应">
+            <incoming>Flow_6</incoming>
+            <outgoing>Flow_7</outgoing>
+        </sendTask>
+        
+        <endEvent id="End_Seller">
+            <incoming>Flow_7</incoming>
+        </endEvent>
+        
+        <!-- 序列流 -->
+        <sequenceFlow id="Flow_5" sourceRef="Start_Seller" targetRef="Receive_QuoteRequest"/>
+        <sequenceFlow id="Flow_6" sourceRef="Receive_QuoteRequest" targetRef="Send_QuoteResponse"/>
+        <sequenceFlow id="Flow_7" sourceRef="Send_QuoteResponse" targetRef="End_Seller"/>
+    </process>
+</definitions>
+
+
+
+编排活动类型及属性说明：
+编排任务 (ChoreographyTask)
+核心属性：
+id: 必需，唯一标识符
+name: 可选，描述性名称
+initiatingParticipantRef: 必需，发起方参与者引用
+子元素：
+participantRef: 至少2个参与者
+messageFlowRef: 消息流引用
+约束：
+必须至少有两个参与者
+必须指定发起方参与者
+可以包含一个或多个消息流
+编排子流程 (SubChoreography)
+核心属性：
+继承ChoreographyActivity的所有属性
+loopType: 循环类型(None/Standard/MultiInstanceSequential/MultiInstanceParallel)
+子元素：
+可以包含其他编排活动
+必须有开始和结束事件
+约束：
+内部活动必须通过序列流连接
+参与者必须是父编排的子集
+调用编排 (CallChoreography)
+核心属性：
+calledChoreographyRef: 必需，被调用的编排引用
+participantAssociations: 参与者映射
+约束：
+必须引用有效的外部编排定义
+参与者必须正确映射
+4. 多实例编排活动
+属性：
+isSequential: 是否顺序执行
+loopCardinality: 循环次数
+loopDataInput: 循环数据输入
+约束：
+必须定义循环特性
+可以应用于任何编排活动类型
+通用约束和特性：
+参与者规则:
+>
+每个编排活动必须至少有两个参与者
+必须明确指定发起方参与者
+参与者不能重复
+2. 消息流规则:
+>
+- 消息流必须有源和目标参与者
+消息流方向必须明确
+可以定义多个消息流
+3. 相关键约束:
+>
+- 用于关联相关的消息
+可以定义多个相关属性
+循环特性:
+>
+支持标准循环
+支持多实例并行/顺序执行
+可以定义完成条件
+5. 事件处理:
+支持中间事件
+支持边界事件
+可以定义异常处理流程
+数据处理:
+支持数据对象
+支持参与者间的数据传输
+可以定义数据映射
+这些编排活动类型为不同的业务场景提供了灵活的协作模式，特别适用于描述多方参与的业务流程。选择合适的类型时需要考虑：
+参与者之间的交互模式
+消息交换的复杂度
+流程的可重用性
+异常处理需求
+数据传输需求
+
+ <!-- 循环特性示例 -->
+   <multiInstanceLoopCharacteristics>
+       <loopCardinality>5</loopCardinality>
+       <completionCondition>${nrOfCompletedInstances == 3}</completionCondition>
+   </multiInstanceLoopCharacteristics>
+
+
+ <!-- 相关键定义示例 -->
+   <correlationKey>
+       <correlationPropertyRef>OrderNumber</correlationPropertyRef>
+   </correlationKey>
+
+
+   <!-- 消息流定义示例 -->
+   <messageFlow id="Flow_1" sourceRef="Buyer" targetRef="Seller"/>
+
+
+     <!-- 参与者定义示例 -->
+   <participantRef>Buyer</participantRef>
+   <participantRef>Seller</participantRef>

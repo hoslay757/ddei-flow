@@ -45,6 +45,18 @@ class DDeiFlowElementSettingDialog extends DDeiPluginBase{
         id: 'ddei-flow-change-bpmnsubtype'
       },
       {
+        id: 'ddei-flow-time-setting'
+      },
+      {
+        id: 'ddei-flow-message-setting'
+      },
+      {
+        id: 'ddei-flow-signal-setting'
+      },
+      {
+        id: 'ddei-flow-error-setting'
+      },
+      {
         id: 'ddei-flow-change-linetype'
       },
       {

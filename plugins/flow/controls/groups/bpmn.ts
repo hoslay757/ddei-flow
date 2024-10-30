@@ -13,14 +13,19 @@ export default {
       'orderNo': 1,
     },
     {
+      'id': '1000004',
+      'name': '边界事件',
+      'orderNo': 2
+    },
+    {
       'id': '1000002',
       'name': '中间事件',
-      'orderNo': 2
+      'orderNo': 3
     },
     {
       'id': '1000003',
       'name': '结束事件',
-      'orderNo': 3
+      'orderNo': 4
     },
     {
       'id': '1000011',

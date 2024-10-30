@@ -19,6 +19,86 @@
           </div>
         </div>
         <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-time-setting' && ((model.bpmnType == 'StartEvent' && (model.bpmnSubType == 4 || model.bpmnSubType == 5)) || (model.bpmnType == 'IntermediateEvent' && (model.bpmnSubType == 6 || model.bpmnSubType == 7 || model.bpmnSubType == 8)) || (model.bpmnType == 'BoundaryEvent' && model.bpmnSubType == 2)) && validItemCondition(item)">
+          <div class="change-bpmn-sub-type">
+            <svg class="icon-ddei-flow" @click="changeTimeType(-1)" style="width:16px;height:16px;" aria-hidden="true">
+              <use xlink:href="#icon-ddei-flow-left"></use>
+            </svg>
+            <div class="change-bpmn-sub-type-text">
+              {{ timeTypeDataSource[timeTypeIndex].text }}
+            </div>
+            <svg class="icon-ddei-flow" @click="changeTimeType(1)" style="width:16px;height:16px;" aria-hidden="true">
+              <use xlink:href="#icon-ddei-flow-right"></use>
+            </svg>
+          </div>
+        </div>
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-time-setting' && model.timeType != 'timeDuration' && model.timeType != 'CRON' && ((model.bpmnType == 'StartEvent' && (model.bpmnSubType == 4 || model.bpmnSubType == 5)) || (model.bpmnType == 'IntermediateEvent' && (model.bpmnSubType == 6 || model.bpmnSubType == 7 || model.bpmnSubType == 8)) || (model.bpmnType == 'BoundaryEvent' && model.bpmnSubType == 2)) && validItemCondition(item)">
+          <div class="change-property-text" :title="item.desc">
+            <div class="change-property-text-title">
+              时间
+            </div>
+            <div class="change-property-text-input">
+              <input v-model="model.timeValue" placeholder="2011-03-11T12:13:14">
+            </div>
+          </div>
+        </div>
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-time-setting' && model.timeType == 'timeDuration' && ((model.bpmnType == 'StartEvent' && (model.bpmnSubType == 4 || model.bpmnSubType == 5)) || (model.bpmnType == 'IntermediateEvent' && (model.bpmnSubType == 6 || model.bpmnSubType == 7 || model.bpmnSubType == 8)) || (model.bpmnType == 'BoundaryEvent' && model.bpmnSubType == 2)) && validItemCondition(item)">
+          <div class="change-property-text" :title="item.desc">
+            <div class="change-property-text-title">
+              周期
+            </div>
+            <div class="change-property-text-input">
+              <input v-model="model.timeValue" placeholder="R3/PT10H/${EndDate}">
+            </div>
+          </div>
+        </div>
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-time-setting' && model.timeType == 'CRON' && ((model.bpmnType == 'StartEvent' && (model.bpmnSubType == 4 || model.bpmnSubType == 5)) || (model.bpmnType == 'IntermediateEvent' && (model.bpmnSubType == 6 || model.bpmnSubType == 7 || model.bpmnSubType == 8)) || (model.bpmnType == 'BoundaryEvent' && model.bpmnSubType == 2)) && validItemCondition(item)">
+          <div class="change-property-text" :title="item.desc">
+            <div class="change-property-text-title">
+              CRON
+            </div>
+            <div class="change-property-text-input">
+              <input v-model="model.timeValue" placeholder="0 0/5* * *？">
+            </div>
+          </div>
+        </div>
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-message-setting' && ((model.bpmnType == 'StartEvent' && (model.bpmnSubType == 2 || model.bpmnSubType == 3)) || (model.bpmnType == 'IntermediateEvent' && (model.bpmnSubType == 5 || model.bpmnSubType == 4 || model.bpmnSubType == 3 || model.bpmnSubType == 2)) || (model.bpmnType == 'EndEvent' && model.bpmnSubType == 2) || (model.bpmnType == 'BoundaryEvent' && (model.bpmnSubType == 1 || !model.bpmnSubType))) && validItemCondition(item)">
+          <div class="change-property-text" :title="item.desc">
+            <div class="change-property-text-title">
+              消息
+            </div>
+            <div class="change-property-text-input">
+              <input v-model="model.messageName" placeholder="消息名称">
+            </div>
+          </div>
+        </div>
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-signal-setting' && ((model.bpmnType == 'StartEvent' && (model.bpmnSubType == 9 || model.bpmnSubType == 8)) || (model.bpmnType == 'IntermediateEvent' && (model.bpmnSubType == 12 || model.bpmnSubType == 13 || model.bpmnSubType == 14 || model.bpmnSubType == 15)) || (model.bpmnType == 'EndEvent' && model.bpmnSubType == 3) || (model.bpmnType == 'BoundaryEvent' && model.bpmnSubType == 3)) && validItemCondition(item)">
+          <div class="change-property-text" :title="item.desc">
+            <div class="change-property-text-title">
+              信号
+            </div>
+            <div class="change-property-text-input">
+              <input v-model="model.signalName" placeholder="信号名称">
+            </div>
+          </div>
+        </div>
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-error-setting' && ((model.bpmnType == 'StartEvent' && (model.bpmnSubType == 16)) || (model.bpmnType == 'IntermediateEvent' && model.bpmnSubType == 27) || (model.bpmnType == 'EndEvent' && model.bpmnSubType == 6) || (model.bpmnType == 'BoundaryEvent' && model.bpmnSubType == 4)) && validItemCondition(item)">
+          <div class="change-property-text" :title="item.desc">
+            <div class="change-property-text-title">
+              错误码
+            </div>
+            <div class="change-property-text-input">
+              <input v-model="model.errorCode" placeholder="错误码">
+            </div>
+          </div>
+        </div>
+        <div class="row"
           v-if="!item.viewer && item.id == 'ddei-flow-change-linetype' && validItemCondition(item) && lineTypeDataSource?.length > 0">
           <div class="change-bpmn-sub-type">
             <svg class="icon-ddei-flow" @click="changeLineType(-1)" style="width:16px;height:16px;" aria-hidden="true">
@@ -106,6 +186,15 @@
           </div>
         </div>
         <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnBaseType == 'Activity' && model?.multiInstance == 1">
+          <div class="change-bpmn-marker" @click="changeBpmnLabel('isParallel')">
+            <div :class="{ 'chk_state': model?.isParallel != 1, 'chk_state_checked': model?.isParallel == 1 }">
+              <span>{{ model?.isParallel == 1 ? '✓' : '' }}</span>
+            </div>
+            并行
+          </div>
+        </div>
+        <div class="row"
           v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnBaseType == 'Activity'">
           <div class="change-bpmn-marker" @click="changeBpmnLabel('multiInstance')">
             <div :class="{ 'chk_state': model?.multiInstance != 1, 'chk_state_checked': model?.multiInstance == 1 }">
@@ -115,12 +204,13 @@
           </div>
         </div>
         <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnBaseType == 'Activity' && model?.multiInstance == 1">
-          <div class="change-bpmn-marker" @click="changeBpmnLabel('isParallel')">
-            <div :class="{ 'chk_state': model?.isParallel != 1, 'chk_state_checked': model?.isParallel == 1 }">
-              <span>{{ model?.isParallel == 1 ? '✓' : '' }}</span>
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && (model.bpmnType == 'BoundaryEvent' && (model.bpmnSubType == 1 || !model.bpmnSubType || model.bpmnSubType == 2))">
+          <div class="change-bpmn-marker" @click="changeBpmnLabel('notInterrupting')">
+            <div
+              :class="{ 'chk_state': model?.notInterrupting != 1, 'chk_state_checked': model?.notInterrupting == 1 }">
+              <span>{{ model?.notInterrupting == 1 ? '✓' : '' }}</span>
             </div>
-            并行
+            非中断
           </div>
         </div>
         <div class="row"
@@ -151,7 +241,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="row"
           v-if="!item.viewer && item.id == 'ddei-flow-property-editor-textarea' && validItemCondition(item) ">
           <div class="change-property-textarea" :title="item.desc">
@@ -196,7 +286,13 @@ export default {
       endPointTypeDataSource: null,
       endPointTypeIndex: -1,
       lineTypeDataSource: null,
-      lineTypeIndex: -1
+      lineTypeIndex: -1,
+      timeTypeIndex: -1,
+      timeTypeDataSource: [
+        { text: "固定时间", value: "timeDate" },
+        { text: "周期执行", value: "timeDuration" },
+        { text: "CRON", value: "CRON" },
+      ]
     };
   },
   computed: {},
@@ -261,6 +357,18 @@ export default {
             }
             this.lineTypeDataSource = ds
           }
+          {
+            let ds = this.timeTypeDataSource
+            if (ds?.length > 0) {
+              let value = this.model.timeType ? this.model.timeType : 'timeDate'
+              for (let i = 0; i < ds.length; i++) {
+                if (ds[i].value == value) {
+                  this.timeTypeIndex = i
+                  break;
+                }
+              }
+            }
+          }
         }
 
       }
@@ -312,17 +420,34 @@ export default {
       } else {
         this.model.bpmnSubType = ds[this.bpmnSubTypeIndex].value
       }
-      if(this.model.bpmnBaseType == 'Sequence'){
+      if (this.model.bpmnBaseType == 'Sequence') {
         this.changeLineBySubType()
       }
-     
+
       this.model.render.clearCachedValue()
       this.model.initPVS()
       this.model.render.enableRefreshShape()
       editor.bus.push(DDeiEnumBusCommandType.RefreshShape);
       editor.bus.executeAll();
-      
 
+
+    },
+
+    /**
+     * 切换时间类型
+     */
+    changeTimeType(delta) {
+      let ds = this.timeTypeDataSource
+      this.timeTypeIndex += delta
+      if (this.timeTypeIndex >= ds.length) {
+        this.model.timeType = ds[0].value
+        this.timeTypeIndex = 0
+      } else if (this.timeTypeIndex == -1) {
+        this.model.timeType = ds[ds.length - 1].value
+        this.timeTypeIndex = ds.length - 1
+      } else {
+        this.model.timeType = ds[this.timeTypeIndex].value
+      }
     },
 
     /**

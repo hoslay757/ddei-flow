@@ -39,7 +39,7 @@ const options = {
         {
           name: "测试",
           action: function (editor) {
-            console.log(editor.flow.toBPMNXML())
+            console.log(editor.flow.toBPMNXML(false,true))
           }
         }
       ]
