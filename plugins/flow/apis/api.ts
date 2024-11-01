@@ -1568,7 +1568,7 @@ class DDeiFlowAPI {
       if (sequence) {
         let noneDirection = false
         let nodeTag = "bpmn:sequenceFlow"
-        if (sequence.bpmnSubType == 5) {
+        if (sequence.bpmnSubType == 5 || (sequence.prevNode?.bpmnType == 'Comment' || sequence.nextNode.bpmnType == 'Comment')){
           nodeTag = "bpmn:association"
           noneDirection = true
         }
@@ -1576,7 +1576,6 @@ class DDeiFlowAPI {
         if (sequence.name) {
           contentStr += ' name="' + sequence.name + '"'
         }
-        // <bpmn:association id = "Association_14lyaze" associationDirection = "None" sourceRef = "Activity_0vhc61s" targetRef = "TextAnnotation_0u08dx5" />
         //对注释的特别处理
         if (sequence.prevNode?.bpmnType == 'Comment' || sequence.nextNode.bpmnType == 'Comment'){
           let commentNode,otherNode
@@ -1608,6 +1607,8 @@ class DDeiFlowAPI {
             contentStr += ' targetRef="' + sequence.nextNode[this.jsonKeyField] + '"'
           }
         }
+        //TODO 对依附Message的处理
+
         if (!noneDirection){
           //判定箭头是否都为空，如果都是空则noneDirection=true
           let spNone = !(sequence.sp && sequence.sp.type != 0)
