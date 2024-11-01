@@ -41,7 +41,7 @@ export default {
           'controlType': 'combox',
           'dataType': 'integer',
           'dataSource': [
-            { 'text': '发送', 'value': 1 }, { 'text': '接受', 'value': 2 }
+            { 'text': '默认', 'value': 1 }, { 'text': '未初始化', 'value': 2 }
           ],
           'itemStyle': { width: 100, height: 25, col: 2, row: 0 },
           'defaultValue': 1,
@@ -61,7 +61,7 @@ export default {
   },
   viewer: BpmnMessageViewer,
   icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
-        <use xlink:href="#icon-ddei-flow-send"></use>
+        <use xlink:href="#icon-ddei-flow-receive"></use>
       </svg>`,
   EVENT_MOUSE_MOVE_IN_CONTROL: showSettingButton
 }

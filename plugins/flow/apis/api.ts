@@ -1273,7 +1273,7 @@ class DDeiFlowAPI {
         } else if (node.bpmnType == 'User') {
   
         } else if (node.bpmnType == 'Message') {
-
+          nodeTag = "bpmn:message"
         } else if (node.bpmnType == 'DataStore') {
           nodeTag = "bpmn:dataStore"
         }
@@ -1332,6 +1332,11 @@ class DDeiFlowAPI {
         } else {
           contentStr += '/>\n'
         }
+      }
+      if (node.bpmnType == 'Message') {
+        defineStr = contentStr.replace(tabStr,"  ")
+        contentStr = ''
+        
       }
       returnData = new DDeiFlowBpmnXmlNode(contentStr, defineStr, processStr, currentProcessStr)
     }

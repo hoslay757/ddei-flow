@@ -21,8 +21,9 @@ export default {
 <template>
   <div ref="divElement" class="ddei-flow-bpmn-viewer-message" title="消息">
     <svg class="icon-ddei-flow" aria-hidden="true">
-      <use v-if="model.bpmnSubType == 1" xlink:href="#icon-ddei-flow-send"></use>
-      <use v-if="model.bpmnSubType == 2" xlink:href="#icon-ddei-flow-receive"></use>
+      <use v-if="model.bpmnSubType == 1" xlink:href="#icon-ddei-flow-receive"></use>
+      <use v-if="model.bpmnSubType == 2" xlink:href="#icon-ddei-flow-send"></use>
+
     </svg>
   </div>
 </template>
