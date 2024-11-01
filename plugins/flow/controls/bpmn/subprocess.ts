@@ -11,6 +11,7 @@ export default {
   subject: 'bpmn',
   define: {
     bpmnBaseType: 'Activity',
+    bpmnSubType:1,
     bpmnType: 'SubProcess',
     allowIncludeModel:1,
     width: 300,
@@ -42,30 +43,21 @@ export default {
           'defaultValue': "子流程",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
-        
+      
         {
-          'code': 'isAdHoc',
-          'name': '自定义',
-          'desc': '是否为自定义流程',
-          'controlType': 'switch-checkbox',
+          'code': 'bpmnSubType',
+          'name': '类型',
+          'desc': '控件的主体显示文本',
+          'controlType': 'combox',
           'dataType': 'integer',
-          'display': 'column',
-          'hiddenTitle': true,
-          'defaultValue': 0,
+          'dataSource': [
+            { 'text': '默认', 'value': 1 }, { 'text': '事件', 'value': 2 },
+            { 'text': '事务', 'value': 3 }, { 'text': '自定义', 'value': 4 }
+          ],
+          'itemStyle': { width: 100, height: 25, col: 2, row: 0 },
+          'defaultValue': 1,
           'type': [1, 2], //类别，1图形，2业务，3事件
-        },
-        {
-          'code': 'isTransaction',
-          'name': '事务',
-          'desc': '是否为事务子流程',
-          'controlType': 'switch-checkbox',
-          'dataType': 'integer',
-          'display': 'column',
-          'hiddenTitle': true,
-          'defaultValue': 0,
-          'type': [1, 2], //类别，1图形，2业务，3事件
-        },
-        
+        },        
         {
           'code': 'desc',
           'name': '备注',
@@ -83,7 +75,7 @@ export default {
           subGroups: [
             {
               name: "基本信息",
-              attrs: ["code", "name", "isLoop", "isTransaction", "multiInstance", "isParallel", "isCompensation", "isAdHoc", "desc"]
+              attrs: ["code", "name", "isLoop", "isTransaction", "multiInstance", "isParallel", "isCompensation", "desc"]
             }
           ]
         },

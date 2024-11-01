@@ -134,6 +134,16 @@ export default {
       'orderNo': 505,
     },
     {
+      'id': '1000506',
+      'name': '数据存储',
+      'orderNo': 506,
+    },
+    {
+      'id': '1000507',
+      'name': '数据存储',
+      'orderNo': 507,
+    },
+    {
       'id': '1000601',
       'name': '序列流',
       'orderNo': 601,

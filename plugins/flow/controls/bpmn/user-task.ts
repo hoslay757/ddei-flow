@@ -38,6 +38,24 @@ export default {
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
         {
+          'code': 'humanPerformer',
+          'name': '执行人',
+          'desc': '任务的执行人',
+          'controlType': 'text',
+          'dataType': 'string',
+          'defaultValue': "执行人",
+          'type': [1, 2] //类别，1图形，2业务，3事件
+        },
+        {
+          'code': 'potentialOwner',
+          'name': '候选人',
+          'desc': '任务的候选人',
+          'controlType': 'text',
+          'dataType': 'string',
+          'defaultValue': "候选人",
+          'type': [1, 2] //类别，1图形，2业务，3事件
+        },
+        {
           'code': 'isLoop',
           'name': '循环',
           'desc': '循环',

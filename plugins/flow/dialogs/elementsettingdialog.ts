@@ -23,6 +23,30 @@ class DDeiFlowElementSettingDialog extends DDeiPluginBase{
       },
       {
         id: 'ddei-flow-property-editor-text',
+        label: "执行人",
+        desc: "用户",
+        property: 'humanPerformer',
+        condition: "model.bpmnType == 'UserTask'"
+      },
+      {
+        id: 'ddei-flow-property-editor-text',
+        label: "候选人",
+        desc: "用户2,用户3",
+        property: 'potentialOwner',
+        condition: "model.bpmnType == 'UserTask'"
+      },
+      {
+        id: 'ddei-flow-property-editor-textarea',
+        label: "脚本",
+        desc: `sum = 0
+for ( i in inputArray ) {
+  sum += i
+}`,
+        property: 'script',
+        condition: "model.bpmnType == 'ScriptTask'"
+      },
+      {
+        id: 'ddei-flow-property-editor-text',
         label: "发送人",
         desc: "上方参与人，用逗号隔开多个参与人",
         property: 'topUser',
@@ -36,13 +60,10 @@ class DDeiFlowElementSettingDialog extends DDeiPluginBase{
         condition: "model.bpmnType == 'ChoreographyTask' || model.bpmnType == 'ChoreographySubProcess'"
       },
       {
-        id: 'ddei-flow-property-editor-textarea',
-        label: "备注",
-        desc: "备注",
-        property: 'desc',
+        id: 'ddei-flow-change-bpmnsubtype'
       },
       {
-        id: 'ddei-flow-change-bpmnsubtype'
+        id: 'ddei-flow-dataobject-setting'
       },
       {
         id: 'ddei-flow-time-setting'
@@ -57,6 +78,9 @@ class DDeiFlowElementSettingDialog extends DDeiPluginBase{
         id: 'ddei-flow-error-setting'
       },
       {
+        id: 'ddei-flow-condition-setting'
+      },
+      {
         id: 'ddei-flow-change-linetype'
       },
       {
@@ -69,7 +93,17 @@ class DDeiFlowElementSettingDialog extends DDeiPluginBase{
         id: 'ddei-flow-change-activity-labels'
       },
       {
-        viewer: null,
+        id: 'ddei-flow-property-editor-text',
+        label: "容量",
+        desc: "数据存储的容量大小",
+        property: 'capacity',
+        condition: "model.bpmnType == 'DataStore' && !model.isUnlimited"
+      },
+      {
+        id: 'ddei-flow-property-editor-textarea',
+        label: "备注",
+        desc: "备注",
+        property: 'desc',
       }
     ]
   });

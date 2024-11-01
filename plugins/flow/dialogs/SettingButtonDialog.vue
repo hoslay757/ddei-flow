@@ -6,7 +6,7 @@
         <component v-if="btn.viewer" :is="btn.viewer" :editor="editor" :options="options" :model="model" v-bind="btn">
         </component>
         <svg class="icon-ddei-flow"
-          v-if="!btn.viewer && btn.id == 'ddei-flow-change-bpmnsubtype' && validItemCondition(btn) && controlDefine?.subject == 'bpmn' && (bpmnSubTypeDataSource?.length > 0 || model?.bpmnBaseType == 'Activity' || model?.bpmnBaseType == 'Line')"
+          v-if="!btn.viewer && btn.id == 'ddei-flow-change-bpmnsubtype' && validItemCondition(btn) && controlDefine?.subject == 'bpmn'"
           @mouseenter="settingMouseEnter($el)" @mouseleave="settingMouseEnterLeave($el)" aria-hidden="true">
           <use xlink:href="#icon-ddei-flow-setting"></use>
         </svg>

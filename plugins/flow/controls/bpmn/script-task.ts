@@ -37,6 +37,24 @@ export default {
           'defaultValue': "脚本任务",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
+        {
+          'code': 'scriptFormat',
+          'name': '语言',
+          'desc': '脚本采用的语言',
+          'controlType': 'textarea',
+          'dataType': 'string',
+          'defaultValue': "groovy",
+          'type': [2] //类别，1图形，2业务，3事件
+        },
+        {
+          'code': 'script',
+          'name': '脚本',
+          'desc': '脚本内容',
+          'controlType': 'textarea',
+          'dataType': 'string',
+          'defaultValue': "",
+          'type': [2] //类别，1图形，2业务，3事件
+        },
 
         {
           'code': 'desc',
@@ -45,7 +63,7 @@ export default {
           'controlType': 'textarea',
           'dataType': 'string',
           'defaultValue': "脚本任务节点",
-          'type': [1, 2] //类别，1图形，2业务，3事件
+          'type': [2] //类别，1图形，2业务，3事件
         },
 
       ]

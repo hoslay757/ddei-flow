@@ -19,7 +19,7 @@ class DDeiFlowAPI {
   /**
    * 配置的属性
    */
-  jsonField: string[] = ["id", "name", "code", "text", "ep", "sp", "desc", "condition", "default", "bpmnType", "bpmnSubType", "bpmnBaseType", "activityId", "errorCode", "timeType", "timeValue","notInterrupting", "messageName","signalName","isLoop", "isLoop","isTransaction", "multiInstance", "isParallel", "isCompensation","isAdHoc","essBounds"]
+  jsonField: string[] = ["id", "name", "code", "text", "ep", "sp", "desc", "isUnlimited","capacity", "condition", "default", "bpmnType", "bpmnSubType", "scriptFormat", "dataType", "customDataType","isCollection", "loopCardinality", "script", "bpmnBaseType","ordering", "activityId", "errorCode", "timeType", "timeValue", "potentialOwner","humanPerformer","notInterrupting", "messageName","signalName","isLoop", "isLoop","isTransaction", "multiInstance", "isParallel", "isCompensation","essBounds"]
 
   /**
    * json中以哪个字段作为key，默认为id，可以指定为code或其他字段
@@ -585,6 +585,9 @@ class DDeiFlowAPI {
       }
     }
     if (!returnStr){
+      if (!flowObject.id){
+        flowObject.id = DDeiUtil.getUniqueCode();
+      }
       returnStr = `<?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions id="`+ flowObject.id + `" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" targetNamespace="http://bpmn.io/schema/bpmn">\n`
       let contentStr = ''
@@ -1137,6 +1140,7 @@ class DDeiFlowAPI {
         tabStr += " "
       }
       if (node) {
+        let childXML = ''
         let nodeTag = "bpmn:task"
         if (node.bpmnType == 'UserTask') {
           nodeTag = "bpmn:userTask"
@@ -1159,17 +1163,60 @@ class DDeiFlowAPI {
         if (node.name) {
           contentStr += ' name="' + node.name + '"'
         }
-        if (node.scriptFormat) {
-          contentStr += ' scriptFormat="' + node.scriptFormat + '"'
+        //补偿
+        if (node.isCompensation){
+          contentStr += ' isForCompensation="true"'
         }
-        if (node.script) {
-          contentStr += ' script="' + node.script + '"'
+        if (node.bpmnType == 'ScriptTask') {
+          nodeTag = "bpmn:scriptTask"
+          if (node.scriptFormat) {
+            contentStr += ' scriptFormat="' + node.scriptFormat + '"'
+          } else if (node.script) {
+            contentStr += ' scriptFormat="groovy"'
+          }
+          if (node.script) {
+            let scriptArr = node.script.split("\n")
+            childXML += tabStr + " <script><![CDATA[\n"
+            for (let i = 0; i < scriptArr.length; i++) {
+              childXML += tabStr + " " + scriptArr[i] + "\n"
+            }
+            childXML += tabStr + " ]]></script>\n"
+          }
+        } else if (node.bpmnType == 'UserTask') {
+          nodeTag = "bpmn:userTask"
+          if (node.humanPerformer) {
+            childXML += tabStr + ' <humanPerformer>\n'
+            childXML += tabStr + '  <resourceAssignmentExpression>\n'
+            childXML += tabStr + '   <formalExpression>' + node.humanPerformer.trim() + '</formalExpression>\n'
+            childXML += tabStr + '  </resourceAssignmentExpression>\n'
+            childXML += tabStr + ' </humanPerformer>\n'
+          }
+          if (node.potentialOwner) {
+            let potentArr = node.potentialOwner.split(",")
+
+            childXML += tabStr + ' <potentialOwner>\n'
+            childXML += tabStr + '  <resourceAssignmentExpression>\n'
+            childXML += tabStr + '   <formalExpression>'
+            for (let i = 0; i < potentArr.length; i++) {
+              if (i != 0) {
+                childXML += ','
+              }
+              if (potentArr[i].trim()) {
+                childXML += 'user(' + potentArr[i].trim() + ')'
+              }
+            }
+
+            childXML += '</formalExpression>\n'
+            childXML += tabStr + '  </resourceAssignmentExpression>\n'
+            childXML += tabStr + ' </potentialOwner>\n'
+          }
         }
+
         if (node.activityId){
           contentStr += ' calledElement="' + node.activityId + '"'
         }
 
-        let childXML = ''
+        
 
         //描述
         childXML += this.bpmnXmlSubDocumentation(node, tabLevel + 1)
@@ -1213,43 +1260,70 @@ class DDeiFlowAPI {
         tabStr += " "
       }
       if (node) {
-        let nodeTag = "bpmn:task"
-        if (node.bpmnType == 'UserTask') {
-          nodeTag = "bpmn:userTask"
-        } else if (node.bpmnType == 'ServiceTask') {
-          nodeTag = "bpmn:serviceTask"
-        } else if (node.bpmnType == 'SendTask') {
-          nodeTag = "bpmn:sendTask"
-        } else if (node.bpmnType == 'ScriptTask') {
-          nodeTag = "bpmn:scriptTask"
-        } else if (node.bpmnType == 'ManualTask') {
-          nodeTag = "bpmn:manualTask"
-        } else if (node.bpmnType == 'ReceiveTask') {
-          nodeTag = "bpmn:receiveTask"
-        } else if (node.bpmnType == 'CallActivityTask') {
-          nodeTag = "bpmn:callActivity"
-        } else if (node.bpmnType == 'ChoreographyTask') {
-          nodeTag = "bpmn:choreography"
+        let nodeTag = "bpmn:dataObject"
+        if (node.bpmnType == 'DataObject') {
+          if (node.bpmnSubType == 2){
+            nodeTag = "bpmn:dataInput"
+          } else if (node.bpmnSubType == 3) {
+            nodeTag = "bpmn:dataOutput"
+          }
+        } else if (node.bpmnType == 'User') {
+  
+        } else if (node.bpmnType == 'Message') {
+
+        } else if (node.bpmnType == 'DataStore') {
+          nodeTag = "bpmn:dataStore"
         }
         contentStr += tabStr + '<' + nodeTag + ' id="' + node[this.jsonKeyField] + '"'
         if (node.name) {
           contentStr += ' name="' + node.name + '"'
         }
-        if (node.scriptFormat) {
-          contentStr += ' scriptFormat="' + node.scriptFormat + '"'
+        if (node.bpmnType == 'DataObject') {
+          switch(node.dataType){
+            case 2: {
+              contentStr += ' itemSubjectRef="xsd:int"'
+            } break;
+            case 3: {
+              contentStr += ' itemSubjectRef="xsd:long"'
+            } break;
+            case 4: {
+              contentStr += ' itemSubjectRef="xsd:float"'
+            } break;
+            case 5: {
+              contentStr += ' itemSubjectRef="xsd:double"'
+            } break;
+            case 6: {
+              contentStr += ' itemSubjectRef="xsd:boolean"'
+            } break;
+            case 7: {
+              contentStr += ' itemSubjectRef="xsd:datetime"'
+            } break;
+            case 8: {
+              if (node.customDataType?.trim()){
+                contentStr += ' itemSubjectRef="' + node.customDataType.trim() +'"'
+              }
+            } break;
+            default: {
+              contentStr += ' itemSubjectRef="xsd:string"'
+            } break;
+          }
+          if (node.isCollection){
+            contentStr += ' isCollection="true"'
+          }
+        } else if (node.bpmnType == 'DataStore') {
+          if (node.isUnlimited) {
+            contentStr += ' isUnlimited="true"'
+          } else if (node.capacity){
+            contentStr += ' capacity="' + node.capacity +'"'
+          }
         }
-        if (node.script) {
-          contentStr += ' script="' + node.script + '"'
-        }
+       
 
         let childXML = ''
 
         //描述
         childXML += this.bpmnXmlSubDocumentation(node, tabLevel + 1)
-        //进出属性
-        childXML += this.bpmnXmlSubInOut(node, tabLevel + 1)
-        //多实例
-        childXML += this.bpmnXmlSubMultiInstance(node, tabLevel + 1)
+
         if (childXML) {
           contentStr += '>\n' + childXML + tabStr + '</' + nodeTag + '>\n'
         } else {
@@ -1399,16 +1473,33 @@ class DDeiFlowAPI {
       }
       if (node) {
         let nodeTag = "bpmn:subProcess"
-        if (node.isTransaction == 1) {
+        if (node.bpmnSubType == 3) {
           nodeTag = "bpmn:transaction"
+        } else if (node.bpmnSubType == 4) {
+          nodeTag = "bpmn:adHocSubProcess"
         }
         contentStr += tabStr + '<' + nodeTag +' id="' + node[this.jsonKeyField] + '"'
         if (node.name) {
           contentStr += ' name="' + node.name + '"'
         }
-        //TODO name = "事件子流程" triggeredByEvent = "true"
+        if (node.bpmnSubType == 4 && node.ordering == 1) {
+          //执行顺序Sequential，默认并行Parallel
+          contentStr += ' ordering="Sequential"'
+        }
+        //补偿
+        if (node.isCompensation) {
+          contentStr += ' isForCompensation="true"'
+        }
+        if(node.bpmnSubType == 2){
+          contentStr += ' triggeredByEvent="true"'
+        }
         let childXML = ''
         let currentProcessStr = ''
+        //描述
+        
+        childXML += this.bpmnXmlSubDocumentation(node, tabLevel + 1)
+        //多实例
+        childXML += this.bpmnXmlSubMultiInstance(node, tabLevel + 1)
         node.nodes?.forEach(subNode => {
           let nodeResult: DDeiFlowBpmnXmlNode = this.node2BPMNXML(subNode, tabLevel + 1)
           if (nodeResult) {
@@ -1523,8 +1614,10 @@ class DDeiFlowAPI {
       
         let childXML = ''
         //条件
-        if (sequence.condition){
-          childXML += tabStr +' <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">'+sequence.condition+'</bpmn:conditionExpression>'
+        if (sequence.bpmnSubType == 2 && sequence.condition){
+          childXML += tabStr + ' <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">\n'
+          childXML += tabStr + '  <![CDATA[' + sequence.condition +']]>\n'
+          childXML += tabStr + ' </bpmn:conditionExpression>\n'
         }
         if (childXML){
           contentStr += '>\n' + childXML + tabStr + '</' + nodeTag +'>\n'
@@ -1553,11 +1646,13 @@ class DDeiFlowAPI {
     if (node.multiInstance){
       returnStr += tabStr + '<bpmn:multiInstanceLoopCharacteristics'
       if (!node.isParallel){
-        returnStr += ' isSequential = "true"'
+        returnStr += ' isSequential="true"'
       }
       returnStr += '>\n'
       //实例数量
-      returnStr += tabStr+' <bpmn:loopCardinality xsi:type="bpmn:tFormalExpression">3</bpmn:loopCardinality>\n'
+      if (node.loopCardinality){
+        returnStr += tabStr + ' <bpmn:loopCardinality xsi:type="bpmn:tFormalExpression">' + node.loopCardinality +'</bpmn:loopCardinality>\n'
+      }
       returnStr += tabStr + '</bpmn:multiInstanceLoopCharacteristics>\n'
     }
 
@@ -1606,7 +1701,7 @@ class DDeiFlowAPI {
       tabStr += " "
     }
     if (node.desc?.trim()){
-      returnStr += tabStr +'<bpmn:documentation>'+node.desc.trim()+'</bpmn:documentation>\n'
+      returnStr += tabStr +'<bpmn:documentation><![CDATA['+node.desc.trim()+']]></bpmn:documentation>\n'
     }
 
     return returnStr

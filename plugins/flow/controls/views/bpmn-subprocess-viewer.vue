@@ -17,7 +17,7 @@ export default {
 
   data(){
     return {
-      eventSubProcess:false
+  
     }
   },
 
@@ -36,27 +36,22 @@ export default {
           this.$refs['transactionBorderElement'].style.borderColor = ""
         }
       }
-      if(this.model.isTransaction == 1){
-        this.eventSubProcess = true
-      }else{
-        this.eventSubProcess = false
-      }
     }
   }
 };
 </script>
 <template>
   <div ref="divElement"
-    :class="{ 'ddei-flow-bpmn-viewer-subprocess': true, 'ddei-flow-bpmn-viewer-subprocess-event':eventSubProcess }">
-    <div ref="transactionBorderElement" v-if="model.isTransaction == 1" class="trans">
+    :class="{ 'ddei-flow-bpmn-viewer-subprocess': true, 'ddei-flow-bpmn-viewer-subprocess-event':model.bpmnSubType == 2 }">
+    <div ref="transactionBorderElement" v-if="model.bpmnSubType == 3" class="trans">
     </div>
-    <div :class="{ 'title': true, 'title-transaction': model?.isTransaction == 1 }" v-if="!model.isExpand">
-      {{ model.name ? model.name : model?.isTransaction == 1 ?"事务子流程":"子流程" }}
+    <div :class="{ 'title': true, 'title-transaction': model?.bpmnSubType == 3 }" v-if="!model.isExpand">
+      {{ model.name ? model.name : model.bpmnSubType == 3 ? "事务子流程" : model.bpmnSubType == 2 ? "事件子流程": "子流程" }}
     </div>
     <div ref="content" class="content" v-if="model.isExpand">
       <div class="content-header">
         <div class="content-header-title">
-          {{ model.name ? model.name : model?.isTransaction == 1 ? "事务子流程" : "子流程" }}
+          {{ model.name ? model.name : model?.bpmnSubType == 3 ? "事务子流程" : model.bpmnSubType == 2 ? "事件子流程" : "子流程" }}
         </div>
         <svg class="icon-ddei-flow content-header-locked" v-if="model.lock == 1" aria-hidden="true">
           <use xlink:href="#icon-ddei-flow-lock"></use>
@@ -66,7 +61,7 @@ export default {
 
       </div>
     </div>
-    <div :class="{ 'markers': true, 'markers-transaction': model?.isTransaction == 1 }">
+    <div :class="{ 'markers': true, 'markers-transaction': model.bpmnSubType == 3 }">
       <svg class="icon-ddei-flow" v-if="model.isLoop == 1" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-loop-marker"></use>
       </svg>
@@ -82,7 +77,7 @@ export default {
       <svg class="icon-ddei-flow" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-sub-process-marker"></use>
       </svg>
-      <svg class="icon-ddei-flow" v-if="model.isAdHoc == 1" aria-hidden="true">
+      <svg class="icon-ddei-flow" v-if="model.bpmnSubType == 4" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-ad-hoc-marker"></use>
       </svg>
     </div>

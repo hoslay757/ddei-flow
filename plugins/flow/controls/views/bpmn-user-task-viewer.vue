@@ -23,7 +23,7 @@ export default {
   <div ref="divElement" class="ddei-flow-bpmn-viewer-user-task">
     <div class="title">
       <svg class="icon-ddei-flow" aria-hidden="true">
-        <use xlink:href="#icon-ddei-flow-user-icon"></use>
+        <use xlink:href="#icon-ddei-flow-user"></use>
       </svg>
       <div class="text">
         {{ model.name ? model.name : "用户任务" }}

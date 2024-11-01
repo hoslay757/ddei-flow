@@ -34,8 +34,10 @@ export default {
   user-select: none;
   display: none;
   .icon-ddei-flow {
-    width: 100%;
-    height: 100%;
+    margin-top: -10px;
+    margin-left: -11px;
+    width: calc(100% + 20px);
+    height: calc(100% + 18px);
   }
 }
 </style>

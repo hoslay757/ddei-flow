@@ -19,6 +19,32 @@
           </div>
         </div>
         <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-dataobject-setting' && model.bpmnType == 'DataObject' && validItemCondition(item)">
+          <div class="change-bpmn-sub-type">
+            <svg class="icon-ddei-flow" @click="changeDataType(-1)" style="width:16px;height:16px;" aria-hidden="true">
+              <use xlink:href="#icon-ddei-flow-left"></use>
+            </svg>
+            <div class="change-bpmn-sub-type-text">
+              {{ dataTypeDataSource[dataTypeIndex].text }}
+            </div>
+            <svg class="icon-ddei-flow" @click="changeDataType(1)" style="width:16px;height:16px;" aria-hidden="true">
+              <use xlink:href="#icon-ddei-flow-right"></use>
+            </svg>
+          </div>
+        </div>
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-dataobject-setting' && model.bpmnType == 'DataObject' && model.dataType == 8 && validItemCondition(item)">
+          <div class="change-property-text" :title="item.desc">
+            <div class="change-property-text-title">
+              类型
+            </div>
+            <div class="change-property-text-input">
+              <input v-model="model.customDataType" placeholder="BusinessClass">
+            </div>
+          </div>
+        </div>
+
+        <div class="row"
           v-if="!item.viewer && item.id == 'ddei-flow-time-setting' && ((model.bpmnType == 'StartEvent' && model.bpmnSubType == 3) || (model.bpmnType == 'IntermediateCatchEvent' && (model.bpmnSubType == 1 || !model.bpmnSubType)) || (model.bpmnType == 'BoundaryEvent' && model.bpmnSubType == 2)) && validItemCondition(item)">
           <div class="change-bpmn-sub-type">
             <svg class="icon-ddei-flow" @click="changeTimeType(-1)" style="width:16px;height:16px;" aria-hidden="true">
@@ -99,6 +125,17 @@
           </div>
         </div>
         <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-condition-setting' && (model.bpmnBaseType == 'Sequence' && model.bpmnSubType == 2) && validItemCondition(item)">
+          <div class="change-property-text" :title="item.desc">
+            <div class="change-property-text-title">
+              条件
+            </div>
+            <div class="change-property-text-input">
+              <input v-model="model.condition" placeholder="${条件表达式}">
+            </div>
+          </div>
+        </div>
+        <div class="row"
           v-if="!item.viewer && item.id == 'ddei-flow-change-linetype' && validItemCondition(item) && lineTypeDataSource?.length > 0">
           <div class="change-bpmn-sub-type">
             <svg class="icon-ddei-flow" @click="changeLineType(-1)" style="width:16px;height:16px;" aria-hidden="true">
@@ -168,12 +205,21 @@
           </div>
         </div>
         <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnType == 'SubProcess'">
-          <div class="change-bpmn-marker" @click="changeBpmnLabel('isTransaction')">
-            <div :class="{ 'chk_state': model?.isTransaction != 1, 'chk_state_checked': model?.isTransaction == 1 }">
-              <span>{{ model?.isTransaction == 1 ? '✓' : '' }}</span>
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnType == 'DataStore'">
+          <div class="change-bpmn-marker" @click="changeBpmnLabel('isUnlimited')">
+            <div :class="{ 'chk_state': model?.isUnlimited != 1, 'chk_state_checked': model?.isUnlimited == 1 }">
+              <span>{{ model?.isUnlimited == 1 ? '✓' : '' }}</span>
             </div>
-            事务
+            无限容量
+          </div>
+        </div>
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model.bpmnType == 'SubProcess' && model.bpmnSubType == 4">
+          <div class="change-bpmn-marker" @click="changeBpmnLabel('ordering')">
+            <div :class="{ 'chk_state': model?.ordering != 1, 'chk_state_checked': model?.ordering == 1 }">
+              <span>{{ model?.ordering == 1 ? '✓' : '' }}</span>
+            </div>
+            顺序执行
           </div>
         </div>
         <div class="row"
@@ -185,15 +231,7 @@
             循环
           </div>
         </div>
-        <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnBaseType == 'Activity' && model?.multiInstance == 1">
-          <div class="change-bpmn-marker" @click="changeBpmnLabel('isParallel')">
-            <div :class="{ 'chk_state': model?.isParallel != 1, 'chk_state_checked': model?.isParallel == 1 }">
-              <span>{{ model?.isParallel == 1 ? '✓' : '' }}</span>
-            </div>
-            并行
-          </div>
-        </div>
+
         <div class="row"
           v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnBaseType == 'Activity'">
           <div class="change-bpmn-marker" @click="changeBpmnLabel('multiInstance')">
@@ -201,6 +239,26 @@
               <span>{{ model?.multiInstance == 1 ? '✓' : '' }}</span>
             </div>
             多实例
+          </div>
+        </div>
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model.multiInstance">
+          <div class="change-property-text" :title="item.desc">
+            <div class="change-property-text-title">
+              实例数
+            </div>
+            <div class="change-property-text-input">
+              <input v-model="model.loopCardinality" placeholder="实例数">
+            </div>
+          </div>
+        </div>
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnBaseType == 'Activity' && model?.multiInstance == 1">
+          <div class="change-bpmn-marker" @click="changeBpmnLabel('isParallel')">
+            <div :class="{ 'chk_state': model?.isParallel != 1, 'chk_state_checked': model?.isParallel == 1 }">
+              <span>{{ model?.isParallel == 1 ? '✓' : '' }}</span>
+            </div>
+            并行
           </div>
         </div>
         <div class="row"
@@ -223,12 +281,12 @@
           </div>
         </div>
         <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && model?.bpmnBaseType == 'Activity' && (model.bpmnType == 'SubProcess' || model.bpmnType == 'ChoreographySubProcess') ">
-          <div class="change-bpmn-marker" @click="changeBpmnLabel('isAdHoc')">
-            <div :class="{ 'chk_state': model?.isAdHoc != 1, 'chk_state_checked': model?.isAdHoc == 1 }">
-              <span>{{ model?.isAdHoc == 1 ? '✓' : '' }}</span>
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnType == 'DataObject'">
+          <div class="change-bpmn-marker" @click="changeBpmnLabel('isCollection')">
+            <div :class="{ 'chk_state': model?.isCollection != 1, 'chk_state_checked': model?.isCollection == 1 }">
+              <span>{{ model?.isCollection == 1 ? '✓' : '' }}</span>
             </div>
-            自定义
+            数据集合
           </div>
         </div>
         <div class="row" v-if="!item.viewer && item.id == 'ddei-flow-property-editor-text' && validItemCondition(item)">
@@ -292,7 +350,9 @@ export default {
         { text: "固定时间", value: "timeDate" },
         { text: "周期执行", value: "timeDuration" },
         { text: "CRON", value: "CRON" },
-      ]
+      ],
+      dataTypeDataSource: null,
+      dataTypeIndex: -1,
     };
   },
   computed: {},
@@ -342,6 +402,18 @@ export default {
               }
             }
             this.bpmnSubTypeDataSource = ds
+          }
+          {
+            let ds = controlDefine.attrDefineMap.get("dataType")?.dataSource
+            if (ds?.length > 0) {
+              for (let i = 0; i < ds.length; i++) {
+                if (ds[i].value == this.model.dataType) {
+                  this.dataTypeIndex = i
+                  break;
+                }
+              }
+            }
+            this.dataTypeDataSource = ds
           }
           this.refreshPointType()
           {
@@ -431,6 +503,23 @@ export default {
       editor.bus.executeAll();
 
 
+    },
+
+    /**
+     * 切换数据类型
+     */
+    changeDataType(delta) {
+      let ds = this.dataTypeDataSource
+      this.dataTypeIndex += delta
+      if (this.dataTypeIndex >= ds.length) {
+        this.model.dataType = ds[0].value
+        this.dataTypeIndex = 0
+      } else if (this.dataTypeIndex == -1) {
+        this.model.dataType = ds[ds.length - 1].value
+        this.dataTypeIndex = ds.length - 1
+      } else {
+        this.model.dataType = ds[this.dataTypeIndex].value
+      }
     },
 
     /**
@@ -589,6 +678,9 @@ export default {
       if (label == 'displayView'){
         delete this.model.upActivityId
       }
+      this.model.render.clearCachedValue()
+      this.model.initPVS()
+      this.model.render.enableRefreshShape()
       editor.bus.push(DDeiEnumBusCommandType.RefreshShape);
       editor.bus.executeAll();
     }
@@ -598,7 +690,7 @@ export default {
 
 <style lang="less" scoped>
 .ddei-flow-element-setting-dialog {
-  width: 160px;
+  width: 200px;
   background: var(--panel-background);
   display: none;
   position: absolute;
@@ -653,13 +745,12 @@ export default {
       .change-bpmn-marker{
         font-size: 12px;
         height: 20px;
-        width:60px;
-        margin-left:25%;
+        width:150px;
+        margin-left:18px;
         .chk_state {
             border: 1px solid var(--panel-title);
             width: 12px;
             height: 12px;
-            margin-right: 10px;
             margin-top: 4px;
             float: left;
             box-sizing: border-box;
@@ -670,7 +761,6 @@ export default {
             border: 1px solid var(--panel-title);
             width: 12px;
             height: 12px;
-            margin-right: 10px;
             margin-top: 4px;
             float: left;
             background-color: var(--dot);

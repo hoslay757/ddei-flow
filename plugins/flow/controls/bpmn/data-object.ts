@@ -8,9 +8,9 @@ export default {
   from: '100500',
   subject: 'bpmn',
   define: {
-    width: 40,
-    height: 52,
-
+    width: 30,
+    height: 39,
+    dataType:1,
     bpmnBaseType: 'Other',
     bpmnType:"DataObject",
     bpmnSubType: 1,
@@ -78,6 +78,32 @@ export default {
               }
             }
         }`,
+
+        //数据集合图标
+        `(i, sample, pvs, model, ovs){
+          if(model.isCollection){
+              switch(i){
+                case 3:
+                  let fill =  1
+                  let stroke = 1
+                  pvs.push({begin:1,x:0,y:25,stroke:stroke,fill:fill,fillColor:'border'});
+                  pvs.push({x:0,y:43,stroke:stroke});
+                  pvs.push({x:0,y:43,stroke:stroke});
+                  pvs.push({end:1,x:0,y:25,stroke:stroke});
+
+                  pvs.push({begin:1,x:-8,y:25,stroke:stroke,fill:fill,fillColor:'border'});
+                  pvs.push({x:-8,y:43,stroke:stroke});
+                  pvs.push({x:-8,y:43,stroke:stroke});
+                  pvs.push({end:1,x:-8,y:25,stroke:stroke});
+
+                  pvs.push({begin:1,x:8,y:25,stroke:stroke,fill:fill,fillColor:'border'});
+                  pvs.push({x:8,y:43,stroke:stroke});
+                  pvs.push({x:8,y:43,stroke:stroke});
+                  pvs.push({end:1,x:8,y:25,stroke:stroke});
+                break;
+              }
+            }
+        }`,
         //文本
         `(i, sample, pvs, model, ovs){
           if(sample.textInput){
@@ -137,6 +163,33 @@ export default {
           ],
           'itemStyle': { width: 80, height: 25, col: 2, row: 0 },
           'defaultValue': 1,
+          'type': [1, 2], //类别，1图形，2业务，3事件
+        },
+        {
+          'code': 'dataType',
+          'name': '数据类型',
+          'desc': '数据的类型，可以是内置类型，也可以由外部定义',
+          'controlType': 'combox',
+          'dataType': 'integer',
+          'dataSource': [
+            { 'text': '字符串', 'value': 1 }, { 'text': '整数', 'value': 2 },
+            { 'text': '长整数', 'value': 3 }, { 'text': '单精度', 'value': 4 },
+            { 'text': '双精度', 'value': 5 }, { 'text': '布尔', 'value': 6 },
+            { 'text': '时间', 'value': 7 }, { 'text': '自定义', 'value': 8 }
+          ],
+          'itemStyle': { width: 100, height: 25, col: 2, row: 0 },
+          'defaultValue': 1,
+          'type': [1, 2], //类别，1图形，2业务，3事件
+        },
+        {
+          'code': 'isCollection',
+          'name': '数据集合',
+          'desc': '是否为数据集合',
+          'controlType': 'switch-checkbox',
+          'dataType': 'integer',
+          'display': 'column',
+          'hiddenTitle': true,
+          'defaultValue': 0,
           'type': [1, 2], //类别，1图形，2业务，3事件
         },
         {
