@@ -50,7 +50,10 @@ export default {
       <use v-if="model.bpmnSubType == 8 && model.notInterrupting" xlink:href="#icon-ddei-flow-start-event-non-inte">
       </use>
       <use v-if="model.bpmnSubType == 9" xlink:href="#icon-ddei-flow-start-event-error"></use>
-      <use v-if="model.bpmnSubType == 10" xlink:href="#icon-ddei-flow-start-event-compensa"></use>
+      <use v-if="model.bpmnSubType == 10 && !model.notInterrupting" xlink:href="#icon-ddei-flow-start-event-compensa">
+      </use>
+      <use v-if="model.bpmnSubType == 10 && model.notInterrupting" xlink:href="#icon-ddei-flow-start-event-compensa-non-inte">
+      </use>
     </svg>
   </div>
 </template>

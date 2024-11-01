@@ -34,10 +34,10 @@ export default {
   user-select: none;
   display: none;
   .icon-ddei-flow {
-    margin-top: -10px;
-    margin-left: -11px;
-    width: calc(100% + 20px);
-    height: calc(100% + 18px);
+    margin-top: -8px;
+    margin-left: -8px;
+    width: calc(100% + 16px);
+    height: calc(100% + 16px);
   }
 }
 </style>

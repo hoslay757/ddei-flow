@@ -7,8 +7,8 @@
   "glyphs": [
     {
       "icon_id": "42266287",
-      "name": "资源 211",
-      "font_class": "a-ziyuan211",
+      "name": "start-event-compensa-non-inte",
+      "font_class": "start-event-compensa-non-inte",
       "unicode": "e6c3",
       "unicode_decimal": 59075
     },
@@ -28,7 +28,7 @@
     },
     {
       "icon_id": "42257705",
-      "name": "资源 184",
+      "name": "start-event-message",
       "font_class": "start-event-message",
       "unicode": "e6bc",
       "unicode_decimal": 59068

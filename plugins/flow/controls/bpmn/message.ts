@@ -9,8 +9,8 @@ export default {
   from: '100103',
   subject: 'bpmn',
   define: {
-    width: 40,
-    height: 30,
+    width: 32,
+    height: 24,
     bpmnBaseType: 'Other',
     bpmnType:"Message",
     bpmnSubType:1,

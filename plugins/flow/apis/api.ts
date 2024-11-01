@@ -746,10 +746,10 @@ class DDeiFlowAPI {
           contentStr += 'name="' + node.name + '"'
         }
 
-        if (node.bpmnSubType != 9 && node.bpmnSubType != 10 && !node.notInterrupting) {
-          //TODO 事件子流程
-          if (node.subProcesses?.length > 0 && node.subProcesses[0]?.isTransaction) {
-            contentStr += ' isInterrupting="true"'
+        if (node.bpmnSubType != 9 && node.notInterrupting) {
+          //事件子流程
+          if (node.subProcesses?.length > 0 && node.subProcesses[0]?.bpmnSubType == 2) {
+            contentStr += ' isInterrupting="false"'
           }
           
         }
@@ -791,6 +791,9 @@ class DDeiFlowAPI {
           } else {
             childXML += tabStr + ' <bpmn:errorEventDefinition />\n'
           }
+        }//补偿
+        else if (node.bpmnSubType == 10) {
+          childXML += tabStr + ' <bpmn:compensateEventDefinition />\n'
         }
         
         if (childXML){

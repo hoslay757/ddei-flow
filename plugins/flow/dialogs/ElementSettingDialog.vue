@@ -262,7 +262,7 @@
           </div>
         </div>
         <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && ((model.bpmnType == 'BoundaryEvent' && (model.bpmnSubType == 1 || !model.bpmnSubType || model.bpmnSubType == 2 || model.bpmnSubType == 7 || model.bpmnSubType == 8 || model.bpmnSubType == 9)) || (model.bpmnType == 'StartEvent' && model.bpmnSubType >= 2 && model.bpmnSubType <=8))">
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && ((model.bpmnType == 'BoundaryEvent' && (model.bpmnSubType == 1 || !model.bpmnSubType || model.bpmnSubType == 2 || model.bpmnSubType == 7 || model.bpmnSubType == 8 || model.bpmnSubType == 9)) || (model.bpmnType == 'StartEvent' && (model.bpmnSubType >= 2 && model.bpmnSubType <=8) || model.bpmnSubType == 10))">
           <div class="change-bpmn-marker" @click="changeBpmnLabel('notInterrupting')">
             <div
               :class="{ 'chk_state': model?.notInterrupting != 1, 'chk_state_checked': model?.notInterrupting == 1 }">
