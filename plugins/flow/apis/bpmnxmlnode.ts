@@ -4,17 +4,23 @@
  */
 class DDeiFlowBpmnXmlNode {
 
-  constructor(contentStr: string | null, defineStr: string | null, processStr: string | null, currentProcessStr: string | null){
+  constructor(contentStr: string | null, defineStr: string | null, processStr: string | null, currentProcessStr: string | null, rootStr:string|null = null){
     this.contentStr = contentStr
     this.defineStr = defineStr
     this.processStr = processStr
     this.currentProcessStr = currentProcessStr
+    this.rootStr = rootStr
   }
 
   /**
    * 追加在当前位置
    */
   contentStr: string | null = null
+
+  /**
+   * 追加在define这一级，用于新增名称空间或者引用
+   */
+  rootStr: string | null = null
 
   /**
    * 追加在定义级，与当前流程process节点平级

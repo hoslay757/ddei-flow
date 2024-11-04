@@ -33,12 +33,17 @@ class DDeiFlowAPI {
   }
 
   /**
-   * 转换为bpmn时的回调函数，每个元素转换为bpmn时都会调用此方法，用于接管bpmn元素的生成，如果返回false会触发原来的逻辑，返回其他值将不会调用原有的逻辑。
+   * 转换为bpmn时的回调函数，每个元素转换为bpmn前都会调用此方法，用于接管bpmn元素的生成，如果返回false会触发原来的逻辑，返回其他值将不会调用原有的逻辑。
    */
   bpmnProcessorFN: Function | null = null
+
+  /**
+   * 转换为bpmn时的回调函数，每个元素转换为bpmn后都会调用此方法，用于接管bpmn元素的生成。
+   */
+  bpmnAfterProcessorFN: Function | null = null
   
   /**
-   * 转换为bpmndi时的回调函数，每个元素转换为bpmndi时都会调用此方法，用于接管bpmn元素的生成，如果返回false会触发原来的逻辑，返回其他值将不会调用原有的逻辑。
+   * 转换为bpmndi时的回调函数，每个元素转换为bpmndi前都会调用此方法，用于接管bpmn元素的生成，如果返回false会触发原来的逻辑，返回其他值将不会调用原有的逻辑。
    */
   bpmndiProcessorFN: Function | null = null
 
@@ -641,7 +646,7 @@ class DDeiFlowAPI {
     let defineStr = ''
     let skip = false
     if (this.bpmnProcessorFN) {
-      let fnResult = this.bpmnProcessorFN(graph);
+      let fnResult = this.bpmnProcessorFN(graph,0);
       if (fnResult !== false) {
         returnData = fnResult
         skip = true; 
@@ -672,6 +677,9 @@ class DDeiFlowAPI {
         contentStr += '  </bpmn:process>\n'
       }
       returnData = new DDeiFlowBpmnXmlNode(contentStr, defineStr, null,null)
+    }
+    if (this.bpmnAfterProcessorFN) {
+      returnData = this.bpmnAfterProcessorFN(graph,0 , returnData)
     }
     return returnData;
   }
@@ -805,6 +813,9 @@ class DDeiFlowAPI {
       }
       returnData = new DDeiFlowBpmnXmlNode(contentStr, defineStr, processStr, currentProcessStr)
     }
+    if (this.bpmnAfterProcessorFN) {
+      returnData = this.bpmnAfterProcessorFN(node, tabLevel, returnData)
+    }
     return returnData;
   }
 
@@ -904,6 +915,9 @@ class DDeiFlowAPI {
       }
       returnData = new DDeiFlowBpmnXmlNode(contentStr, defineStr, processStr, currentProcessStr)
     }
+    if (this.bpmnAfterProcessorFN) {
+      returnData = this.bpmnAfterProcessorFN(node, tabLevel, returnData)
+    }
     return returnData;
   }
 
@@ -976,6 +990,9 @@ class DDeiFlowAPI {
       }
       returnData = new DDeiFlowBpmnXmlNode(contentStr, defineStr, processStr, currentProcessStr)
     }
+    if (this.bpmnAfterProcessorFN) {
+      returnData = this.bpmnAfterProcessorFN(node, tabLevel, returnData)
+    }
     return returnData;
   }
 
@@ -1034,6 +1051,9 @@ class DDeiFlowAPI {
 
       }
       returnData = new DDeiFlowBpmnXmlNode(contentStr, defineStr, processStr, currentProcessStr)
+    }
+    if (this.bpmnAfterProcessorFN) {
+      returnData = this.bpmnAfterProcessorFN(node, tabLevel, returnData)
     }
     return returnData;
   }
@@ -1114,6 +1134,9 @@ class DDeiFlowAPI {
         }
       }
       returnData = new DDeiFlowBpmnXmlNode(contentStr,defineStr,processStr,currentProcessStr)
+    }
+    if (this.bpmnAfterProcessorFN) {
+      returnData = this.bpmnAfterProcessorFN(node, tabLevel, returnData)
     }
     return returnData;
   }
@@ -1235,6 +1258,9 @@ class DDeiFlowAPI {
       }
       returnData = new DDeiFlowBpmnXmlNode(contentStr, defineStr, processStr, currentProcessStr)
     }
+    if (this.bpmnAfterProcessorFN) {
+      returnData = this.bpmnAfterProcessorFN(node, tabLevel, returnData)
+    }
     return returnData;
   }
 
@@ -1340,6 +1366,9 @@ class DDeiFlowAPI {
       }
       returnData = new DDeiFlowBpmnXmlNode(contentStr, defineStr, processStr, currentProcessStr)
     }
+    if (this.bpmnAfterProcessorFN) {
+      returnData = this.bpmnAfterProcessorFN(node, tabLevel, returnData)
+    }
     return returnData;
   }
 
@@ -1383,6 +1412,9 @@ class DDeiFlowAPI {
         }
       }
       returnData = new DDeiFlowBpmnXmlNode(contentStr, defineStr, processStr, currentProcessStr)
+    }
+    if (this.bpmnAfterProcessorFN) {
+      returnData = this.bpmnAfterProcessorFN(node, tabLevel, returnData)
     }
     return returnData;
   }
@@ -1451,6 +1483,9 @@ class DDeiFlowAPI {
         }
       }
       returnData = new DDeiFlowBpmnXmlNode(contentStr, defineStr, processStr, currentProcessStr)
+    }
+    if (this.bpmnAfterProcessorFN) {
+      returnData = this.bpmnAfterProcessorFN(node, tabLevel, returnData)
     }
     return returnData;
   }
@@ -1535,6 +1570,9 @@ class DDeiFlowAPI {
         }
       }
       returnData = new DDeiFlowBpmnXmlNode(contentStr, defineStr, processStr, null)
+    }
+    if (this.bpmnAfterProcessorFN) {
+      returnData = this.bpmnAfterProcessorFN(node, tabLevel, returnData)
     }
     return returnData;
   }
@@ -1635,6 +1673,9 @@ class DDeiFlowAPI {
         }
       }
       returnData = new DDeiFlowBpmnXmlNode(contentStr, defineStr, processStr, currentProcessStr)
+    }
+    if (this.bpmnAfterProcessorFN) {
+      returnData = this.bpmnAfterProcessorFN(node, tabLevel, returnData)
     }
     return returnData;
   }

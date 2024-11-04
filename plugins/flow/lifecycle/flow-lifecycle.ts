@@ -1,6 +1,6 @@
 import { DDeiAbstractShape,DDeiLifeCycle, DDeiFuncData, DDeiEditorUtil, DDeiUtil, DDeiFuncCallResult, DDeiEditorEnumBusCommandType, DDeiEnumBusCommandType } from "ddei-editor";
 import { clone} from "lodash";
-import { getIncludeModels, showSettingButton, updateCallActivityView } from "../controls/util"
+import { getIncludeModels, showSettingButton, changeSettingButtonPos, updateCallActivityView } from "../controls/util"
 
 
 class DDeiFlowLifeCycle extends DDeiLifeCycle {
@@ -438,6 +438,11 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
         this.dragModels = null
 
       }
+
+      //选择调用控件
+      let data1 = clone(data)
+      data1.model = data.models[0]
+      changeSettingButtonPos(operateType, data1, ddInstance, evt)
       let toolBoxs = document.getElementsByClassName("ddei-core-panel-toolbox-simple")
       for (let i = 0; i < toolBoxs.length; i++) {
         toolBoxs[i].style.display = ""

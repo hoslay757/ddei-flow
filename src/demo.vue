@@ -39,6 +39,14 @@ const options = {
         {
           name: "测试",
           action: function (editor) {
+            if (!editor.flow.bpmnAfterProcessorFN){
+              editor.flow.bpmnAfterProcessorFN = function(node,tabLevel,result){
+                if(node?.bpmnType == 'StartEvent'){
+                  debugger
+                }
+                return result
+              }
+            }
             console.log(editor.flow.toBPMNXML(false,true))
           }
         }

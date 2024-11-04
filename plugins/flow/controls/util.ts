@@ -6,18 +6,18 @@ import { DDeiUtil, DDeiLink,DDeiConfig,DDeiEditor, DDeiEditorUtil, DDeiEnumOpera
 const showSettingButton = function (operate: DDeiEnumOperateType, data: object | null, ddInstance: DDei, evt: Event): DDeiFuncCallResult {
   let rs = new DDeiFuncCallResult();
   rs.state = 2;
-  
+
 
   //计算位置，显示按钮div
   let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
   if (editor) {
     let model = data.model
     //如果存在选中控件，则重新定位到选中控件
-    if (editor.ddInstance.stage.selectedModels?.size > 0){
-      if (!editor.ddInstance.stage.selectedModels.has(model.id)){
+    if (editor.ddInstance.stage.selectedModels?.size > 0) {
+      if (!editor.ddInstance.stage.selectedModels.has(model.id)) {
         if (editor.ddInstance.stage.selectedModels.size == 1) {
           model = Array.from(editor.ddInstance.stage.selectedModels.values())[0]
-        }else{
+        } else {
           return rs;
         }
       }
@@ -29,7 +29,7 @@ const showSettingButton = function (operate: DDeiEnumOperateType, data: object |
     let modelPos = DDeiUtil.getModelsDomAbsPosition([model])
     let editorEle = document.getElementById(editor.id)
     let editorPos = DDeiUtil.getDomAbsPosition(editorEle)
-    let left = modelPos.left + modelPos.width + (6.5 * (stageRatio - 1))- editorPos.left
+    let left = modelPos.left + modelPos.width + (6.5 * (stageRatio - 1)) - editorPos.left
     let top = modelPos.top + (6.5 * (stageRatio - 1)) - editorPos.top
     if (model.bpmnBaseType == 'Event') {
       left = modelPos.left + modelPos.width + (12 * (stageRatio - 1)) - editorPos.left
@@ -38,6 +38,55 @@ const showSettingButton = function (operate: DDeiEnumOperateType, data: object |
     let settingBtnEle = document.getElementById(editor.id + "_ddei-flow-setting-button-dialog");
     if (!settingBtnEle || settingBtnEle.style.display == "none" || (editor.tempPopData && editor.tempPopData['ddei-flow-setting-button-dialog'] && editor.tempPopData['ddei-flow-setting-button-dialog'].model != model)) {
       DDeiEditorUtil.showDialog(editor, 'ddei-flow-setting-button-dialog', {
+        group: "ddei-flow-setting-button",
+        model: model
+      }, { type: 99, left: left, top: top, hiddenMask: true }, null, true, true)
+    }
+
+
+    DDeiEditorUtil.closeDialog(editor, 'ddei-flow-element-setting-dialog')
+
+  }
+  return rs;
+}
+
+
+/**
+ * 额外显示一个切换控件类型的小图标在右上角区域
+ */
+const changeSettingButtonPos = function (operate: DDeiEnumOperateType, data: object | null, ddInstance: DDei, evt: Event): DDeiFuncCallResult {
+  let rs = new DDeiFuncCallResult();
+  rs.state = 2;
+
+
+  //计算位置，显示按钮div
+  let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
+  if (editor) {
+    let model = data.model
+    //如果存在选中控件，则重新定位到选中控件
+    if (editor.ddInstance.stage.selectedModels?.size > 0) {
+      if (!editor.ddInstance.stage.selectedModels.has(model.id)) {
+        if (editor.ddInstance.stage.selectedModels.size == 1) {
+          model = Array.from(editor.ddInstance.stage.selectedModels.values())[0]
+        } else {
+          return rs;
+        }
+      }
+    }
+    let stageRatio = model.getStageRatio()
+    //获取model的绝对位置
+    let modelPos = DDeiUtil.getModelsDomAbsPosition([model])
+    let editorEle = document.getElementById(editor.id)
+    let editorPos = DDeiUtil.getDomAbsPosition(editorEle)
+    let left = modelPos.left + modelPos.width + (6.5 * (stageRatio - 1)) - editorPos.left
+    let top = modelPos.top + (6.5 * (stageRatio - 1)) - editorPos.top
+    if (model.bpmnBaseType == 'Event') {
+      left = modelPos.left + modelPos.width + (12 * (stageRatio - 1)) - editorPos.left
+    }
+
+    let settingBtnEle = document.getElementById(editor.id + "_ddei-flow-setting-button-dialog");
+    if (settingBtnEle){
+      DDeiEditorUtil.displayDialog(editor, 'ddei-flow-setting-button-dialog', {
         group: "ddei-flow-setting-button",
         model: model
       }, { type: 99, left: left, top: top, hiddenMask: true }, null, true, true)
@@ -153,4 +202,4 @@ const lineObiCheck = function(model, param){
 
 
 
-export { showSettingButton, getIncludeModels, getParentModels, updateCallActivityView, lineObiCheck }
+export { showSettingButton, changeSettingButtonPos, getIncludeModels, getParentModels, updateCallActivityView, lineObiCheck }
