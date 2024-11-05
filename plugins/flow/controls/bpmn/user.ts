@@ -13,7 +13,17 @@ export default {
     height: 45,
     bpmnBaseType: 'Other',
     bpmnType:"User",
+    
     ext: {
+      sample:{
+        //依附图形的初始化配置，如果产生依附图形，则会在配置的位置生成
+        depPos: {
+          type: 8  //位置5中心点，6789上右下左
+        },
+        depProps: {
+          "8": "name"   //映射属性
+        },
+      },
       attrs: [
         {
           'code': 'code',

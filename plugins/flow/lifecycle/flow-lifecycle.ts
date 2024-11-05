@@ -39,9 +39,32 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
   EVENT_CONTROL_DEL_AFTER: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-del-after", 1, (operateType, data, ddInstance, evt) => { return this.controlDelAfter(operateType, data, ddInstance, evt) });
 
   EVENT_CONTROL_SELECT_BEFORE: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-select-before", 1, (operateType, data, ddInstance, evt) => { return this.controlSelectBefore(operateType, data, ddInstance, evt) });
-  
+
+  EVENT_CONTROL_DBL_CLICK: DDeiFuncData | null = new DDeiFuncData("ddei-flow-control-dbl-click", 1, (operateType, data, ddInstance, evt) => { return this.controlDblClick(operateType, data, ddInstance, evt) });
 
   dragModels :DDeiAbstractShape[]|null = null
+
+  /**
+   * 控件双击
+   * @param operateType 
+   * @param data 
+   * @param ddInstance 
+   * @param evt 
+   * @returns 
+   */
+  controlDblClick(operateType, data, ddInstance, evt) {
+    if (data?.models && data.models.length > 0) {
+      let model = data.models[0]
+      //屏蔽掉默认的双击快捷编辑行为
+      if (model.bpmnBaseType == 'Event' || model.bpmnBaseType == 'Activity' || model.bpmnBaseType == 'Gateway' || model.bpmnBaseType == 'Group') {
+        let result = new DDeiFuncCallResult()
+        result.state = -1
+        return result;
+      }
+
+
+    }
+  }
   /**
    * 拖拽中
    */
@@ -440,9 +463,11 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
       }
 
       //选择调用控件
-      let data1 = clone(data)
-      data1.model = data.models[0]
-      changeSettingButtonPos(operateType, data1, ddInstance, evt)
+      if (data.models?.length > 0){
+        let data1 = clone(data)
+        data1.model = data.models[0]
+        changeSettingButtonPos(operateType, data1, ddInstance, evt)
+      }
       let toolBoxs = document.getElementsByClassName("ddei-core-panel-toolbox-simple")
       for (let i = 0; i < toolBoxs.length; i++) {
         toolBoxs[i].style.display = ""

@@ -295,7 +295,8 @@
               {{ item.label }}
             </div>
             <div class="change-property-text-input">
-              <input v-model="model[item.property]" :placeholder="item.desc">
+              <input v-model="model[item.property]" @change="modelChangeProperty(model,item.property)"
+                :placeholder="item.desc">
             </div>
           </div>
         </div>
@@ -307,7 +308,8 @@
               {{ item.label }}
             </div>
             <div class="change-property-textarea-input">
-              <textarea v-model="model[item.property]" :placeholder="item.desc"></textarea>
+              <textarea v-model="model[item.property]" @change="modelChangeProperty(model, item.property)"
+                :placeholder="item.desc"></textarea>
             </div>
           </div>
         </div>
@@ -320,7 +322,7 @@
 </template>
 
 <script lang="ts">
-import { DDeiEditorUtil, DDeiEnumBusCommandType } from "ddei-editor";
+import { DDeiEditorUtil, DDeiEnumBusCommandType, DDeiEnumOperateType, DDeiUtil, DDeiEditorEnumBusCommandType } from "ddei-editor";
 import DialogBase from "./dialog"
 
 export default {
@@ -365,6 +367,49 @@ export default {
   },
   methods: {
 
+    modelChangeProperty(model,property){
+      if (!model || !property) {
+        return;
+      }
+      let mds = [model];
+      if (
+        this.editBefore &&
+        !this.editBefore(
+          DDeiEnumOperateType.EDIT,
+          mds,
+          this.attrDefine?.code,
+          this.editor.ddInstance,
+          null
+        )
+      ) {
+        return;
+      }
+      //获取属性路径
+      let paths = [property];
+    
+
+      this.editor.ddInstance.stage.selectedModels.forEach((element) => {
+        //推送信息进入总线
+        this.editor.bus.push(
+          DDeiEnumBusCommandType.ModelChangeValue,
+          {
+            mids: [element.id],
+            paths: paths,
+            value: model[property]
+          },
+          null,
+          true
+        );
+      });
+      
+      this.editor.bus.push(DDeiEditorEnumBusCommandType.RefreshEditorParts, {
+        parts: ["topmenu"],
+      });
+      this.editor.bus.push(DDeiEnumBusCommandType.RefreshShape);
+      this.editor.bus.executeAll();
+      //编辑完成后的回调函数
+      DDeiUtil.invokeCallbackFunc("EVENT_CONTROL_EDIT_AFTER", DDeiEnumOperateType.EDIT, { models: mds, propName: this.attrDefine?.code }, this.editor.ddInstance, null)
+    },
     validItemCondition(item){
       if (!item.condition){
         return true;
