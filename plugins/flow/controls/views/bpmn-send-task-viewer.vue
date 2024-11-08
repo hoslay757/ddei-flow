@@ -25,7 +25,7 @@ export default {
         <use xlink:href="#icon-ddei-flow-send"></use>
       </svg>
       <div class="text">
-        {{ model.name ? model.name : "发送任务" }}
+        {{ editor.i18n(model.name ? model.name : "ddei.flow.sendtask") }}
       </div>
     </div>
     <div class="markers">

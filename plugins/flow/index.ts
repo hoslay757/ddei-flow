@@ -32,14 +32,14 @@ class DDeiFlow extends DDeiPluginBase {
             groups: [
               {
                 editMode: 1,
-                desc: "选择",
+                desc: "ddei.choose",
                 icon: `<svg class="icon" style="width: 28px; height: 28px;margin-left:-1px;margin-top:2px; " aria-hidden="true">
             <use xlink: href = "#icon-selector">< /use>
           </svg>`
               },
               {
                 editMode: 4,
-                desc: "连线",
+                desc: "ddei.flow.sequence",
                 controls: [
                   "1000601"
                 ]
@@ -126,6 +126,17 @@ class DDeiFlow extends DDeiPluginBase {
     return this.options?.initConfig
   }
 
+  getLangs(editor) {
+    const langModules = import.meta.glob('./i18n/*', { eager: true });
+    let langs = {}
+    for (let i in langModules) {
+      let langModule = langModules[i];
+      let newI = i.substring(i.lastIndexOf('/') + 1, i.lastIndexOf('.'))
+      langs[newI] = langModule.default
+    }
+    return langs;
+  }
+  
   getOptions(): object {
     let options = {}
     let array = [this.controls, this.lifecycles,this.dialogs]

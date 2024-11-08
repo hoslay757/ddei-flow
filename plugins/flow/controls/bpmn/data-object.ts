@@ -2,7 +2,7 @@ import { showSettingButton } from "../util"
 
 export default {
   id: '1000501',
-  name: '数据对象',
+  name: 'ddei.flow.dataobj',
   code: 'data',
   desc: 'bpmn中的数据对象',
   from: '100500',
@@ -143,7 +143,7 @@ export default {
       attrs: [
         {
           'code': 'code',
-          'name': '编码',
+          'name': 'ddei.code',
           'desc': '编码，一般用于业务标识',
           'controlType': 'text',
           'dataType': 'string',
@@ -152,7 +152,7 @@ export default {
         },
         {
           'code': 'name',
-          'name': '名称',
+          'name': 'ddei.name',
           'desc': '名称，一般用于显示',
           'controlType': 'text',
           'dataType': 'string',
@@ -161,12 +161,12 @@ export default {
         },
         {
           'code': 'bpmnSubType',
-          'name': '类型',
+          'name': 'ddei.type',
           'desc': '控件的主体显示文本',
           'controlType': 'combox',
           'dataType': 'integer',
           'dataSource': [
-            { 'text': '默认', 'value': 1 }, { 'text': '输入', 'value': 2 }, { 'text': '输出', 'value': 3 }
+            { 'text': 'ddei.flow.property.ds.default', 'value': 1 }, { 'text': 'ddei.flow.property.ds.input', 'value': 2 }, { 'text': 'ddei.flow.property.ds.output', 'value': 3 }
           ],
           'itemStyle': { width: 80, height: 25, col: 2, row: 0 },
           'defaultValue': 1,
@@ -174,15 +174,15 @@ export default {
         },
         {
           'code': 'dataType',
-          'name': '数据类型',
+          'name': 'ddei.flow.property.datatype',
           'desc': '数据的类型，可以是内置类型，也可以由外部定义',
           'controlType': 'combox',
           'dataType': 'integer',
           'dataSource': [
-            { 'text': '字符串', 'value': 1 }, { 'text': '整数', 'value': 2 },
-            { 'text': '长整数', 'value': 3 }, { 'text': '单精度', 'value': 4 },
-            { 'text': '双精度', 'value': 5 }, { 'text': '布尔', 'value': 6 },
-            { 'text': '时间', 'value': 7 }, { 'text': '自定义', 'value': 8 }
+            { text: "ddei.flow.property.ds.string", 'value': 1 }, { 'text': 'ddei.flow.property.ds.integer', 'value': 2 },
+            { 'text': 'ddei.flow.property.ds.long', 'value': 3 }, { 'text': 'ddei.flow.property.ds.float', 'value': 4 },
+            { 'text': 'ddei.flow.property.ds.double', 'value': 5 }, { 'text': 'ddei.flow.property.ds.boolean', 'value': 6 },
+            { 'text': 'ddei.flow.property.ds.datetime', 'value': 7 }, { 'text': 'ddei.flow.property.ds.custom', 'value': 8 }
           ],
           'itemStyle': { width: 100, height: 25, col: 2, row: 0 },
           'defaultValue': 1,
@@ -190,7 +190,7 @@ export default {
         },
         {
           'code': 'isCollection',
-          'name': '数据集合',
+          'name': 'ddei.flow.datacoll',
           'desc': '是否为数据集合',
           'controlType': 'switch-checkbox',
           'dataType': 'integer',
@@ -201,7 +201,7 @@ export default {
         },
         {
           'code': 'desc',
-          'name': '备注',
+          'name': 'ddei.description',
           'desc': '备注说明',
           'controlType': 'textarea',
           'dataType': 'string',

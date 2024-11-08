@@ -26,7 +26,7 @@ export default {
         <use xlink:href="#icon-ddei-flow-script"></use>
       </svg>
       <div class="text">
-        {{ model.name ? model.name : "脚本任务" }}
+        {{ editor.i18n(model.name ? model.name : "ddei.flow.scripttask") }}
       </div>
     </div>
     <div class="markers">

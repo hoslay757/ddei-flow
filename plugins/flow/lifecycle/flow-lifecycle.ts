@@ -404,6 +404,9 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
         let treeRoots = this.modelsToTreeRoot(dmodels,stage)
         
         treeRoots?.forEach(dmodel => {
+          if (dmodel.depModel){
+            return
+          }
           //建立新关系
           let id = dmodel.id
           if (id.indexOf("_shadow") != -1) {

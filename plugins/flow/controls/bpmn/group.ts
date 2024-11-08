@@ -4,7 +4,7 @@ import BpmnGroupViewer from "../views/bpmn-group-viewer.vue"
 
 export default {
   id: '1000401',
-  name: '分组',
+  name: 'ddei.flow.group',
   code: 'group',
   desc: 'bpmn中的Group',
   from: '1000011',
@@ -25,7 +25,7 @@ export default {
       attrs: [
         {
           'code': 'code',
-          'name': '编码',
+          'name': 'ddei.code',
           'desc': '用于业务标识',
           'controlType': 'text',
           'dataType': 'string',
@@ -34,16 +34,16 @@ export default {
         },
         {
           'code': 'name',
-          'name': '标题',
+          'name': 'ddei.name',
           'desc': '分组标题',
           'controlType': 'text',
           'dataType': 'string',
-          'defaultValue': "分组1",
+          'defaultValue': "ddei.flow.group",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
         {
           'code': 'border.color',
-          'name': '颜色',
+          'name': 'ddei.color',
           'desc': '图形的边框显示颜色，在高级设置中，可以分别设置不同方向边框的样式',
           'controlType': 'color-combo',
           'dataType': 'string',
@@ -51,21 +51,21 @@ export default {
         },
         {
           'code': 'desc',
-          'name': '备注',
+          'name': 'ddei.description',
           'desc': '备注说明',
           'controlType': 'textarea',
           'dataType': 'string',
-          'defaultValue': "子流程节点",
+          'defaultValue': "ddei.flow.group",
           'type': [1, 2] //类别，1图形，2业务，3事件
         }
       ],
       groups: [
         {
-          name: "数据",
+          'name': 'ddei.data',
           icon: 'icon-a-ziyuan409',
           subGroups: [
             {
-              name: "基本信息",
+              'name': 'ddei.basic',
               attrs: ["code", "name", "desc"]
             }
           ]

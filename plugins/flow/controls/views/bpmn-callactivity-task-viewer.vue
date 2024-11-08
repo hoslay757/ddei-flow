@@ -25,7 +25,8 @@ export default {
           if (viewModel){
             viewModel = this.getCallActivityTask(viewModel)
             if (this.model.displayView){
-              this.$refs['viewDiv'].innerHTML = "加载中"
+              
+              this.$refs['viewDiv'].innerHTML = this.editor.i18n('ddei.flow.loading')
               setTimeout(() => {
                 this.editor.flow.toImage([viewModel]).then(html => {
                   if (html) {
@@ -63,8 +64,8 @@ export default {
 <template>
   <div ref="divElement" class="ddei-flow-bpmn-viewer-callactivity-task">
     <div v-if="!model || !model.activityId" class="title">
-      <div class="text" >
-        {{ "调用" }}
+      <div class="text">
+        {{ editor.i18n("ddei.flow.calltask") }}
       </div>
     </div>
     <div v-if="model?.activityId" ref="viewDiv" class="view">

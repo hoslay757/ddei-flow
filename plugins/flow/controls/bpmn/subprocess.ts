@@ -4,7 +4,7 @@ import BpmnSubProcessViewer from "../views/bpmn-subprocess-viewer.vue"
 
 export default {
   id: '1000091',
-  name: '子流程',
+  name: 'ddei.flow.subprocess',
   code: 'subprocess',
   desc: 'bpmn中的SubProcess',
   from: '1000011',
@@ -27,7 +27,7 @@ export default {
        
         {
           'code': 'code',
-          'name': '编码',
+          'name': 'ddei.code',
           'desc': '用于业务标识',
           'controlType': 'text',
           'dataType': 'string',
@@ -36,23 +36,23 @@ export default {
         },
         {
           'code': 'name',
-          'name': '名称',
+          'name': 'ddei.name',
           'desc': '任务的名称',
           'controlType': 'text',
           'dataType': 'string',
-          'defaultValue': "子流程",
+          'defaultValue': "ddei.flow.subprocess",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
       
         {
           'code': 'bpmnSubType',
-          'name': '类型',
+          'name': 'ddei.type',
           'desc': '控件的主体显示文本',
           'controlType': 'combox',
           'dataType': 'integer',
           'dataSource': [
-            { 'text': '默认', 'value': 1 }, { 'text': '事件', 'value': 2 },
-            { 'text': '事务', 'value': 3 }, { 'text': '自定义', 'value': 4 }
+            { 'text': 'ddei.flow.property.ds.default', 'value': 1 }, { 'text': 'ddei.flow.property.ds.event', 'value': 2 },
+            { 'text': 'ddei.flow.property.ds.transaction', 'value': 3 }, { 'text': 'ddei.flow.property.ds.custom', 'value': 4 }
           ],
           'itemStyle': { width: 100, height: 25, col: 2, row: 0 },
           'defaultValue': 1,
@@ -60,21 +60,21 @@ export default {
         },        
         {
           'code': 'desc',
-          'name': '备注',
+          'name': 'ddei.description',
           'desc': '备注说明',
           'controlType': 'textarea',
           'dataType': 'string',
-          'defaultValue': "子流程节点",
+          'defaultValue': "ddei.flow.subprocess",
           'type': [1, 2] //类别，1图形，2业务，3事件
         }
       ],
       groups: [
         {
-          name: "数据",
+          'name': 'ddei.data',
           icon: 'icon-a-ziyuan409',
           subGroups: [
             {
-              name: "基本信息",
+              'name': 'ddei.basic',
               attrs: ["code", "name", "isLoop", "isTransaction", "multiInstance", "isParallel", "isCompensation", "desc"]
             }
           ]

@@ -2,9 +2,9 @@ import { showSettingButton } from "../util"
 
 export default {
   id: '1000506',
-  name: '数据存储',
+  name: 'ddei.flow.datastore',
   code: 'ds',
-  desc: 'bpmn中的消息',
+  desc: 'bpmn中的数据存储',
   from: '103010',
   subject: 'bpmn',
   define: {
@@ -25,7 +25,7 @@ export default {
       attrs: [
         {
           'code': 'code',
-          'name': '编码',
+          'name': 'ddei.code',
           'desc': '编码，一般用于业务标识',
           'controlType': 'text',
           'dataType': 'string',
@@ -34,7 +34,7 @@ export default {
         },
         {
           'code': 'name',
-          'name': '名称',
+          'name': 'ddei.name',
           'desc': '名称，一般用于显示',
           'controlType': 'text',
           'dataType': 'string',
@@ -43,7 +43,7 @@ export default {
         },
         {
           'code': 'isUnlimited',
-          'name': '无限容量',
+          'name': 'ddei.flow.unlimited',
           'desc': '是否无限容量',
           'controlType': 'switch-checkbox',
           'dataType': 'integer',
@@ -54,7 +54,7 @@ export default {
         },
         {
           'code': 'capacity',
-          'name': '容量',
+          'name': 'ddei.flow.property.capacity',
           'desc': '数据存储的大小',
           'controlType': 'text',
           'dataType': 'integer',
@@ -63,7 +63,7 @@ export default {
         },
         {
           'code': 'desc',
-          'name': '备注',
+          'name': 'ddei.description',
           'desc': '备注说明',
           'controlType': 'textarea',
           'dataType': 'string',

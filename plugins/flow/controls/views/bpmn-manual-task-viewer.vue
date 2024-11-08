@@ -25,7 +25,7 @@ export default {
         <use xlink:href="#icon-ddei-flow-manual"></use>
       </svg>
       <div class="text">
-        {{ model.name ? model.name : "手工任务" }}
+        {{ editor.i18n(model.name ? model.name : "ddei.flow.manualtask") }}
       </div>
     </div>
     <div class="markers">

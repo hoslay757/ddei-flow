@@ -25,7 +25,7 @@ export default {
         <use xlink:href="#icon-ddei-flow-business-rule"></use>
       </svg>
       <div class="text">
-        {{ model.name ? model.name : "业务规则" }}
+        {{ editor.i18n(model.name ? model.name : "ddei.flow.busitask") }}
       </div>
     </div>
     <div class="markers">

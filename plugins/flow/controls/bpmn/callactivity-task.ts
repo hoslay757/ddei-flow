@@ -3,7 +3,7 @@ import BpmnCallActivityTaskViewer from "../views/bpmn-callactivity-task-viewer.v
 
 export default {
   id: '1000081',
-  name: '调用',
+  name: 'ddei.flow.calltask',
   code: 'call',
   desc: 'bpmn中的CallaAtivityTask',
   from: '100002',
@@ -20,7 +20,7 @@ export default {
       attrs: [
         {
           'code': 'code',
-          'name': '编码',
+          'name': 'ddei.code',
           'desc': '用于业务标识',
           'controlType': 'text',
           'dataType': 'string',
@@ -29,16 +29,16 @@ export default {
         },
         {
           'code': 'name',
-          'name': '标题',
+          'name': 'ddei.name',
           'desc': '调用',
           'controlType': 'text',
           'dataType': 'string',
-          'defaultValue': "调用",
+          'defaultValue': "ddei.flow.calltask",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
         {
           'code': 'border.color',
-          'name': '颜色',
+          'name': 'ddei.color',
           'desc': '图形的边框显示颜色，在高级设置中，可以分别设置不同方向边框的样式',
           'controlType': 'color-combo',
           'dataType': 'string',
@@ -46,7 +46,7 @@ export default {
         },
         {
           'code': 'borderWidth',
-          'name': '粗细',
+          'name': 'ddei.property.width',
           'desc': '图形的边框的粗细，0为无边框',
           'controlType': 'range',
           'min': 0,
@@ -59,7 +59,7 @@ export default {
         
         {
           'code': 'borderRound',
-          'name': '圆角',
+          'name': 'ddei.property.round',
           'desc': '图形的边框的是否为为圆角的弧度',
           'controlType': 'range',
           'mapping': ["border.round"],
@@ -71,21 +71,21 @@ export default {
         },
         {
           'code': 'desc',
-          'name': '备注',
+          'name': 'ddei.description',
           'desc': '备注说明',
           'controlType': 'textarea',
           'dataType': 'string',
-          'defaultValue': "调用节点，可以调用任务、编排或者子流程",
+          'defaultValue': "ddei.flow.calltask",
           'type': [1, 2] //类别，1图形，2业务，3事件
         }
       ],
       groups: [
         {
-          name: "数据",
+          'name': 'ddei.data',
           icon: 'icon-a-ziyuan409',
           subGroups: [
             {
-              name: "基本信息",
+              'name': 'ddei.basic',
               attrs: ["code", "name", "desc"]
             }
           ]

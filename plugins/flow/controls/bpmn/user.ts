@@ -3,7 +3,7 @@ import BpmnUserViewer from "../views/bpmn-user-viewer.vue"
 
 export default {
   id: '1000504',
-  name: '用户',
+  name: 'ddei.flow.user',
   code: 'user',
   desc: 'bpmn中的用户对象',
   from: '100103',
@@ -27,7 +27,7 @@ export default {
       attrs: [
         {
           'code': 'code',
-          'name': '编码',
+          'name': 'ddei.code',
           'desc': '编码，一般用于业务标识',
           'controlType': 'text',
           'dataType': 'string',
@@ -36,20 +36,20 @@ export default {
         },
         {
           'code': 'name',
-          'name': '名称',
+          'name': 'ddei.name',
           'desc': '名称，一般用于显示',
           'controlType': 'text',
           'dataType': 'string',
-          'defaultValue': "用户",
+          'defaultValue': "ddei.flow.user",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
         {
           'code': 'desc',
-          'name': '备注',
+          'name': 'ddei.description',
           'desc': '备注说明',
           'controlType': 'textarea',
           'dataType': 'string',
-          'defaultValue': "用户节点",
+          'defaultValue': "ddei.flow.user",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
       ]

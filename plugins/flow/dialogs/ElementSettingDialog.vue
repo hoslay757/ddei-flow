@@ -10,7 +10,7 @@
               <use xlink:href="#icon-ddei-flow-left"></use>
             </svg>
             <div class="change-bpmn-sub-type-text">
-              {{ bpmnSubTypeDataSource[bpmnSubTypeIndex].text }}
+              {{ editor.i18n(bpmnSubTypeDataSource[bpmnSubTypeIndex].text) }}
             </div>
             <svg class="icon-ddei-flow" @click="changeBpmnSubType(1)" style="width:16px;height:16px;"
               aria-hidden="true">
@@ -25,7 +25,7 @@
               <use xlink:href="#icon-ddei-flow-left"></use>
             </svg>
             <div class="change-bpmn-sub-type-text">
-              {{ dataTypeDataSource[dataTypeIndex].text }}
+              {{ editor.i18n(dataTypeDataSource[dataTypeIndex].text) }}
             </div>
             <svg class="icon-ddei-flow" @click="changeDataType(1)" style="width:16px;height:16px;" aria-hidden="true">
               <use xlink:href="#icon-ddei-flow-right"></use>
@@ -36,10 +36,10 @@
           v-if="!item.viewer && item.id == 'ddei-flow-dataobject-setting' && model.bpmnType == 'DataObject' && model.dataType == 8 && validItemCondition(item)">
           <div class="change-property-text" :title="item.desc">
             <div class="change-property-text-title">
-              类型
+              {{editor.i18n('ddei.flow.busicls')}}
             </div>
             <div class="change-property-text-input">
-              <input v-model="model.customDataType" placeholder="BusinessClass">
+              <input v-model="model.customDataType" :placeholder="editor.i18n('ddei.flow.busicls')">
             </div>
           </div>
         </div>
@@ -51,7 +51,7 @@
               <use xlink:href="#icon-ddei-flow-left"></use>
             </svg>
             <div class="change-bpmn-sub-type-text">
-              {{ timeTypeDataSource[timeTypeIndex].text }}
+              {{ editor.i18n(timeTypeDataSource[timeTypeIndex].text) }}
             </div>
             <svg class="icon-ddei-flow" @click="changeTimeType(1)" style="width:16px;height:16px;" aria-hidden="true">
               <use xlink:href="#icon-ddei-flow-right"></use>
@@ -62,7 +62,7 @@
           v-if="!item.viewer && item.id == 'ddei-flow-time-setting' && model.timeType != 'timeDuration' && model.timeType != 'CRON' && ((model.bpmnType == 'StartEvent' && model.bpmnSubType == 3) || (model.bpmnType == 'IntermediateCatchEvent' && (model.bpmnSubType == 1 || !model.bpmnSubType)) || (model.bpmnType == 'BoundaryEvent' && model.bpmnSubType == 2)) && validItemCondition(item)">
           <div class="change-property-text" :title="item.desc">
             <div class="change-property-text-title">
-              时间
+              {{ editor.i18n('ddei.flow.time') }}
             </div>
             <div class="change-property-text-input">
               <input v-model="model.timeValue" placeholder="2011-03-11T12:13:14">
@@ -73,7 +73,7 @@
           v-if="!item.viewer && item.id == 'ddei-flow-time-setting' && model.timeType == 'timeDuration' && ((model.bpmnType == 'StartEvent' && model.bpmnSubType == 3) || (model.bpmnType == 'IntermediateCatchEvent' && (model.bpmnSubType == 1 || !model.bpmnSubType)) || (model.bpmnType == 'BoundaryEvent' && model.bpmnSubType == 2)) && validItemCondition(item)">
           <div class="change-property-text" :title="item.desc">
             <div class="change-property-text-title">
-              周期
+              {{ editor.i18n('ddei.flow.timeduration') }}
             </div>
             <div class="change-property-text-input">
               <input v-model="model.timeValue" placeholder="R3/PT10H/${EndDate}">
@@ -84,7 +84,7 @@
           v-if="!item.viewer && item.id == 'ddei-flow-time-setting' && model.timeType == 'CRON' && ((model.bpmnType == 'StartEvent' && model.bpmnSubType == 3) || (model.bpmnType == 'IntermediateCatchEvent' && (model.bpmnSubType == 1 || !model.bpmnSubType)) || (model.bpmnType == 'BoundaryEvent' && model.bpmnSubType == 2)) && validItemCondition(item)">
           <div class="change-property-text" :title="item.desc">
             <div class="change-property-text-title">
-              CRON
+              {{ editor.i18n('ddei.flow.timecron') }}
             </div>
             <div class="change-property-text-input">
               <input v-model="model.timeValue" placeholder="0 0/5* * *？">
@@ -95,10 +95,10 @@
           v-if="!item.viewer && item.id == 'ddei-flow-message-setting' && ((model.bpmnType == 'StartEvent' && model.bpmnSubType == 2) || (model.bpmnType == 'IntermediateCatchEvent' && model.bpmnSubType == 2) || (model.bpmnType == 'IntermediateThrowEvent' && model.bpmnSubType == 2) || (model.bpmnType == 'EndEvent' && model.bpmnSubType == 2) || (model.bpmnType == 'BoundaryEvent' && (model.bpmnSubType == 1 || !model.bpmnSubType))) && validItemCondition(item)">
           <div class="change-property-text" :title="item.desc">
             <div class="change-property-text-title">
-              消息
+              {{ editor.i18n('ddei.flow.message') }}
             </div>
             <div class="change-property-text-input">
-              <input v-model="model.messageName" placeholder="消息名称">
+              <input v-model="model.messageName" :placeholder="editor.i18n('ddei.flow.messagename') ">
             </div>
           </div>
         </div>
@@ -106,10 +106,10 @@
           v-if="!item.viewer && item.id == 'ddei-flow-signal-setting' && ((model.bpmnType == 'StartEvent' && model.bpmnSubType == 5) || (model.bpmnType == 'IntermediateCatchEvent' && model.bpmnSubType == 3) || (model.bpmnType == 'IntermediateThrowEvent' && model.bpmnSubType == 3) || (model.bpmnType == 'EndEvent' && model.bpmnSubType == 3) || (model.bpmnType == 'BoundaryEvent' && model.bpmnSubType == 3)) && validItemCondition(item)">
           <div class="change-property-text" :title="item.desc">
             <div class="change-property-text-title">
-              信号
+              {{ editor.i18n('ddei.flow.signal') }}
             </div>
             <div class="change-property-text-input">
-              <input v-model="model.signalName" placeholder="信号名称">
+              <input v-model="model.signalName" :placeholder="editor.i18n('ddei.flow.signalname')">
             </div>
           </div>
         </div>
@@ -117,10 +117,10 @@
           v-if="!item.viewer && item.id == 'ddei-flow-error-setting' && ((model.bpmnType == 'StartEvent' && model.bpmnSubType == 9) || (model.bpmnType == 'IntermediateEvent' && model.bpmnSubType == 27) || (model.bpmnType == 'EndEvent' && model.bpmnSubType == 6) || (model.bpmnType == 'BoundaryEvent' && model.bpmnSubType == 4)) && validItemCondition(item)">
           <div class="change-property-text" :title="item.desc">
             <div class="change-property-text-title">
-              错误码
+              {{ editor.i18n('ddei.flow.errorcode') }}
             </div>
             <div class="change-property-text-input">
-              <input v-model="model.errorCode" placeholder="错误码">
+              <input v-model="model.errorCode" :placeholder="editor.i18n('ddei.flow.errorcode')">
             </div>
           </div>
         </div>
@@ -128,10 +128,10 @@
           v-if="!item.viewer && item.id == 'ddei-flow-condition-setting' && (model.bpmnBaseType == 'Sequence' && model.bpmnSubType == 2) && validItemCondition(item)">
           <div class="change-property-text" :title="item.desc">
             <div class="change-property-text-title">
-              条件
+              {{ editor.i18n('ddei.flow.condition') }}
             </div>
             <div class="change-property-text-input">
-              <input v-model="model.condition" placeholder="${条件表达式}">
+              <input v-model="model.condition" :placeholder="'${' + editor.i18n('ddei.flow.conditionexpress') +'}'">
             </div>
           </div>
         </div>
@@ -142,7 +142,7 @@
               <use xlink:href="#icon-ddei-flow-left"></use>
             </svg>
             <div class="change-bpmn-sub-type-text">
-              {{ lineTypeDataSource[lineTypeIndex].text }}
+              {{ editor.i18n(lineTypeDataSource[lineTypeIndex].text) }}
             </div>
             <svg class="icon-ddei-flow" @click="changeLineType(1)" style="width:16px;height:16px;" aria-hidden="true">
               <use xlink:href="#icon-ddei-flow-right"></use>
@@ -154,13 +154,13 @@
           v-if="!item.viewer && item.id == 'ddei-flow-change-linepointtype' && validItemCondition(item) && model?.bpmnSubType == 5 && startPointTypeDataSource?.length > 0">
           <div class="change-point-type">
             <div class="change-point-type-title">
-              起点
+              {{ editor.i18n('ddei.flow.startnode') }}
             </div>
             <svg class="icon-ddei-flow" @click="changePointType(1,-1)" aria-hidden="true">
               <use xlink:href="#icon-ddei-flow-left"></use>
             </svg>
             <div class="change-point-type-text">
-              {{ startPointTypeDataSource[startPointTypeIndex].text }}
+              {{ editor.i18n(startPointTypeDataSource[startPointTypeIndex].text) }}
             </div>
             <svg class="icon-ddei-flow" @click="changePointType(1,1)" aria-hidden="true">
               <use xlink:href="#icon-ddei-flow-right"></use>
@@ -171,7 +171,7 @@
           v-if="!item.viewer && item.id == 'ddei-flow-change-linepointtype' && validItemCondition(item) && model?.bpmnBaseType == 'Sequence'">
           <div class="quick-button" @click="exchangePoints()">
             <div class="quick-button-text">
-              交换
+              {{ editor.i18n('ddei.flow.exchange') }}
             </div>
             <svg class="icon" aria-hidden="true">
               <use xlink:href="#icon-zhihuan"></use>
@@ -182,13 +182,13 @@
           v-if="!item.viewer && item.id == 'ddei-flow-change-linepointtype' && validItemCondition(item) && model?.bpmnSubType == 5 && endPointTypeDataSource?.length > 0">
           <div class="change-point-type">
             <div class="change-point-type-title">
-              终点
+              {{ editor.i18n('ddei.flow.endnode') }}
             </div>
             <svg class="icon-ddei-flow" @click="changePointType(2,-1)" aria-hidden="true">
               <use xlink:href="#icon-ddei-flow-left"></use>
             </svg>
             <div class="change-point-type-text">
-              {{ endPointTypeDataSource[endPointTypeIndex].text }}
+              {{ editor.i18n(endPointTypeDataSource[endPointTypeIndex].text) }}
             </div>
             <svg class="icon-ddei-flow" @click="changePointType(2,1)" aria-hidden="true">
               <use xlink:href="#icon-ddei-flow-right"></use>
@@ -201,7 +201,7 @@
             <div :class="{ 'chk_state': model?.displayView != 1, 'chk_state_checked': model?.displayView == 1 }">
               <span>{{ model?.displayView == 1 ? '✓' : '' }}</span>
             </div>
-            预览
+            {{ editor.i18n('ddei.flow.overview') }}
           </div>
         </div>
         <div class="row"
@@ -210,7 +210,7 @@
             <div :class="{ 'chk_state': model?.isUnlimited != 1, 'chk_state_checked': model?.isUnlimited == 1 }">
               <span>{{ model?.isUnlimited == 1 ? '✓' : '' }}</span>
             </div>
-            无限容量
+            {{ editor.i18n('ddei.flow.unlimited') }}
           </div>
         </div>
         <div class="row"
@@ -219,7 +219,7 @@
             <div :class="{ 'chk_state': model?.ordering != 1, 'chk_state_checked': model?.ordering == 1 }">
               <span>{{ model?.ordering == 1 ? '✓' : '' }}</span>
             </div>
-            顺序执行
+            {{ editor.i18n('ddei.flow.ordering') }}
           </div>
         </div>
         <div class="row"
@@ -228,7 +228,7 @@
             <div :class="{ 'chk_state': model?.isLoop != 1, 'chk_state_checked': model?.isLoop == 1 }">
               <span>{{ model?.isLoop == 1 ? '✓' :''}}</span>
             </div>
-            循环
+            {{ editor.i18n('ddei.flow.loop') }}
           </div>
         </div>
 
@@ -238,17 +238,18 @@
             <div :class="{ 'chk_state': model?.multiInstance != 1, 'chk_state_checked': model?.multiInstance == 1 }">
               <span>{{ model?.multiInstance == 1 ? '✓' : '' }}</span>
             </div>
-            多实例
+            {{ editor.i18n('ddei.flow.multiins') }}
+
           </div>
         </div>
         <div class="row"
           v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model.multiInstance">
           <div class="change-property-text" :title="item.desc">
             <div class="change-property-text-title">
-              实例数
+              {{ editor.i18n('ddei.flow.insnum') }}
             </div>
             <div class="change-property-text-input">
-              <input v-model="model.loopCardinality" placeholder="实例数">
+              <input v-model="model.loopCardinality" :placeholder="editor.i18n('ddei.flow.insnum')">
             </div>
           </div>
         </div>
@@ -258,66 +259,73 @@
             <div :class="{ 'chk_state': model?.isParallel != 1, 'chk_state_checked': model?.isParallel == 1 }">
               <span>{{ model?.isParallel == 1 ? '✓' : '' }}</span>
             </div>
-            并行
+            {{ editor.i18n('ddei.flow.parallel') }}
           </div>
         </div>
-        <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && ((model.bpmnType == 'BoundaryEvent' && (model.bpmnSubType == 1 || !model.bpmnSubType || model.bpmnSubType == 2 || model.bpmnSubType == 7 || model.bpmnSubType == 8 || model.bpmnSubType == 9)) || (model.bpmnType == 'StartEvent' && (model.bpmnSubType >= 2 && model.bpmnSubType <=8) || model.bpmnSubType == 10))">
-          <div class="change-bpmn-marker" @click="changeBpmnLabel('notInterrupting')">
-            <div
-              :class="{ 'chk_state': model?.notInterrupting != 1, 'chk_state_checked': model?.notInterrupting == 1 }">
-              <span>{{ model?.notInterrupting == 1 ? '✓' : '' }}</span>
-            </div>
-            非中断
+        <div class="row" v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model.bpmnType == 'ChoreographySubProcess'">
+          <div class=" change-bpmn-marker" @click="changeBpmnLabel('isAdHoc')">
+          <div :class="{ 'chk_state': model?.isAdHoc != 1, 'chk_state_checked': model?.isAdHoc == 1 }">
+            <span>{{ model?.isAdHoc == 1 ? '✓' : '' }}</span>
           </div>
+          {{ editor.i18n('ddei.flow.property.custom') }}
         </div>
-        <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnBaseType == 'Activity'">
-          <div class="change-bpmn-marker" @click="changeBpmnLabel('isCompensation')">
-            <div :class="{ 'chk_state': model?.isCompensation != 1, 'chk_state_checked': model?.isCompensation == 1 }">
-              <span>{{ model?.isCompensation == 1 ? '✓' : '' }}</span>
-            </div>
-            补偿
-          </div>
-        </div>
-        <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnType == 'DataObject'">
-          <div class="change-bpmn-marker" @click="changeBpmnLabel('isCollection')">
-            <div :class="{ 'chk_state': model?.isCollection != 1, 'chk_state_checked': model?.isCollection == 1 }">
-              <span>{{ model?.isCollection == 1 ? '✓' : '' }}</span>
-            </div>
-            数据集合
-          </div>
-        </div>
-        <div class="row" v-if="!item.viewer && item.id == 'ddei-flow-property-editor-text' && validItemCondition(item)">
-          <div class="change-property-text" :title="item.desc">
-            <div class="change-property-text-title">
-              {{ item.label }}
-            </div>
-            <div class="change-property-text-input">
-              <input v-model="model[item.property]" @change="modelChangeProperty(model,item.property)"
-                :placeholder="item.desc">
-            </div>
-          </div>
-        </div>
-
-        <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-property-editor-textarea' && validItemCondition(item) ">
-          <div class="change-property-textarea" :title="item.desc">
-            <div class="change-property-textarea-title">
-              {{ item.label }}
-            </div>
-            <div class="change-property-textarea-input">
-              <textarea v-model="model[item.property]" @change="modelChangeProperty(model, item.property)"
-                :placeholder="item.desc"></textarea>
-            </div>
-          </div>
-        </div>
-        <component v-if="item.viewer" :is="item.viewer" :editor="editor" :options="options" :model="model"
-          v-bind="item">
-        </component>
       </div>
+      <div class="row"
+        v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && ((model.bpmnType == 'BoundaryEvent' && (model.bpmnSubType == 1 || !model.bpmnSubType || model.bpmnSubType == 2 || model.bpmnSubType == 7 || model.bpmnSubType == 8 || model.bpmnSubType == 9)) || (model.bpmnType == 'StartEvent' && (model.bpmnSubType >= 2 && model.bpmnSubType <=8) || model.bpmnSubType == 10))">
+        <div class="change-bpmn-marker" @click="changeBpmnLabel('notInterrupting')">
+          <div :class="{ 'chk_state': model?.notInterrupting != 1, 'chk_state_checked': model?.notInterrupting == 1 }">
+            <span>{{ model?.notInterrupting == 1 ? '✓' : '' }}</span>
+          </div>
+          {{ editor.i18n('ddei.flow.notInterrupting') }}
+        </div>
+      </div>
+      <div class="row"
+        v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnBaseType == 'Activity'">
+        <div class="change-bpmn-marker" @click="changeBpmnLabel('isCompensation')">
+          <div :class="{ 'chk_state': model?.isCompensation != 1, 'chk_state_checked': model?.isCompensation == 1 }">
+            <span>{{ model?.isCompensation == 1 ? '✓' : '' }}</span>
+          </div>
+
+          {{ editor.i18n('ddei.flow.compensation') }}
+        </div>
+      </div>
+      <div class="row"
+        v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnType == 'DataObject'">
+        <div class="change-bpmn-marker" @click="changeBpmnLabel('isCollection')">
+          <div :class="{ 'chk_state': model?.isCollection != 1, 'chk_state_checked': model?.isCollection == 1 }">
+            <span>{{ model?.isCollection == 1 ? '✓' : '' }}</span>
+          </div>
+          {{ editor.i18n('ddei.flow.datacoll') }}
+        </div>
+      </div>
+      <div class="row" v-if="!item.viewer && item.id == 'ddei-flow-property-editor-text' && validItemCondition(item)">
+        <div class="change-property-text" :title="item.desc">
+          <div class="change-property-text-title">
+            {{ editor.i18n(item.label) }}
+          </div>
+          <div class="change-property-text-input">
+            <input v-model="model[item.property]" @change="modelChangeProperty(model,item.property)"
+              :placeholder="editor.i18n(item.desc)">
+          </div>
+        </div>
+      </div>
+
+      <div class="row"
+        v-if="!item.viewer && item.id == 'ddei-flow-property-editor-textarea' && validItemCondition(item) ">
+        <div class="change-property-textarea" :title="item.desc">
+          <div class="change-property-textarea-title">
+            {{ editor.i18n(item.label) }}
+          </div>
+          <div class="change-property-textarea-input">
+            <textarea v-model="model[item.property]" @change="modelChangeProperty(model, item.property)"
+              :placeholder="editor.i18n(item.desc) "></textarea>
+          </div>
+        </div>
+      </div>
+      <component v-if="item.viewer" :is="item.viewer" :editor="editor" :options="options" :model="model" v-bind="item">
+      </component>
     </div>
+  </div>
   </div>
 </template>
 
@@ -349,9 +357,9 @@ export default {
       lineTypeIndex: -1,
       timeTypeIndex: -1,
       timeTypeDataSource: [
-        { text: "固定时间", value: "timeDate" },
-        { text: "周期执行", value: "timeDuration" },
-        { text: "CRON", value: "CRON" },
+        { text: "ddei.flow.property.ds.timedate", value: "timeDate" },
+        { text: "ddei.flow.property.ds.timeduration", value: "timeDuration" },
+        { text: "ddei.flow.property.ds.timecron", value: "CRON" },
       ],
       dataTypeDataSource: null,
       dataTypeIndex: -1,

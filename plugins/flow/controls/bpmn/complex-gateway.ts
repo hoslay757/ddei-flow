@@ -3,7 +3,7 @@ import BpmnComplexGatewayViewer from "../views/bpmn-complex-gateway-viewer.vue"
 
 export default {
   id: '1000204',
-  name: '复杂网关',
+  name: 'ddei.flow.complexgateway',
   code: 'complex_gateway',
   desc: 'bpmn中的ComplexGateway',
   from: '100040',
@@ -20,7 +20,7 @@ export default {
       attrs:[
         {
           'code': 'border.color',
-          'name': '颜色',
+          'name': 'ddei.color',
           'desc': '图形的边框显示颜色，在高级设置中，可以分别设置不同方向边框的样式',
           'controlType': 'color-combo',
           'dataType': 'string',

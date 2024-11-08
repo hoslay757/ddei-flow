@@ -4,7 +4,7 @@ import BpmnUserTaskViewer from "../views/bpmn-user-task-viewer.vue"
 
 export default {
   id: '1000011',
-  name: '用户任务',
+  name: 'ddei.flow.usertask',
   code: 'user_task',
   desc: 'bpmn中的UserTask',
   from: '100002',
@@ -21,7 +21,7 @@ export default {
       attrs: [
         {
           'code': 'code',
-          'name': '编码',
+          'name': 'ddei.code',
           'desc': '用于业务标识',
           'controlType': 'text',
           'dataType': 'string',
@@ -30,35 +30,35 @@ export default {
         },
         {
           'code': 'name',
-          'name': '名称',
+          'name': 'ddei.name',
           'desc': '任务的名称',
           'controlType': 'text',
           'dataType': 'string',
-          'defaultValue': "用户任务",
+          'defaultValue': "ddei.flow.usertask",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
         {
           'code': 'humanPerformer',
-          'name': '执行人',
+          'name': 'ddei.flow.property.humanperformer',
           'desc': '任务的执行人',
           'controlType': 'text',
           'dataType': 'string',
-          'defaultValue': "执行人",
+          'defaultValue': "ddei.flow.property.humanperformer",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
         {
           'code': 'potentialOwner',
-          'name': '候选人',
+          'name': 'ddei.flow.property.potentialowner',
           'desc': '任务的候选人',
           'controlType': 'text',
           'dataType': 'string',
-          'defaultValue': "候选人",
+          'defaultValue': "ddei.flow.property.potentialowner",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
         {
           'code': 'isLoop',
-          'name': '循环',
-          'desc': '循环',
+          'name': 'dde.flow.loop',
+          'desc': 'dde.flow.loop',
           'controlType': 'switch-checkbox',
           'dataType': 'integer',
           'hiddenTitle': true,
@@ -68,7 +68,7 @@ export default {
         },
         {
           'code': 'multiInstance',
-          'name': '多实例',
+          'name': 'ddei.flow.multiins',
           'desc': '执行人是多个实例',
           'controlType': 'switch-checkbox',
           'dataType': 'integer',
@@ -80,7 +80,7 @@ export default {
         },
         {
           'code': 'isParallel',
-          'name': '并行',
+          'name': 'ddei.flow.parallel',
           'desc': '多个执行人是否并行执行',
           'controlType': 'switch-checkbox',
           'dataType': 'integer',
@@ -91,7 +91,7 @@ export default {
         },
         {
           'code': 'isCompensation',
-          'name': '补偿',
+          'name': 'ddei.flow.compensation',
           'desc': '是否为补偿',
           'controlType': 'switch-checkbox',
           'dataType': 'integer',
@@ -102,22 +102,22 @@ export default {
         },
         {
           'code': 'desc',
-          'name': '备注',
+          'name': 'ddei.description',
           'desc': '备注说明',
           'controlType': 'textarea',
           'dataType': 'string',
-          'defaultValue': "用户任务节点",
+          'defaultValue': "ddei.flow.usertask",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
 
       ],
       groups: [
         {
-          name: "数据",
+          'name': 'ddei.data',
           icon: 'icon-a-ziyuan409',
           subGroups: [
             {
-              name: "基本信息",
+              'name': 'ddei.basic',
               attrs: ["code", "name", "isLoop", "multiInstance", "isParallel","isCompensation", "desc"]
             }
           ]

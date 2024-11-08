@@ -4,7 +4,7 @@ import BpmnScriptTaskViewer from "../views/bpmn-script-task-viewer.vue"
 
 export default {
   id: '1000021',
-  name: '脚本任务',
+  name: 'ddei.flow.scripttask',
   code: 'script_task',
   desc: 'bpmn中的ScriptTask',
   from: '1000011',
@@ -21,7 +21,7 @@ export default {
       attrs: [
         {
           'code': 'code',
-          'name': '编码',
+          'name': 'ddei.code',
           'desc': '用于业务标识',
           'controlType': 'text',
           'dataType': 'string',
@@ -30,16 +30,16 @@ export default {
         },
         {
           'code': 'name',
-          'name': '名称',
+          'name': 'ddei.name',
           'desc': '任务的名称',
           'controlType': 'text',
           'dataType': 'string',
-          'defaultValue': "脚本任务",
+          'defaultValue': "ddei.flow.scripttask",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
         {
           'code': 'scriptFormat',
-          'name': '语言',
+          'name': 'ddei.flow.property.language',
           'desc': '脚本采用的语言',
           'controlType': 'textarea',
           'dataType': 'string',
@@ -48,7 +48,7 @@ export default {
         },
         {
           'code': 'script',
-          'name': '脚本',
+          'name': 'ddei.flow.property.script',
           'desc': '脚本内容',
           'controlType': 'textarea',
           'dataType': 'string',
@@ -58,11 +58,11 @@ export default {
 
         {
           'code': 'desc',
-          'name': '备注',
+          'name': 'ddei.description',
           'desc': '备注说明',
           'controlType': 'textarea',
           'dataType': 'string',
-          'defaultValue': "脚本任务节点",
+          'defaultValue': "ddei.flow.scripttask",
           'type': [2] //类别，1图形，2业务，3事件
         },
 

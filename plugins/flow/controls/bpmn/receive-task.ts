@@ -4,7 +4,7 @@ import BpmnReceiveTaskViewer from "../views/bpmn-receive-task-viewer.vue"
 
 export default {
   id: '1000061',
-  name: '接收任务',
+  name: 'ddei.flow.receivetask',
   code: 'receive_task',
   desc: 'bpmn中的ReceiveTask',
   from: '1000011',
@@ -21,7 +21,7 @@ export default {
       attrs: [
         {
           'code': 'code',
-          'name': '编码',
+          'name': 'ddei.code',
           'desc': '用于业务标识',
           'controlType': 'text',
           'dataType': 'string',
@@ -30,21 +30,21 @@ export default {
         },
         {
           'code': 'name',
-          'name': '名称',
+          'name': 'ddei.name',
           'desc': '任务的名称',
           'controlType': 'text',
           'dataType': 'string',
-          'defaultValue': "接收任务",
+          'defaultValue': "ddei.flow.receivetask",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
 
         {
           'code': 'desc',
-          'name': '备注',
+          'name': 'ddei.description',
           'desc': '备注说明',
           'controlType': 'textarea',
           'dataType': 'string',
-          'defaultValue': "接收任务节点",
+          'defaultValue': "ddei.flow.receivetask",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
 

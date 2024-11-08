@@ -3,7 +3,7 @@ import BpmnEndEventViewer from "../views/bpmn-end-event-viewer.vue"
 
 export default {
   id: '1000003',
-  name: '结束事件',
+  name: 'ddei.flow.endevent',
   code: 'end',
   desc: 'bpmn中的EndEvent',
   from: '1000001',
@@ -18,7 +18,7 @@ export default {
       attrs: [
         {
           'code': 'code',
-          'name': '编码',
+          'name': 'ddei.code',
           'desc': '编码，一般用于业务标识',
           'controlType': 'text',
           'dataType': 'string',
@@ -27,23 +27,23 @@ export default {
         },
         {
           'code': 'name',
-          'name': '名称',
+          'name': 'ddei.name',
           'desc': '名称，一般用于显示',
           'controlType': 'text',
           'dataType': 'string',
-          'defaultValue': "结束",
+          'defaultValue': "ddei.flow.endevent",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
         {
           'code': 'bpmnSubType',
-          'name': '类型',
+          'name': 'ddei.type',
           'desc': '控件的主体显示文本',
           'controlType': 'combox',
           'dataType': 'integer',
           'dataSource': [
-            { 'text': '默认', 'value': 1 }, { 'text': '消息', 'value': 2 }, { 'text': '信号', 'value': 3 },
-            { 'text': '多次', 'value': 4 }, { 'text': '升级', 'value': 5 }, { 'text': '错误', 'value': 6 },
-            { 'text': '补偿', 'value': 7 }, { 'text': '取消', 'value': 8 }, { 'text': '终止', 'value': 9 }
+            { 'text': 'ddei.flow.property.ds.default', 'value': 1 }, { 'text': 'ddei.flow.property.ds.message', 'value': 2 }, { 'text': 'ddei.flow.property.ds.signal', 'value': 3 },
+            { 'text': 'ddei.flow.property.ds.multiple', 'value': 4 }, { 'text': 'ddei.flow.property.ds.escalation', 'value': 5 }, { 'text': 'ddei.flow.property.ds.error', 'value': 6 },
+            { 'text': 'ddei.flow.property.ds.compensation', 'value': 7 }, { 'text': 'ddei.flow.property.ds.cancel', 'value': 8 }, { 'text': 'ddei.flow.property.ds.stop', 'value': 9 }
           ],
           'itemStyle': { width: 80, height: 25, col: 2, row: 0 },
           'defaultValue': 1,
@@ -51,7 +51,7 @@ export default {
         },
         {
           'code': 'border.color',
-          'name': '颜色',
+          'name': 'ddei.color',
           'desc': '图形的边框显示颜色，在高级设置中，可以分别设置不同方向边框的样式',
           'controlType': 'color-combo',
           'dataType': 'string',
@@ -59,11 +59,11 @@ export default {
         },
         {
           'code': 'desc',
-          'name': '备注',
+          'name': 'ddei.description',
           'desc': '备注说明',
           'controlType': 'textarea',
           'dataType': 'string',
-          'defaultValue': "流程结束节点",
+          'defaultValue': "ddei.flow.endevent",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
       ]

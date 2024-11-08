@@ -1,6 +1,6 @@
 export default {
   id: '1000701',
-  name: '注释',
+  name: 'ddei.control.comment',
   code: 'comment',
   desc: 'bpmn中的注释',
   from: '103008',
@@ -10,7 +10,7 @@ export default {
     height: 70,
     bpmnBaseType: 'Comment',
     bpmnType:"Comment",
-    text: "注释文本",
+    text: "ddei.control.comment",
   },
 
   icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">

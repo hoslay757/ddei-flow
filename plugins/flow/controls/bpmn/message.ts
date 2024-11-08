@@ -3,7 +3,7 @@ import BpmnMessageViewer from "../views/bpmn-message-viewer.vue"
 
 export default {
   id: '1000505',
-  name: '消息',
+  name: 'ddei.flow.message',
   code: 'msg',
   desc: 'bpmn中的消息',
   from: '100103',
@@ -27,7 +27,7 @@ export default {
       attrs: [
         {
           'code': 'code',
-          'name': '编码',
+          'name': 'ddei.code',
           'desc': '编码，一般用于业务标识',
           'controlType': 'text',
           'dataType': 'string',
@@ -36,21 +36,21 @@ export default {
         },
         {
           'code': 'name',
-          'name': '名称',
+          'name': 'ddei.name',
           'desc': '名称，一般用于显示',
           'controlType': 'text',
           'dataType': 'string',
-          'defaultValue': "消息",
+          'defaultValue': "ddei.flow.message",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
         {
           'code': 'bpmnSubType',
-          'name': '类型',
+          'name': 'ddei.type',
           'desc': '',
           'controlType': 'combox',
           'dataType': 'integer',
           'dataSource': [
-            { 'text': '默认', 'value': 1 }, { 'text': '未初始化', 'value': 2 }
+            { 'text': 'ddei.flow.property.ds.default', 'value': 1 }, { 'text': 'ddei.flow.property.ds.noninit', 'value': 2 }
           ],
           'itemStyle': { width: 100, height: 25, col: 2, row: 0 },
           'defaultValue': 1,
@@ -58,11 +58,11 @@ export default {
         },
         {
           'code': 'desc',
-          'name': '备注',
+          'name': 'ddei.description',
           'desc': '备注说明',
           'controlType': 'textarea',
           'dataType': 'string',
-          'defaultValue': "消息节点",
+          'defaultValue': "ddei.flow.message",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
       ]

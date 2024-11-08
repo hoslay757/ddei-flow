@@ -9,6 +9,9 @@ import buttondemo from "./buttondemo.vue"
 const { proxy } = getCurrentInstance()
 
 const options = {
+  i18n: {
+    lang: 'en_US'
+  },
   //配置扩展插件
   extensions: [
 
@@ -25,16 +28,16 @@ const options = {
         },
         {
           id: "ddei-core-open",
-          name: "打开"
+          name: "ddei.open"
         },
         {
           id: "ddei-core-download",
-          name: "下载"
+          name: "ddei.download"
         },
         
         {
           id: "ddei-core-new",
-          name: "新建"
+          name: "ddei.new"
         },
         {
           name: "测试",

@@ -2,7 +2,7 @@ import { showSettingButton } from "../util"
 
 export default {
   id: '1000507',
-  name: '数据存储',
+  name: 'ddei.flow.datastore',
   code: 'ds',
   desc: 'bpmn中的消息',
   from: '103011',
@@ -25,7 +25,7 @@ export default {
       attrs: [
         {
           'code': 'code',
-          'name': '编码',
+          'name': 'ddei.code',
           'desc': '编码，一般用于业务标识',
           'controlType': 'text',
           'dataType': 'string',
@@ -34,7 +34,7 @@ export default {
         },
         {
           'code': 'name',
-          'name': '名称',
+          'name': 'ddei.name',
           'desc': '名称，一般用于显示',
           'controlType': 'text',
           'dataType': 'string',
@@ -43,7 +43,7 @@ export default {
         },
         {
           'code': 'desc',
-          'name': '备注',
+          'name': 'ddei.description',
           'desc': '备注说明',
           'controlType': 'textarea',
           'dataType': 'string',

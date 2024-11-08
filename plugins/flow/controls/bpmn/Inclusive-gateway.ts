@@ -3,7 +3,7 @@ import BpmnInclusiveGatewayViewer from "../views/bpmn-inclusive-gateway-viewer.v
 
 export default {
   id: '1000203',
-  name: '包容网关',
+  name: 'ddei.flow.inclusivegateway',
   code: 'inclusive_gateway',
   desc: 'bpmn中的InclusiveGateway',
   from: '100040',
@@ -20,7 +20,7 @@ export default {
       attrs: [
         {
           'code': 'border.color',
-          'name': '颜色',
+          'name': 'ddei.color',
           'desc': '图形的边框显示颜色，在高级设置中，可以分别设置不同方向边框的样式',
           'controlType': 'color-combo',
           'dataType': 'string',

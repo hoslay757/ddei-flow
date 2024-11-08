@@ -1,6 +1,6 @@
 export default {
   id: '1000601',
-  name: '控制流',
+  name: 'ddei.flow.sequence',
   code: 'seq',
   desc: 'bpmn中的SequenceFlow',
   from: '100401',
@@ -65,7 +65,7 @@ export default {
       attrs: [
         {
           'code': 'code',
-          'name': '编码',
+          'name': 'ddei.code',
           'desc': '用于业务标识',
           'controlType': 'text',
           'dataType': 'string',
@@ -74,22 +74,22 @@ export default {
         },
         {
           'code': 'name',
-          'name': '名称',
+          'name': 'ddei.name',
           'desc': '名称',
           'controlType': 'text',
           'dataType': 'string',
-          'defaultValue': "顺序流",
+          'defaultValue': "ddei.flow.sequence",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
         {
           'code': 'bpmnSubType',
-          'name': '类型',
+          'name': 'ddei.type',
           'desc': '控件的主体显示文本',
           'controlType': 'combox',
           'dataType': 'integer',
           'dataSource': [
-            { 'text': '默认', 'value': 1 }, { 'text': '条件', 'value': 2 }, { 'text': '缺省条件', 'value': 3 }
-            , { 'text': '消息', 'value': 4 }, { 'text': '协会', 'value': 5 }
+            { 'text': 'ddei.flow.property.ds.default', 'value': 1 }, { 'text': 'ddei.flow.property.ds.condition', 'value': 2 }, { 'text': 'ddei.flow.property.ds.defaultcondition', 'value': 3 }
+            , { 'text': 'ddei.flow.property.ds.message', 'value': 4 }, { 'text': 'ddei.flow.property.ds.association', 'value': 5 }
           ],
           'itemStyle': { width: 100, height: 25, col: 2, row: 0 },
           'defaultValue': 1,
@@ -97,22 +97,22 @@ export default {
         },
         {
           'code': 'desc',
-          'name': '备注',
+          'name': 'ddei.description',
           'desc': '备注说明',
           'controlType': 'textarea',
           'dataType': 'string',
-          'defaultValue': "流程顺序流节点",
+          'defaultValue': "ddei.flow.sequence",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
 
       ],
       groups: [
         {
-          name: "数据",
+          'name': 'ddei.data',
           icon: 'icon-a-ziyuan409',
           subGroups: [
             {
-              name: "基本信息",
+              'name': 'ddei.basic',
               attrs: ["code", "name", "bpmnSubType", "desc"]
             }
           ]

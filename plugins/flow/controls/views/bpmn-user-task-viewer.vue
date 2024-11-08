@@ -26,7 +26,7 @@ export default {
         <use xlink:href="#icon-ddei-flow-user"></use>
       </svg>
       <div class="text">
-        {{ model.name ? model.name : "用户任务" }}
+        {{ editor.i18n(model.name ? model.name : "ddei.flow.usertask") }}
       </div>
 
     </div>

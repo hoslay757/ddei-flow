@@ -58,7 +58,7 @@ export default {
       </div>
       <div class="middle">
         <div class="text">
-          {{ model.name ? model.name : "编排" }}
+          {{ editor.i18n(model.name ? model.name : "ddei.flow.choretask") }}
         </div>
         <div class="markers">
           <svg class="icon-ddei-flow" v-if="model.isLoop == 1" aria-hidden="true">

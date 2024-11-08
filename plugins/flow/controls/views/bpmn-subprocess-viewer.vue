@@ -46,12 +46,16 @@ export default {
     <div ref="transactionBorderElement" v-if="model.bpmnSubType == 3" class="trans">
     </div>
     <div :class="{ 'title': true, 'title-transaction': model?.bpmnSubType == 3 }" v-if="!model.isExpand">
-      {{ model.name ? model.name : model.bpmnSubType == 3 ? "事务子流程" : model.bpmnSubType == 2 ? "事件子流程": "子流程" }}
+      {{ editor.i18n(model.name ? model.name : model.bpmnSubType == 3 ? "ddei.flow.transsubprocess" : model.bpmnSubType
+      == 2 ?
+      "ddei.flow.eventsubprocess" : "ddei.flow.subprocess") }}
     </div>
     <div ref="content" class="content" v-if="model.isExpand">
       <div class="content-header">
         <div class="content-header-title">
-          {{ model.name ? model.name : model?.bpmnSubType == 3 ? "事务子流程" : model.bpmnSubType == 2 ? "事件子流程" : "子流程" }}
+          {{ editor.i18n(model.name ? model.name : model?.bpmnSubType == 3 ? "ddei.flow.transsubprocess" :
+          model.bpmnSubType == 2 ?
+          "ddei.flow.eventsubprocess" : "ddei.flow.subprocess") }}
         </div>
         <svg class="icon-ddei-flow content-header-locked" v-if="model.lock == 1" aria-hidden="true">
           <use xlink:href="#icon-ddei-flow-lock"></use>
