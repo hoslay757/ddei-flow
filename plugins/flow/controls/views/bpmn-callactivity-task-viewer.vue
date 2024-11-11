@@ -14,7 +14,6 @@ export default {
       default: null
     }
   },
-
   methods:{
     refreshView(model, vNode, tempShape, composeRender){
       if (this.model.activityId){
@@ -55,6 +54,13 @@ export default {
         }
       }
       return model
+    },
+    refreshDragState(type) {
+      if (type == 1) {
+        this.$refs['divElement'].style.borderColor = "green"
+      } else {
+        this.$refs['divElement'].style.borderColor = ""
+      }
     }
   }
 

@@ -71,8 +71,31 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
   controlDraging(operateType, data, ddInstance, evt): DDeiFuncCallResult {
     if (ddInstance && ddInstance["AC_DESIGN_EDIT"]) {
       let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
+      let models = [...data.models]
+      //如果仅拖拽了一个控件，且控件为startEvent、boundaryEvent则类行为修改attachedModel判定，否则判定includeModel
+      if (models?.length == 1 && (models[0].bpmnType == 'StartEvent' || models[0].bpmnType == 'BoundaryEvent')){
+        let evtModel = data.models[0];
+        let activities = editor.activities;
+        let attachModel = null
+        for (let n = 0; n < activities.length; n++) {
+          let subModel = activities[n]
+          let k = editor.viewerMap.get(subModel.id)
+          if (!attachModel && evtModel.isInRect(subModel.essBounds.x, subModel.essBounds.y, subModel.essBounds.x + subModel.essBounds.width, subModel.essBounds.y + subModel.essBounds.height) && 
+            (Math.abs(subModel.essBounds.x - evtModel.cpv.x) <= 3 || Math.abs(subModel.essBounds.x1 - evtModel.cpv.x) <= 3 || Math.abs(subModel.essBounds.y - evtModel.cpv.y) <= 3 || Math.abs(subModel.essBounds.y1 - evtModel.cpv.y) <= 3)
+          ) {
+            attachModel = subModel
+            k.component.ctx.refreshDragState(1)
+          }else{
+            k.component.ctx.refreshDragState(0)
+          }
+        
+        }
+        
+        
+      }
+
       if (editor.desigingSubProecsses?.length > 0){
-        let models = [...data.models]
+        
         //比较被拖拽的对象是否位于desigingSubProecsses中，如果是则变色
         let dragContainerModel = null;
         let model = models[0]
@@ -228,16 +251,16 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
           topMenus[i].style.display = "none"
         }
 
+        
+        
+        data.models.forEach(model => {
+          let models = getIncludeModels(model)
+          models.forEach(m=>{
+            data.models.push(m)
+          })
+        });
         //如果拖拽的为subProcess，将其includeModels也纳入拖放范围
         this.dragModels = [...data.models]
-        data.models.forEach(model => {
-          if (model.allowIncludeModel) {
-            let models = getIncludeModels(model)
-            models.forEach(m=>{
-              data.models.push(m)
-            })
-          }
-        });
         this.resetSubProcesses(data,ddInstance)
         
         
@@ -251,6 +274,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
     let layer = data.models[0].layer ? data.models[0].layer : editor.ddInstance.stage.layers[editor.ddInstance.stage.layerIndex];
     let subModels = layer.getSubModels(null, 20)
     editor.desigingSubProecsses = []
+    editor.activities = []
     subModels?.forEach(mds => {
       if (mds.allowIncludeModel) {
         if (data.models.indexOf(mds) == -1) {
@@ -259,8 +283,17 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
           }
         }
       }
+      if (mds.bpmnBaseType == 'Activity') {
+        editor.activities.push(mds)
+      }
     });
     editor.desigingSubProecsses.sort((a, b) => {
+      if (a?.render && b?.render) {
+        return a.render.tempZIndex - b.render.tempZIndex
+      }
+      return 0
+    })
+    editor.activities.sort((a, b) => {
       if (a?.render && b?.render) {
         return a.render.tempZIndex - b.render.tempZIndex
       }
@@ -326,7 +359,9 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
     model.zIndex = parentNode.zIndex ? parentNode.zIndex + oldZindex : oldZindex
     model.includeModels?.forEach(imid => {
       let imodel = stage.getModelById(imid)
-      this.changeNodeZIndexDeep(imodel,model,stage)
+      if (imodel){
+        this.changeNodeZIndexDeep(imodel,model,stage)
+      }
     });
     let links = stage.getSourceModelLinks(model.id)
     links?.forEach(link => {
@@ -364,6 +399,44 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
   controlDragAfter(operateType, data, ddInstance, evt): DDeiFuncCallResult {
     if (ddInstance && ddInstance["AC_DESIGN_EDIT"]) {
       let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
+      //如果仅拖拽了一个控件，且控件为startEvent、boundaryEvent则类行为修改attachedModel判定，否则判定includeModel
+      let attachModel = null
+      if (data.models?.length == 1 && (data.models[0].bpmnType == 'StartEvent' || data.models[0].bpmnType == 'BoundaryEvent')) {
+        let evtModel = data.models[0];
+        let activities = editor.activities;
+        let stage = evtModel.stage;
+        let id = evtModel.id
+        if (id.indexOf("_shadow") != -1) {
+          id = id.substring(0, id.indexOf("_shadow"))
+          evtModel = stage.getModelById(id)
+        }
+        //解除原有关系
+        if (evtModel.attachPModel) {
+          let oldattachPModel = stage.getModelById(evtModel.attachPModel)
+          oldattachPModel.attachModels?.splice(oldattachPModel.attachModels?.indexOf(evtModel.id))
+          delete evtModel.attachPModel
+        }
+        
+        //建立新的关系
+        for (let n = 0; n < activities.length; n++) {
+          let subModel = activities[n]
+          let k = editor.viewerMap.get(subModel.id)
+          if (!attachModel && evtModel.isInRect(subModel.essBounds.x, subModel.essBounds.y, subModel.essBounds.x + subModel.essBounds.width, subModel.essBounds.y + subModel.essBounds.height) &&
+            (Math.abs(subModel.essBounds.x - evtModel.cpv.x) <= 3 || Math.abs(subModel.essBounds.x1 - evtModel.cpv.x) <= 3 || Math.abs(subModel.essBounds.y - evtModel.cpv.y) <= 3 || Math.abs(subModel.essBounds.y1 - evtModel.cpv.y) <= 3)
+          ) {
+            evtModel.attachPModel = subModel.id
+            if (!subModel.attachModels) {
+              subModel.attachModels = []
+            }
+            subModel.attachModels.push(evtModel.id)
+            attachModel = subModel
+          }
+          k.component.ctx.refreshDragState(0)
+          
+        }
+
+
+      }
       if (editor.desigingSubProecsses?.length > 0 && this.dragModels?.length > 0) {
         let dragParentActiveIds = []
         let dragContainerModel = null;
@@ -372,7 +445,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
         for (let i = 0; i < editor.desigingSubProecsses.length; i++) {
           let containerModel = editor.desigingSubProecsses[i]
           let k = editor.viewerMap.get(containerModel.id)
-          if (model.isInRect(containerModel.essBounds.x, containerModel.essBounds.y, containerModel.essBounds.x + containerModel.essBounds.width, containerModel.essBounds.y + containerModel.essBounds.height)) {
+          if (attachModel != containerModel && model.isInRect(containerModel.essBounds.x, containerModel.essBounds.y, containerModel.essBounds.x + containerModel.essBounds.width, containerModel.essBounds.y + containerModel.essBounds.height)) {
             if (!k.component.ctx.isInRect || (k.component.ctx.isInRect && k.component.ctx.isInRect(model))) {
               dragContainerModel = containerModel
             }
@@ -389,6 +462,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
         }
         
         let dmodels = []
+        
         this.dragModels?.forEach(dm => {
           //建立新关系
           let id = dm.id
@@ -434,7 +508,6 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
           //更新关系
           
           if (dragContainerModel) {
-            
             if (!dragContainerModel.includeModels) {
               dragContainerModel.includeModels = []
             }
@@ -454,16 +527,10 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
         })
         
         updateCallActivityView(stage, model.layer, dragParentActiveIds)
-        
-        
-
-        
-        
-        editor.bus.push("refresh-shape");
-        editor.bus.executeAll();
-        this.dragModels = null
-
       }
+      editor.bus.push("refresh-shape");
+      editor.bus.executeAll();
+      this.dragModels = null
 
       //选择调用控件
       if (data.models?.length > 0){
@@ -583,12 +650,10 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
     let stage = ddInstance.stage
 
     models.forEach(model => {
-      if (model.allowIncludeModel) {
-        let includeModels = getIncludeModels(model)
-        includeModels.forEach(lms => {
-          stage.removeModel(lms, true)
-        })
-      }
+      let includeModels = getIncludeModels(model)
+      includeModels.forEach(lms => {
+        stage.removeModel(lms, true)
+      })
     });
 
     DDeiEditorUtil.closeDialog(editor, 'ddei-flow-setting-button-dialog')

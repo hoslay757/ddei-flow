@@ -1,4 +1,4 @@
-import { showSettingButton } from "../util"
+import { showSettingButton, lineObiCheck } from "../util"
 import BpmnBoundaryEventViewer from "../views/bpmn-boundary-event-viewer.vue"
 
 export default {
@@ -88,7 +88,9 @@ export default {
       ]
     }
   },
-
+  filters: {
+    LINE_OBI_FILTER: lineObiCheck
+  },
   viewer: BpmnBoundaryEventViewer,
   icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-boundary-event-message"></use>

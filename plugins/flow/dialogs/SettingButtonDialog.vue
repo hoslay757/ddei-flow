@@ -45,7 +45,7 @@
 import { DDeiEditorUtil, DDeiUtil, DDeiConfig, DDeiLink, DDeiAbstractShape, DDeiEditorState } from "ddei-editor";
 import DialogBase from "./dialog"
 import { Matrix3, Vector3 } from "three"
-import { getIncludeModels, updateCallActivityView } from "../controls/util"
+import { getIncludeModels } from "../controls/util"
 
 export default {
   name: "ddei-flow-setting-button-dialog",
@@ -210,17 +210,19 @@ export default {
           //获取所有连线,只有一个端点在内部，且不为model的才需要调整
           let lines = []
           includeModels.forEach(ims=>{
-            //获取连线
-            let sublinks = stage.getSourceModelLinks(ims.id)
-            sublinks?.forEach(slink => {
-              if (!slink.disabled && slink.dm){
-                if (lines.indexOf(slink.dm) == -1){
-                  lines.push(slink.dm)
-                }else{
-                  lines.splice(lines.indexOf(slink.dm),1)
+            if (ims.attachPModel != model.id){
+              //获取连线
+              let sublinks = stage.getSourceModelLinks(ims.id)
+              sublinks?.forEach(slink => {
+                if (!slink.disabled && slink.dm){
+                  if (lines.indexOf(slink.dm) == -1){
+                    lines.push(slink.dm)
+                  }else{
+                    lines.splice(lines.indexOf(slink.dm),1)
+                  }
                 }
-              }
-            });
+              });
+            }
           })
           for(let ln = lines.length-1;ln>=0;ln--){
             let line = lines[ln]
@@ -443,7 +445,7 @@ export default {
       if (needExt) {
         //改变本级其他控件位置
         curLevelModels.forEach(subModel => {
-          if (subModel.baseModelType != 'DDeiLine') {
+          if (subModel.baseModelType != 'DDeiLine' && subModel.attachPModel != model.id) {
             //对比控件的cpv，如果x相等，位置不变
             let moveX = 0, moveY = 0
             if (subModel.cpv.x > model.cpv.x) {

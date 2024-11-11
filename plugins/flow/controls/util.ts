@@ -105,24 +105,44 @@ const getIncludeModels = function(subProcessModel,modelLinks,first:boolean = tru
     }
     let stage = subProcessModel.stage;
     let models = []
-    if (!subProcessModel.includeModels) {
-      subProcessModel.includeModels = []
-    }else{
-      
-      subProcessModel.includeModels.forEach(subModelId => {
-        if (subProcessModel.isShadowControl){
-          subModelId+="_shadow"
-        }
-        let subModel = stage.getModelById(subModelId)
-        if (subModel){
-          models.push(subModel)
-          if (subModel.allowIncludeModel){
-            let mds = getIncludeModels(subModel, modelLinks,false)
-            models.push(...mds)
+    if (subProcessModel.allowIncludeModel) {
+      if (!subProcessModel.includeModels) {
+        subProcessModel.includeModels = []
+      } else {
+
+        subProcessModel.includeModels.forEach(subModelId => {
+          if (subProcessModel.isShadowControl) {
+            subModelId += "_shadow"
           }
-          
-        }
-      });
+          let subModel = stage.getModelById(subModelId)
+          if (subModel) {
+            models.push(subModel)
+            if (subModel.allowIncludeModel) {
+              let mds = getIncludeModels(subModel, modelLinks, false)
+              models.push(...mds)
+            }
+
+          }
+        });
+
+      }
+    }
+    if (subProcessModel.bpmnBaseType == 'Activity'){
+      if (!subProcessModel.attachModels) {
+        subProcessModel.attachModels = []
+      } else {
+
+        subProcessModel.attachModels.forEach(subModelId => {
+          if (subProcessModel.isShadowControl) {
+            subModelId += "_shadow"
+          }
+          let subModel = stage.getModelById(subModelId)
+          if (subModel) {
+            models.push(subModel)
+          }
+        });
+
+      }
     }
     
     return models;
@@ -168,6 +188,7 @@ const updateCallActivityView = function (stage,layer,dragParentActiveIds){
 const lineObiCheck = function(model, param){
   let line = param.line
   if (line) {
+    
     let distLinks = line.stage.getDistModelLinks(line.id);
     if (distLinks) {
       let len = distLinks.length
@@ -192,7 +213,11 @@ const lineObiCheck = function(model, param){
       if (subprocessIncludeModels.indexOf(model) != -1) {
         return false;
       }
+      if (model.attachPModel == otherModel.id || model.id == otherModel.attachPModel) {
+        return false
+      }
     }
+    
   }
 
   return true

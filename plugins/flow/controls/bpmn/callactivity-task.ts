@@ -1,5 +1,5 @@
 import BpmnCallActivityTaskViewer from "../views/bpmn-callactivity-task-viewer.vue"
-
+import {  lineObiCheck } from "../util"
 
 export default {
   id: '1000081',
@@ -92,6 +92,9 @@ export default {
         },
       ]
     }
+  },
+  filters: {
+    LINE_OBI_FILTER: lineObiCheck
   },
   viewer: BpmnCallActivityTaskViewer,
   icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">

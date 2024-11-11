@@ -19,7 +19,7 @@ class DDeiFlowAPI {
   /**
    * 配置的属性
    */
-  jsonField: string[] = ["id", "name", "code", "text", "ep", "sp", "desc", "isUnlimited","capacity", "condition", "default", "bpmnType", "bpmnSubType", "scriptFormat", "dataType", "customDataType","isCollection", "loopCardinality", "script", "bpmnBaseType","ordering", "activityId", "errorCode", "timeType", "timeValue", "potentialOwner","humanPerformer","notInterrupting", "messageName","signalName","isLoop", "isLoop","isTransaction", "multiInstance", "isParallel", "isCompensation","essBounds"]
+  jsonField: string[] = ["id", "name", "code", "text", "ep", "sp", "desc", "isUnlimited", "capacity", "condition", "default", "bpmnType", "bpmnSubType", "scriptFormat", "dataType", "attachPModel","customDataType","isCollection", "loopCardinality", "script", "bpmnBaseType","ordering", "activityId", "errorCode", "timeType", "timeValue", "potentialOwner","humanPerformer","notInterrupting", "messageName","signalName","isLoop", "isLoop","isTransaction", "multiInstance", "isParallel", "isCompensation","essBounds"]
 
   /**
    * json中以哪个字段作为key，默认为id，可以指定为code或其他字段
@@ -753,6 +753,10 @@ class DDeiFlowAPI {
         if (node.name) {
           contentStr += 'name="' + node.name + '"'
         }
+        //依附的taskid
+        if (node.attachPModel) {
+          contentStr += ' attachedToRef="' + node.attachPModel + '"'
+        }
 
         if (node.bpmnSubType != 9 && node.notInterrupting) {
           //事件子流程
@@ -855,7 +859,11 @@ class DDeiFlowAPI {
         } else {
           contentStr += ' cancelActivity="true"'
         }
-        //TODO 依附的taskid   attachedToRef="firstLineSupport"
+        //依附的taskid
+        if (node.attachPModel){
+          contentStr += ' attachedToRef="' + node.attachPModel +'"'
+        }
+
         let childXML = ''
         //消息
         if (!node.bpmnSubType || node.bpmnSubType == 1) {
@@ -1675,7 +1683,7 @@ class DDeiFlowAPI {
       returnData = new DDeiFlowBpmnXmlNode(contentStr, defineStr, processStr, currentProcessStr)
     }
     if (this.bpmnAfterProcessorFN) {
-      returnData = this.bpmnAfterProcessorFN(node, tabLevel, returnData)
+      returnData = this.bpmnAfterProcessorFN(sequence, tabLevel, returnData)
     }
     return returnData;
   }

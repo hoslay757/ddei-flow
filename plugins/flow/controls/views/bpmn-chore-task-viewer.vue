@@ -45,6 +45,13 @@ export default {
         this.bottomUsers = bottomUsers
       }
     },
+    refreshDragState(type) {
+      if (type == 1) {
+        this.$refs['divElement'].style.borderColor = "green"
+      } else {
+        this.$refs['divElement'].style.borderColor = ""
+      }
+    }
   }
 
   

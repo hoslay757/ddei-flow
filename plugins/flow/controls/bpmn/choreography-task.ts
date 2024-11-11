@@ -1,4 +1,4 @@
-import { showSettingButton } from "../util"
+import { showSettingButton, lineObiCheck } from "../util"
 import BpmnChoreTaskViewer from "../views/bpmn-chore-task-viewer.vue"
 
 
@@ -52,6 +52,9 @@ export default {
 
       ]
     }
+  },
+  filters: {
+    LINE_OBI_FILTER: lineObiCheck
   },
   viewer: BpmnChoreTaskViewer,
   icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">

@@ -18,7 +18,7 @@ const options = {
     DDeiFlow,
     DDeiCoreTopMenuSimplePanel.configuration({
       direct: 2,//方向，1纵向，2横向
-      position: 3,//位置1-9顺时针，1为左上角，9为中心
+      position: 2,//位置1-9顺时针，1为左上角，9为中心
       drag: 1,//是否允许拖拽位置
       items: [//自定义菜单
         {
@@ -45,7 +45,7 @@ const options = {
             if (!editor.flow.bpmnAfterProcessorFN){
               editor.flow.bpmnAfterProcessorFN = function(node,tabLevel,result){
                 if(node?.bpmnType == 'StartEvent'){
-                  debugger
+                  
                 }
                 return result
               }
