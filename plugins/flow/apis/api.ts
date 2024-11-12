@@ -1,4 +1,4 @@
-import { DDeiEditor, DDeiUtil, DDeiAbstractShape, DDeiStage,DDeiFile,DDeiSheet,DDeiLayer } from "ddei-editor"
+import { DDeiEditor, DDeiUtil, DDeiAbstractShape, DDeiStage, DDeiEnumBusCommandType,DDeiSheet,DDeiLayer } from "ddei-editor"
 import {getIncludeModels} from "../controls/util"
 import html2canvas from "html2canvas"
 import DDeiFlowFile from "./file"
@@ -19,14 +19,17 @@ class DDeiFlowAPI {
   /**
    * 配置的属性
    */
-  jsonField: string[] = ["id", "name", "code", "text", "ep", "sp", "desc", "isUnlimited", "capacity", "condition", "default", "bpmnType", "bpmnSubType", "scriptFormat", "dataType", "attachPModel","customDataType","isCollection", "loopCardinality", "script", "bpmnBaseType","ordering", "activityId", "errorCode", "timeType", "timeValue", "potentialOwner","humanPerformer","notInterrupting", "messageName","signalName","isLoop", "isLoop","isTransaction", "multiInstance", "isParallel", "isCompensation","essBounds"]
+  jsonField: string[] = ["id", "name", "code", "text", "ep", "sp", "desc", "isUnlimited", "capacity", "condition", "default", "bpmnType", "bpmnSubType", "scriptFormat", "dataType","customDataType","isCollection", "loopCardinality", "script", "bpmnBaseType","ordering", "activityId", "errorCode", "timeType", "timeValue", "potentialOwner","humanPerformer","notInterrupting", "messageName","signalName","isLoop", "isLoop","isTransaction", "multiInstance", "isParallel", "isCompensation","essBounds"]
 
   /**
    * json中以哪个字段作为key，默认为id，可以指定为code或其他字段
    */
   jsonKeyField:string = 'id'
 
-  static modelsCache = {}
+  /**
+   * 模型缓存
+   */
+  modelsCache = {}
 
   constructor(editor:DDeiEditor){
     this.editor = editor
@@ -247,6 +250,44 @@ class DDeiFlowAPI {
     return cloneElements;
   }
 
+
+  /**
+   * 加载流程图
+   * @param jsonData 
+   */
+  loadData(jsonData) {
+
+  }
+
+  /**
+   * 刷新视图
+   */
+  refresh(): void {
+    let ddInstance = this.editor.ddInstance
+    for (let i in this.modelsCache) {
+      let shapeModel = this.modelsCache[i]
+      shapeModel?.render?.clearCachedValue()
+      shapeModel?.render?.enableRefreshShape()
+    }
+
+    ddInstance.bus.push(DDeiEnumBusCommandType.RefreshShape);
+    ddInstance.bus.executeAll()
+  }
+
+
+  /**
+   * 获取当前的流程图
+   */
+  getFlowGraphs(): DDeiFlowGraph[]|null{
+    let file = this.editor.files[this.editor.currentFileIndex];
+    if (file) {
+      let sheet = file.sheets[file.currentSheetIndex];
+      let graphics = this.stage2FlowGraphs(sheet.stage)
+      return graphics
+    }
+    return null
+  }
+
   /**
    * 将当前文档转换为易于识别和解析的json对象
    */
@@ -264,7 +305,7 @@ class DDeiFlowAPI {
       }
       for (; i < sheetLen; i++) {
         let sheet = sheets[i];
-        let graphics = this.stage2FlowObj(sheet.stage, fileObj)
+        let graphics = this.stage2FlowGraphs(sheet.stage, fileObj)
         if (!fileObj){
           return graphics[0]
         }
@@ -285,7 +326,7 @@ class DDeiFlowAPI {
    * @param stage 舞台对象
    * @returns json对象
    */
-  stage2FlowObj(stage: DDeiStage, allLayers: boolean = true): DDeiFlowGraph[]|null {
+  stage2FlowGraphs(stage: DDeiStage, allLayers: boolean = true): DDeiFlowGraph[]|null {
     if (stage) {
       let layers = stage.layers;
       if (!(layers?.length > 0)) {
@@ -303,40 +344,57 @@ class DDeiFlowAPI {
       }
       //每个图层生成一个流程
       let returnArray = []
-      DDeiFlowAPI.modelsCache = {}
+      this.modelsCache = {}
       for (; i < layerLen; i++) {
         let layer = layers[i];
-        let graph = new DDeiFlowGraph({ id: singleLayer ?stage.id:stage.id+"_"+layer.id,name:stage.name});
+        let graph = new DDeiFlowGraph({ id: singleLayer ? stage.id : stage.id + "_" + layer.id, name: stage.name, shapeModel :stage,api:this});
         //获取当前图层所有元素，转换为json对象
         let models = stage.getLayerModels()
         models.forEach(model => {
-          DDeiFlowAPI.modelsCache[model.id] = model
+          this.modelsCache[model.id] = model
           let node =  this.parseModelToFlowNode(model);
           if(node){
             node.graph = graph
-            graph.nodes.set(node.id,node)
+            graph.nodes.set(node[this.jsonKeyField] ? node[this.jsonKeyField] : node.id,node)
           }
         });
         let deletedNodes = []
         //根据包含关系，建立正确的subprocess关系
         graph.nodes.forEach(node=>{
           //如果当前节点的includePModelId不为空，且最终指向一个subprocess，则建立子流程关系
-          let model = DDeiFlowAPI.modelsCache[node.id]
+          let model = this.modelsCache[node.id]
           
           if (model.includePModelId){
-            
+
             let subProcessNode = this.getSubProcessNode(model.includePModelId,graph);
             if (subProcessNode){
               let subProcesses = this.getSubProcessNodes(subProcessNode.id, graph);
               node.graph = subProcessNode;
               
               node.subProcesses = subProcesses;
-              subProcessNode.nodes.set(node.id, node)
+              subProcessNode.nodes.set(node[this.jsonKeyField] ? node[this.jsonKeyField] : node.id, node)
               
               deletedNodes.push(node.id)
             }
           }
         });
+        //根据依附关系，建立attachNodes关系
+        graph.nodes.forEach(node => {
+          //如果当前节点的includePModelId不为空，且最终指向一个subprocess，则建立子流程关系
+          let model = this.modelsCache[node.id]
+          let attachNodes = []
+          model.attachModels?.forEach(amid => {
+            let attachModel = this.modelsCache[amid]
+            let attachNode = graph.nodes.get(attachModel[this.jsonKeyField] ? attachModel[this.jsonKeyField] : attachModel.id)
+            
+            attachNode.attachPNode = node
+            attachNodes.push(attachNode)
+          });
+          if (attachNodes.length > 0){
+            node.attachNodes = attachNodes
+          }
+        });
+
         let isolatedNodes = []
         let groups = []
         //建立整个图网络
@@ -345,7 +403,7 @@ class DDeiFlowAPI {
           if (node instanceof DDeiFlowSequence) {
             //如果为连接线，则建立两边的关系
             //线图形对应的json对象
-            let lineModel = DDeiFlowAPI.modelsCache[node.id]
+            let lineModel = this.modelsCache[node.id]
             let lineSequenceNode = node
             let lineLinks = stage.getDistModelLinks(lineSequenceNode.id)
             //获取另一端节点
@@ -354,8 +412,8 @@ class DDeiFlowAPI {
               let lineLink = lineLinks[0]
               if (lineLink.sm) {
                 let distPV = lineLink.getDistPV()
-                lineNode1 = graph.nodes.get(lineLink.sm.id)
-                let lineNodeModel = DDeiFlowAPI.modelsCache[lineNode1.id];
+                lineNode1 = graph.nodes.get(lineLink.sm[this.jsonKeyField] ? lineLink.sm[this.jsonKeyField] : lineLink.sm.id)
+                let lineNodeModel = this.modelsCache[lineNode1.id];
                 includeSubProcess1 = this.getSubProcessNode(lineNodeModel.includePModelId,graph);
                 if (distPV == lineModel.startPoint) {
                   lineSequenceNode.prevNode = lineNode1
@@ -369,8 +427,8 @@ class DDeiFlowAPI {
               let lineLink = lineLinks[1]
               if (lineLink.sm) {
                 let distPV = lineLink.getDistPV()
-                lineNode2 = graph.nodes.get(lineLink.sm.id)
-                let lineNodeModel = DDeiFlowAPI.modelsCache[lineNode2.id];
+                lineNode2 = graph.nodes.get(lineLink.sm[this.jsonKeyField] ? lineLink.sm[this.jsonKeyField] : lineLink.sm.id)
+                let lineNodeModel = this.modelsCache[lineNode2.id];
                 includeSubProcess2 = this.getSubProcessNode(lineNodeModel.includePModelId, graph);
                 if (distPV == lineModel.startPoint) {
                   lineSequenceNode.prevNode = lineNode2
@@ -382,10 +440,12 @@ class DDeiFlowAPI {
           
           } else if (node instanceof DDeiFlowGroup) {
             groups.push(node)
-            let model = DDeiFlowAPI.modelsCache[node.id]
+            let model = this.modelsCache[node.id]
             
             model.includeModels?.forEach(im => {
-              node.nodes.set(im, graph.nodes.get(im))
+              let md = this.modelsCache[im]
+              let key = md[this.jsonKeyField] ? md[this.jsonKeyField] :  md.id
+              node.nodes.set(key, graph.nodes.get(key))
             });
           } else {
             //获取连线,连线区分方向，以开始->结束为方向
@@ -394,7 +454,8 @@ class DDeiFlowAPI {
               //连线上的pv
               let linePV = link.getDistPV();
               //线图形对应的json对象
-              let lineSequenceNode = graph.nodes.get(link.dm.id)
+              let key = link.dm[this.jsonKeyField] ? link.dm[this.jsonKeyField] : link.dm.id
+              let lineSequenceNode = graph.nodes.get(key)
               //线的开始节点在图形上
               if (linePV == link.dm.startPoint) {
                 node.nextNodes.push(lineSequenceNode)
@@ -412,18 +473,20 @@ class DDeiFlowAPI {
         
         //识别开始于结束节点
         graph.nodes.forEach(node => {
-          let model = DDeiFlowAPI.modelsCache[node.id]
+          let model = this.modelsCache[node.id]
           if (node.bpmnType == 'StartEvent') {
-            if (!model.includePModelId){
-              graph.startNodes.push(node)
-            }else{
-              let subProcessNode = this.getSubProcessNode(model.includePModelId, graph);
-              if (subProcessNode){
-                subProcessNode.startNodes.push(node)
-              }else{
+            if(!node.attachPNode){
+              if (!model.includePModelId){
                 graph.startNodes.push(node)
+              }else{
+                let subProcessNode = this.getSubProcessNode(model.includePModelId, graph);
+                if (subProcessNode){
+                  subProcessNode.startNodes.push(node)
+                }else{
+                  graph.startNodes.push(node)
+                }
+                
               }
-              
             }
             
           } else if (node.bpmnType == 'EndEvent') {
@@ -446,7 +509,7 @@ class DDeiFlowAPI {
               isolatedNodes.push(node)
             }
           }
-          else if (node.prevNodes?.length == 0 && node.bpmnType != 'StartEvent' && node.bpmnType != 'Group' && node.bpmnType != 'Comment') {
+          else if (!node.attachPNode && node.prevNodes?.length == 0 && node.bpmnType != 'StartEvent' && node.bpmnType != 'Group' && node.bpmnType != 'Comment') {
             if (node.bpmnType != 'SubProcess') {
               isolatedNodes.push(node)
             } else {
@@ -462,7 +525,7 @@ class DDeiFlowAPI {
               }
             }
           } 
-          else if (node.prevNodes?.length == 0 && node.nextNodes?.length == 0) {
+          else if (!node.attachPNode && node.prevNodes?.length == 0 && node.nextNodes?.length == 0) {
             if (node.bpmnType != 'SubProcess'){
               isolatedNodes.push(node)
             }else{
@@ -501,7 +564,7 @@ class DDeiFlowAPI {
       let subProcessesNode = this.getSubProcessNode(includePModelId,graph)
       if (subProcessesNode){
         returnNodes.splice(0, 0, subProcessesNode)
-        let subProcessModel = DDeiFlowAPI.modelsCache[subProcessesNode.id]
+        let subProcessModel = this.modelsCache[subProcessesNode.id]
         includePModelId = subProcessModel?.includePModelId
       }else{
         break;
@@ -512,13 +575,16 @@ class DDeiFlowAPI {
   }
 
   private getSubProcessNode(includePModelId, graph):DDeiFlowSubProcess|null{
-    let pNode = graph.nodes.get(includePModelId);
-    if(pNode){
-      let pNodeModel = DDeiFlowAPI.modelsCache[pNode.id]
-      if (pNode.bpmnType == 'SubProcess'){
-        return pNode;
-      } else if (pNode.bpmnType == 'Group' && pNodeModel.includePModelId){
-        return this.getSubProcessNode(pNodeModel.includePModelId, graph)
+    let pNodeModel = this.modelsCache[includePModelId]
+    if (pNodeModel){
+      let pNode = graph.nodes.get(pNodeModel[this.jsonKeyField] ? pNodeModel[this.jsonKeyField] : pNodeModel.id);
+      if(pNode){
+        
+        if (pNode.bpmnType == 'SubProcess'){
+          return pNode;
+        } else if (pNode.bpmnType == 'Group' && pNodeModel.includePModelId){
+          return this.getSubProcessNode(pNodeModel.includePModelId, graph)
+        }
       }
     }
     return null;
@@ -538,6 +604,8 @@ class DDeiFlowAPI {
         modelJson[field] = model[field];
       }
     })
+    modelJson.shapeModel = model
+    modelJson.api = this
     switch (model.bpmnBaseType){
       case 'Event':{
         returnNode = new DDeiFlowNode(modelJson)
@@ -1193,7 +1261,7 @@ class DDeiFlowAPI {
         } else if (node.bpmnType == 'ChoreographyTask') {
           nodeTag = "bpmn:choreography"
         }
-        contentStr += tabStr + '<' + nodeTag + ' id="' + node[this.jsonKeyField] + '"'
+        contentStr += tabStr + '<' + nodeTag + ' id="' + (node[this.jsonKeyField] ? node[this.jsonKeyField] : node.id) + '"'
         if (node.name) {
           contentStr += ' name="' + node.name + '"'
         }
@@ -1311,7 +1379,7 @@ class DDeiFlowAPI {
         } else if (node.bpmnType == 'DataStore') {
           nodeTag = "bpmn:dataStore"
         }
-        contentStr += tabStr + '<' + nodeTag + ' id="' + node[this.jsonKeyField] + '"'
+        contentStr += tabStr + '<' + nodeTag + ' id="' + (node[this.jsonKeyField] ? node[this.jsonKeyField] : node.id) + '"'
         if (node.name) {
           contentStr += ' name="' + node.name + '"'
         }
@@ -1407,7 +1475,7 @@ class DDeiFlowAPI {
       if (node) {
         let nodeTag = "bpmn:textAnnotation"
         
-        contentStr += tabStr + '<' + nodeTag + ' id="' + node[this.jsonKeyField] + '"'
+        contentStr += tabStr + '<' + nodeTag + ' id="' + (node[this.jsonKeyField] ? node[this.jsonKeyField] : node.id) + '"'
         let childXML = ''
         if(node.text){
           childXML += tabStr +'  <bpmn:text>'+node.text+'</bpmn:text>\n'
@@ -1464,7 +1532,7 @@ class DDeiFlowAPI {
         } else if (node.bpmnType == 'InclusiveGateway') {
           nodeTag = "bpmn:inclusiveGateway"
         } 
-        contentStr += tabStr + '<' + nodeTag + ' id="' + node[this.jsonKeyField] + '"'
+        contentStr += tabStr + '<' + nodeTag + ' id="' + (node[this.jsonKeyField] ? node[this.jsonKeyField] : node.id) + '"'
         if (node.name) {
           contentStr += ' name="' + node.name + '"'
         }
@@ -1473,7 +1541,7 @@ class DDeiFlowAPI {
         if (node.bpmnType == 'ExclusiveGateway') {
           let defSeqs = this.getDefaultSequenceNodes(node)
           if (defSeqs?.length > 0){
-            contentStr += ' default="' + defSeqs[0][this.jsonKeyField] + '"'
+            contentStr += ' default="' + (defSeqs[0][this.jsonKeyField] ? defSeqs[0][this.jsonKeyField] : defSeqs[0].id) + '"'
           }
         }
 
@@ -1529,7 +1597,7 @@ class DDeiFlowAPI {
         } else if (node.bpmnSubType == 4) {
           nodeTag = "bpmn:adHocSubProcess"
         }
-        contentStr += tabStr + '<' + nodeTag +' id="' + node[this.jsonKeyField] + '"'
+        contentStr += tabStr + '<' + nodeTag + ' id="' + (node[this.jsonKeyField] ? node[this.jsonKeyField] : node.id) + '"'
         if (node.name) {
           contentStr += ' name="' + node.name + '"'
         }
@@ -1618,7 +1686,7 @@ class DDeiFlowAPI {
           nodeTag = "bpmn:association"
           noneDirection = true
         }
-        contentStr += tabStr + '<' + nodeTag +' id="' + sequence[this.jsonKeyField] + '"' 
+        contentStr += tabStr + '<' + nodeTag + ' id="' + (sequence[this.jsonKeyField] ? sequence[this.jsonKeyField] : sequence.id) + '"' 
         if (sequence.name) {
           contentStr += ' name="' + sequence.name + '"'
         }
@@ -1640,17 +1708,17 @@ class DDeiFlowAPI {
             commentNode = sequence.nextNode
             otherNode = sequence.prevNode
           }
-          contentStr += ' targetRef="' + commentNode[this.jsonKeyField]+'"'
+          contentStr += ' targetRef="' + (commentNode[this.jsonKeyField] ? commentNode[this.jsonKeyField] : commentNode.id)+'"'
           if(otherNode){
-            contentStr += ' sourceRef="'+otherNode[this.jsonKeyField]+'"'
+            contentStr += ' sourceRef="' + (otherNode[this.jsonKeyField] ? otherNode[this.jsonKeyField] : otherNode.id)+'"'
           }
           noneDirection = true
         }else{
           if (sequence.prevNode) {
-            contentStr += ' sourceRef="' + sequence.prevNode[this.jsonKeyField] + '"'
+            contentStr += ' sourceRef="' + (sequence.prevNode[this.jsonKeyField] ? sequence.prevNode[this.jsonKeyField] : sequence.prevNode.id) + '"'
           }
           if (sequence.nextNode) {
-            contentStr += ' targetRef="' + sequence.nextNode[this.jsonKeyField] + '"'
+            contentStr += ' targetRef="' + (sequence.nextNode[this.jsonKeyField] ? sequence.nextNode[this.jsonKeyField] : sequence.nextNode.id) + '"'
           }
         }
         //TODO 对依附Message的处理
@@ -1734,10 +1802,10 @@ class DDeiFlowAPI {
     node.graph.nodes.forEach(subNode => {
       if (subNode instanceof DDeiFlowSequence) {
         if (subNode.nextNode == node) {
-          returnStr += tabStr + '<bpmn:incoming>' + subNode[this.jsonKeyField] + '</bpmn:incoming>\n'
+          returnStr += tabStr + '<bpmn:incoming>' + (subNode[this.jsonKeyField] ? subNode[this.jsonKeyField] : subNode.id) + '</bpmn:incoming>\n'
         }
         if (subNode.prevNode == node) {
-          returnStr += tabStr + '<bpmn:outgoing>' + subNode[this.jsonKeyField] + '</bpmn:outgoing>\n'
+          returnStr += tabStr + '<bpmn:outgoing>' + (subNode[this.jsonKeyField] ? subNode[this.jsonKeyField] : subNode.id) + '</bpmn:outgoing>\n'
         }
       }
     });
@@ -1821,12 +1889,12 @@ class DDeiFlowAPI {
           }
           if (node) {
             let nodeTag = "bpmndi:BPMNShape"
-
-            returnStr += tabStr + '<' + nodeTag + ' id="' + node[this.jsonKeyField] + '_id" bpmnElement="' + node[this.jsonKeyField] + '"'
+            let key = node[this.jsonKeyField] ? node[this.jsonKeyField] : node.id
+            returnStr += tabStr + '<' + nodeTag + ' id="' + key + '_id" bpmnElement="' +key + '"'
 
             //图形大小的处理
             
-            let nodeModel = DDeiFlowAPI.modelsCache[node[this.jsonKeyField]];
+            let nodeModel = this.modelsCache[node.id];
             let childXML = tabStr + ' <dc:Bounds x="' + nodeModel.essBounds.x + '" y="' + nodeModel.essBounds.y + '" width="' + nodeModel.essBounds.width + '" height="' + nodeModel.essBounds.height+'"/>\n'
             returnStr += '>\n' + childXML + tabStr + '</' + nodeTag + '>\n'
           }
@@ -1860,12 +1928,12 @@ class DDeiFlowAPI {
       }
       if (sequence) {
         let nodeTag = "bpmndi:BPMNEdge"
-        
-        returnStr += tabStr + '<' + nodeTag + ' id="' + sequence[this.jsonKeyField] + '_id" bpmnElement="' + sequence[this.jsonKeyField] +'"'
+        let key = sequence[this.jsonKeyField] ? sequence[this.jsonKeyField] : sequence.id
+        returnStr += tabStr + '<' + nodeTag + ' id="' + key + '_id" bpmnElement="' + key +'"'
 
         //连线的途径点处理
         let childXML = ''
-        let sequenceModel = DDeiFlowAPI.modelsCache[sequence[this.jsonKeyField]];
+        let sequenceModel = this.modelsCache[sequence.id];
         //直线、曲线
         if (sequenceModel.type == 1 || sequenceModel.type == 3){
           childXML += tabStr+' <di:waypoint x="' + sequenceModel.startPoint.x + '" y="' + sequenceModel.startPoint.y + '"/>\n'

@@ -71,18 +71,13 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    color: var(--fontColor);
-    font-family: var(--fontFamily);
-    font-size: var(--fontSize);
-    font-style: var(--fontStyle);
-    font-weight: var(--fontWeight);
-    text-decoration: var(--textDecoration);
     .icon-ddei-flow {
       position: absolute;
       left:0px;
       top:0px;
       width: 24px;
       height:24px;
+      fill: var(--borderColor);
     }
 
     .text {
@@ -92,6 +87,12 @@ export default {
       padding:2px;
       overflow: hidden;
       text-overflow: ellipsis;
+      color: var(--fontColor);
+      font-family: var(--fontFamily);
+      font-size: var(--fontSize);
+      font-style: var(--fontStyle);
+      font-weight: var(--fontWeight);
+      text-decoration: var(--textDecoration);
     }
 
   }
@@ -109,6 +110,7 @@ export default {
     .icon-ddei-flow {
       width: 14px;
       height: 14px;
+      fill: var(--borderColor);
     }
   }
 }

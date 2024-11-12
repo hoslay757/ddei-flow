@@ -110,12 +110,7 @@ export default {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    color: var(--fontColor);
-    font-family: var(--fontFamily);
-    font-size: var(--fontSize);
-    font-style: var(--fontStyle);
-    font-weight: var(--fontWeight);
-    text-decoration: var(--textDecoration);
+    
     .text {
       flex: 1;
       text-align: center;
@@ -123,6 +118,12 @@ export default {
       padding: 2px;
       overflow: hidden;
       text-overflow: ellipsis;
+      color: var(--fontColor);
+      font-family: var(--fontFamily);
+      font-size: var(--fontSize);
+      font-style: var(--fontStyle);
+      font-weight: var(--fontWeight);
+      text-decoration: var(--textDecoration);
     }
     .top {
       flex: 0 0 20px;
@@ -157,6 +158,7 @@ export default {
         .icon-ddei-flow {
           width: 16px;
           height: 16px;
+          fill: var(--borderColor);
         }
       }
     }

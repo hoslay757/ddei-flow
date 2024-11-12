@@ -131,6 +131,7 @@ export default {
     .icon-ddei-flow {
       width: 14px;
       height: 14px;
+      fill: var(--borderColor);
     }
   }
   

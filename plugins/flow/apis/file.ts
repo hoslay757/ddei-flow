@@ -1,3 +1,4 @@
+import { DDeiFlowAPI } from "..";
 import DDeiFlowGraph from "./graph"
 /**
  * DDeiFlowFile表示图形设计器被解析后的一个文件对象
@@ -12,6 +13,11 @@ class DDeiFlowFile {
     }
   }
   /**
+   * 所属API
+   */
+  api: DDeiFlowAPI;
+
+  /**
    * id
    */
   id:string;
@@ -24,5 +30,29 @@ class DDeiFlowFile {
    * 文件包含的所有流程图
    */
   graphics: DDeiFlowGraph[] = []
+
+  toJSON() {
+    let returnData = {}
+    for (let i in this) {
+      if (this[i] || this[i] === 0) {
+        returnData[i] = this[i]
+      }
+    }
+   
+    if (returnData.graphics?.length > 0){
+      let gs = []
+      returnData.graphics.forEach(graph => {
+        gs.push(graph.toJSON())
+      });
+      returnData.graphics = gs
+    }else{
+      delete returnData.graphics
+    }
+    
+
+    delete returnData.api
+
+    return returnData
+  }
 }
 export default DDeiFlowFile;

@@ -65,6 +65,14 @@ export default {
           'defaultValue': "ddei.flow.scripttask",
           'type': [2] //类别，1图形，2业务，3事件
         },
+        {
+          'code': 'border.color',
+          'name': 'ddei.color',
+          'desc': '图形的边框显示颜色，在高级设置中，可以分别设置不同方向边框的样式',
+          'controlType': 'color-combo',
+          'dataType': 'string',
+          'defaultValue': 'black',
+        },
 
       ]
     }
