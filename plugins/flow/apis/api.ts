@@ -1,4 +1,5 @@
-import { DDeiEditor, DDeiUtil, DDeiAbstractShape, DDeiStage, DDeiEnumBusCommandType,DDeiSheet,DDeiLayer } from "ddei-editor"
+import { DDeiEditor, DDeiUtil, DDeiAbstractShape, DDeiStage, DDeiEnumBusCommandType, DDeiFile, DDeiActiveType, DDeiFileState } from "ddei-editor"
+import { DDeiEditorState, DDeiEditorEnumBusCommandType, DDeiEditorUtil } from "ddei-editor"
 import {getIncludeModels} from "../controls/util"
 import html2canvas from "html2canvas"
 import DDeiFlowFile from "./file"
@@ -8,6 +9,7 @@ import DDeiFlowGroup from "./group";
 import DDeiFlowSequence from "./sequence"
 import DDeiFlowSubProcess from "./subprocess"
 import DDeiFlowBpmnXmlNode from "./bpmnxmlnode"
+import { merge } from "lodash"
 /**
  * DDeiFlow插件的API方法包，提供了API以及工具函数
  * 初始化时挂载到editor的flow属性上
@@ -250,13 +252,138 @@ class DDeiFlowAPI {
     return cloneElements;
   }
 
+  private settingSubModelsData(model,dataJson):void{
+    let key = model[this.jsonKeyField] ? model[this.jsonKeyField] : model.id
+    if (dataJson[key]) {
+      merge(model, dataJson[key])
+    }
+    if(model.models){
+      for (let id in model.models) {
+        let subModel = model.models[id]
+        this.settingSubModelsData(subModel, dataJson)
+      }
+    }
+  }
 
   /**
-   * 加载流程图
-   * @param jsonData 
+   * 加载并刷新流程图
+   * @param designJson 设计器json
+   * @param dataJson 数据json
    */
-  loadData(jsonData) {
+  loadData(designJson:string|object,dataJson:string|object|null = null) {
 
+    let resultJSON = typeof (designJson) == 'string' ? JSON.parse(designJson) : designJson;
+    if (dataJson){
+      dataJson = typeof (dataJson) == 'string' ? JSON.parse(dataJson) : dataJson;
+      resultJSON.sheets.forEach(sheet => {
+        sheet.stage.layers.forEach(layer => {
+          this.settingSubModelsData(layer, dataJson)
+        });
+        
+        
+      });
+      
+      
+    }
+    //合并数据与设计器
+
+    let ddInstance = this.editor.ddInstance;
+    let file = DDeiFile.loadFromJSON(resultJSON, {
+      currentDdInstance: ddInstance,
+    });
+    let openedFiles = this.editor.files;
+    let openedFileIndex = -1
+    if (!file.id) {
+      file.id = DDeiUtil.getUniqueCode()
+    }
+    for (let fi = 0; fi < openedFiles.length; fi++) {
+      if ((openedFiles[fi].id && openedFiles[fi].id == file.id)) {
+        openedFileIndex = fi
+        break;
+      }
+    }
+    ddInstance.stage.destroyRender()
+    if (openedFileIndex == -1) {
+      this.editor.addFile(file);
+      for (let x = 0; x < this.editor.files.length; x++) {
+        this.editor.files[x].active = DDeiActiveType.NONE;
+      }
+      this.editor.currentFileIndex = this.editor.files.length - 1;
+      file.state = DDeiFileState.NONE;
+      file.active = DDeiActiveType.ACTIVE;
+      let sheets = file?.sheets;
+
+      if (file && sheets && ddInstance) {
+        file.changeSheet(file.currentSheetIndex);
+
+        let stage = sheets[file.currentSheetIndex].stage;
+
+        stage.ddInstance = ddInstance;
+        ddInstance.disabled = false
+        //记录文件初始日志
+        file.initHistroy();
+        file.histroy[0].isNew = true;
+        //刷新页面
+        ddInstance.stage = stage;
+        //加载场景渲染器
+        stage.initRender();
+        //设置视窗位置到中央
+        if (!stage.wpv) {
+          //缺省定位在画布中心点位置
+          stage.wpv = {
+            x:
+              -(
+                stage.width -
+                ddInstance.render.container.clientWidth
+              ) / 2,
+            y:
+              -(
+                stage.height -
+                ddInstance.render.container.clientHeight
+              ) / 2,
+            z: 0,
+          };
+        }
+        this.editor.changeState(DDeiEditorState.DESIGNING);
+        ddInstance.bus.push(
+          DDeiEditorEnumBusCommandType.ClearTemplateUI
+        );
+        ddInstance.bus.push(
+          DDeiEditorEnumBusCommandType.RefreshEditorParts
+        );
+        ddInstance?.bus?.push(DDeiEnumBusCommandType.RefreshShape);
+        ddInstance?.bus?.executeAll();
+      }
+    } else {
+
+      file = this.editor.files[openedFileIndex]
+      if (file && ddInstance) {
+        for (let x = 0; x < this.editor.files.length; x++) {
+          this.editor.files[x].active = DDeiActiveType.NONE;
+        }
+        file.active = DDeiActiveType.ACTIVE
+        this.editor.currentFileIndex = openedFileIndex;
+        let stage = file.sheets[file.currentSheetIndex].stage;
+        stage.ddInstance = ddInstance;
+
+        //刷新页面
+        ddInstance.stage = stage;
+        ddInstance.disabled = false
+        //加载场景渲染器
+        stage.initRender();
+        this.editor.changeState(DDeiEditorState.DESIGNING);
+        ddInstance.bus.push(
+          DDeiEditorEnumBusCommandType.ClearTemplateUI
+        );
+        ddInstance.bus.push(
+          DDeiEditorEnumBusCommandType.RefreshEditorParts
+        );
+        ddInstance?.bus?.push(DDeiEnumBusCommandType.RefreshShape);
+        ddInstance?.bus?.executeAll();
+      }
+    }
+    DDeiEditorUtil.invokeCallbackFunc("EVENT_ADD_FILE_AFTER", "LOAD_FILE", { file: file }, this.editor.ddInstance)
+  
   }
 
   /**

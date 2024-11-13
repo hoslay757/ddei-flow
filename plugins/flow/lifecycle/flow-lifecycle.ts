@@ -69,6 +69,18 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
    * 拖拽中
    */
   controlDraging(operateType, data, ddInstance, evt): DDeiFuncCallResult {
+    if (this.markHiddenPanel) {
+
+      let toolBoxs = document.getElementsByClassName("ddei-core-panel-toolbox-simple")
+      for (let i = 0; i < toolBoxs.length; i++) {
+        toolBoxs[i].style.display = "none"
+      }
+      let topMenus = document.getElementsByClassName("ddei-core-panel-topmenu-simple")
+      for (let i = 0; i < topMenus.length; i++) {
+        topMenus[i].style.display = "none"
+      }
+      delete this.markHiddenPanel
+    }
     if (ddInstance && ddInstance["AC_DESIGN_EDIT"]) {
       let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
       let models = [...data.models]
@@ -164,15 +176,8 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
   controlCreateBefore(operateType, data, ddInstance, evt){
     if (ddInstance && ddInstance["AC_DESIGN_EDIT"]) {
       if (data.models?.length > 0) {
-        let toolBoxs = document.getElementsByClassName("ddei-core-panel-toolbox-simple")
-        for (let i = 0; i < toolBoxs.length; i++) {
-          toolBoxs[i].style.display = "none"
-        }
-        let topMenus = document.getElementsByClassName("ddei-core-panel-topmenu-simple")
-        for (let i = 0; i < topMenus.length; i++) {
-          topMenus[i].style.display = "none"
-        }
-        this.dragModels = data.models        
+        this.markHiddenPanel = true
+        this.dragModels = data.models
         this.resetSubProcesses(data, ddInstance);
       }
     }
@@ -260,7 +265,9 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
           })
         });
         //如果拖拽的为subProcess，将其includeModels也纳入拖放范围
+        
         this.dragModels = [...data.models]
+        
         this.resetSubProcesses(data,ddInstance)
         
         
@@ -441,7 +448,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
         let dragParentActiveIds = []
         let dragContainerModel = null;
         let model = this.dragModels[0]
-        let stage = model.stage;
+        let stage = ddInstance.stage;
         for (let i = 0; i < editor.desigingSubProecsses.length; i++) {
           let containerModel = editor.desigingSubProecsses[i]
           let k = editor.viewerMap.get(containerModel.id)
@@ -488,45 +495,48 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
           }
           
           let dSourceModel = stage.getModelById(id)
-          //删除老关系
-          if (dSourceModel.includePModelId) {
+          if (dSourceModel){
+            //删除老关系
+            if (dSourceModel.includePModelId) {
+              
+              let includePModel = null;
+              for (let n = 0; n < editor.desigingSubProecsses.length;n++){
+                if (editor.desigingSubProecsses[n].id == dSourceModel.includePModelId){
+                  includePModel = editor.desigingSubProecsses[n]
+                  break;
+                }
+              }
+              if (includePModel && includePModel.includeModels.indexOf(id) != -1) {
+                includePModel.includeModels.splice(includePModel.includeModels.indexOf(id), 1)
+              }
+              dragParentActiveIds.push(dSourceModel.includePModelId)
+              delete dSourceModel.includePModelId
+              delete dSourceModel.render.tempZIndex
+            }
+            //更新关系
             
-            let includePModel = null;
-            for (let n = 0; n < editor.desigingSubProecsses.length;n++){
-              if (editor.desigingSubProecsses[n].id == dSourceModel.includePModelId){
-                includePModel = editor.desigingSubProecsses[n]
-                break;
+            if (dragContainerModel) {
+              if (!dragContainerModel.includeModels) {
+                dragContainerModel.includeModels = []
+              }
+              
+              if (dragContainerModel.includeModels.indexOf(id) == -1) {
+                dragContainerModel.includeModels.push(id)
+                
+                dSourceModel.includePModelId = pid
+                this.changeNodeZIndexDeep(dSourceModel, dragContainerModel,stage)
+                
+              }
+              if (dragParentActiveIds.indexOf(pid) == -1){
+                dragParentActiveIds.push(pid)
               }
             }
-            if (includePModel && includePModel.includeModels.indexOf(id) != -1) {
-              includePModel.includeModels.splice(includePModel.includeModels.indexOf(id), 1)
-            }
-            dragParentActiveIds.push(dSourceModel.includePModelId)
-            delete dSourceModel.includePModelId
-            delete dSourceModel.render.tempZIndex
           }
-          //更新关系
-          
-          if (dragContainerModel) {
-            if (!dragContainerModel.includeModels) {
-              dragContainerModel.includeModels = []
-            }
-            
-            if (dragContainerModel.includeModels.indexOf(id) == -1) {
-              dragContainerModel.includeModels.push(id)
-              
-              dSourceModel.includePModelId = pid
-              this.changeNodeZIndexDeep(dSourceModel, dragContainerModel,stage)
-              
-            }
-            if (dragParentActiveIds.indexOf(pid) == -1){
-              dragParentActiveIds.push(pid)
-            }
-          }
-          dmodel.pModel.resortModelByZIndex()
+          dmodel.pModel?.resortModelByZIndex()
         })
-        
+       
         updateCallActivityView(stage, model.layer, dragParentActiveIds)
+        
       }
       editor.bus.push("refresh-shape");
       editor.bus.executeAll();
@@ -565,6 +575,7 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
 
 
   mouseOperating(operateType, data, ddInstance, evt){
+   
     return this.hiddenTempElements(operateType, data, ddInstance, evt)
   }
 

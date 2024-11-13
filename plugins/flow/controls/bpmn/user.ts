@@ -13,7 +13,7 @@ export default {
     height: 45,
     bpmnBaseType: 'Other',
     bpmnType:"User",
-    
+    name: "ddei.flow.user",
     ext: {
       sample:{
         //依附图形的初始化配置，如果产生依附图形，则会在配置的位置生成

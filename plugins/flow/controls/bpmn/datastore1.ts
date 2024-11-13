@@ -12,6 +12,7 @@ export default {
     height: 30,
     bpmnBaseType: 'Other',
     bpmnType:"DataStore",
+    name:"ddei.flow.datastore",
     ext: {
       sample: {
         //依附图形的初始化配置，如果产生依附图形，则会在配置的位置生成
@@ -38,7 +39,7 @@ export default {
           'desc': '名称，一般用于显示',
           'controlType': 'text',
           'dataType': 'string',
-          'defaultValue': "数据存储",
+          'defaultValue': "ddei.flow.datastore",
           'type': [1, 2] //类别，1图形，2业务，3事件
         },
         {

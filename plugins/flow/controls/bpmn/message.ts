@@ -14,6 +14,7 @@ export default {
     bpmnBaseType: 'Other',
     bpmnType:"Message",
     bpmnSubType:1,
+    name:'ddei.flow.message',
     ext: {
       sample: {
         //依附图形的初始化配置，如果产生依附图形，则会在配置的位置生成

@@ -14,6 +14,7 @@ export default {
     bpmnBaseType: 'Other',
     bpmnType:"DataObject",
     bpmnSubType: 1,
+    name: "ddei.flow.dataobj",
     //2为极坐标，以cpv为圆心，半径r采样获得点，在以width/100、height/100的的原始比例进行缩放
     poly: 2,
     //采样信息

@@ -77,6 +77,9 @@ export default {
   methods: {
 
     validItemCondition(btn) {
+      if(!this.editor.ddInstance["AC_DESIGN_EDIT"]){
+        return false;
+      }
       if (!btn.condition) {
         return true;
       } else {

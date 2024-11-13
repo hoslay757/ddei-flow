@@ -6,8 +6,6 @@ import { DDeiUtil, DDeiLink,DDeiConfig,DDeiEditor, DDeiEditorUtil, DDeiEnumOpera
 const showSettingButton = function (operate: DDeiEnumOperateType, data: object | null, ddInstance: DDei, evt: Event): DDeiFuncCallResult {
   let rs = new DDeiFuncCallResult();
   rs.state = 2;
-
-
   //计算位置，显示按钮div
   let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
   if (editor) {
@@ -47,6 +45,7 @@ const showSettingButton = function (operate: DDeiEnumOperateType, data: object |
     DDeiEditorUtil.closeDialog(editor, 'ddei-flow-element-setting-dialog')
 
   }
+  
   return rs;
 }
 

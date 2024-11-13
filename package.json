@@ -49,7 +49,7 @@
     "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
   },
   "dependencies": {
-    "ddei-editor": "file:///Users/hoslay/work/ddei/ddei-editor/ddei-editor-1.2.43-1.tgz",
+    "ddei-editor": "file:///Users/hoslay/work/ddei/ddei-editor/ddei-editor-1.2.43-5.tgz",
     "html2canvas": "^1.4.1"
   },
   "devDependencies": {
