@@ -28,7 +28,10 @@ class DDeiFlowDialogs extends DDeiPluginBase {
     return dialogs
   }
 
-
+  static modify(fn){
+    return DDeiFlowDialogs.defaultIns.modify(fn)
+  }
+  
 
   static configuration(options) {
     if (options) {

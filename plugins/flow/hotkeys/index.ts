@@ -35,6 +35,9 @@ class DDeiFlowHotkeys extends DDeiPluginBase{
     return hotkeys
   }
 
+  static modify(fn) {
+    return DDeiFlowHotkeys.defaultIns.modify(fn)
+  }
 
   static configuration(options) {
     let hotkeys = new DDeiFlowHotkeys(options);

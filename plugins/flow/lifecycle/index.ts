@@ -22,6 +22,10 @@ class DDeiFlowLifeCycles extends DDeiPluginBase {
   }
 
 
+  static modify(fn) {
+    return DDeiFlowLifeCycles.defaultIns.modify(fn)
+  }
+
   static configuration(options) {
     let core = new DDeiFlowLifeCycles(options);
     core.lifecycles = core.lifecycles.configuration(options)

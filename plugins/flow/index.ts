@@ -211,110 +211,124 @@ class DDeiFlow extends DDeiPluginBase {
 
   // 代理方法的工厂函数
   createModelHiddenProxy(originalFunc) {
-    return function proxy() {
-      let model = arguments[0]
-      let hidden = originalFunc.apply(this, arguments);
-      if (!hidden){
-        let stage = model.stage
-        if(model.includePModelId){
-          let subProcessModel = stage.getModelById(model.includePModelId)
-          if (subProcessModel){
-            if (!subProcessModel.isExpand){
-              return true
-            }else{
-              return DDeiUtil.isModelHidden(subProcessModel)
+    if (originalFunc.name != 'ddeiFlowModelHiddenProxy'){
+      return function ddeiFlowModelHiddenProxy() {
+        let model = arguments[0]
+        let hidden = originalFunc.apply(this, arguments);
+        if (!hidden){
+          let stage = model.stage
+          if(model.includePModelId){
+            let subProcessModel = stage.getModelById(model.includePModelId)
+            if (subProcessModel){
+              if (!subProcessModel.isExpand){
+                return true
+              }else{
+                return DDeiUtil.isModelHidden(subProcessModel)
+              }
+            }
+            
+          }else if(model.baseModelType == 'DDeiLine'){
+            let distLinks = stage.getDistModelLinks(model.id);
+            if (distLinks?.length == 2){
+              let hiddenOne = DDeiUtil.isModelHidden(distLinks[0].sm)
+              let hiddenTwo = DDeiUtil.isModelHidden(distLinks[1].sm)
+              return hiddenOne && hiddenTwo
             }
           }
-          
-        }else if(model.baseModelType == 'DDeiLine'){
-          let distLinks = stage.getDistModelLinks(model.id);
-          if (distLinks?.length == 2){
-            let hiddenOne = DDeiUtil.isModelHidden(distLinks[0].sm)
-            let hiddenTwo = DDeiUtil.isModelHidden(distLinks[1].sm)
-            return hiddenOne && hiddenTwo
-          }
         }
-      }
-      return hidden
-    };
+        return hidden
+      };
+    }else{
+      return originalFunc
+    }
   }
 
   createGetLineInitJSONProxy(originalFunc) {
-    return function proxy() {
-      let ddInstance = arguments[0]
-      let smodel = arguments[1]
-      let emodel = arguments[2]
-      if (ddInstance && smodel?.id && emodel?.id){
-        let startModel = ddInstance.stage.getModelById(smodel.id);
-        let endModel = ddInstance.stage.getModelById(emodel.id);
-        if (startModel){
-          //验证：1.开始连开始
-          if (startModel.bpmnType == "StartEvent") {
-            if (endModel.bpmnType == "StartEvent") {
-              return null
+    if (originalFunc.name != 'ddeiFlowGetLineInitJSONProxy') {
+      return function ddeiFlowGetLineInitJSONProxy() {
+        let ddInstance = arguments[0]
+        let smodel = arguments[1]
+        let emodel = arguments[2]
+        if (ddInstance && smodel?.id && emodel?.id){
+          let startModel = ddInstance.stage.getModelById(smodel.id);
+          let endModel = ddInstance.stage.getModelById(emodel.id);
+          if (startModel){
+            //验证：1.开始连开始
+            if (startModel.bpmnType == "StartEvent") {
+              if (endModel.bpmnType == "StartEvent") {
+                return null
+              }
+            }
+            else if (startModel.bpmnType == "EndEvent") {
+              if (endModel.bpmnType == "EndEvent") {
+                return null
+              }
+            }
+            //判断补偿和默认
+            
+            if ((startModel.bpmnType == 'EndEvent' && startModel.bpmnSubType == 7) 
+            || (startModel.bpmnType == 'IntermediateEvent' && (startModel.bpmnSubType == 28 || startModel.bpmnSubType == 29))
+              ||  (startModel.bpmnType == 'StartEvent' && startModel.bpmnSubType == 17) 
+            ) {
+              return {
+                modelCode: "1000601",
+                bpmnSubType: 5,
+                dash :[4, 4],
+                ep: { type: 1 }
+              }
             }
           }
-          else if (startModel.bpmnType == "EndEvent") {
-            if (endModel.bpmnType == "EndEvent") {
-              return null
-            }
-          }
-          //判断补偿和默认
-          
-          if ((startModel.bpmnType == 'EndEvent' && startModel.bpmnSubType == 7) 
-          || (startModel.bpmnType == 'IntermediateEvent' && (startModel.bpmnSubType == 28 || startModel.bpmnSubType == 29))
-            ||  (startModel.bpmnType == 'StartEvent' && startModel.bpmnSubType == 17) 
-          ) {
+
+          if (startModel?.bpmnType == 'Comment' || endModel?.bpmnType == 'Comment') {
+            //注释为协会、以及直线、无箭头
+            
             return {
               modelCode: "1000601",
               bpmnSubType: 5,
-              dash :[4, 4],
-              ep: { type: 1 }
+              dash: [4, 4],
+              sp : {type:0},
+              ep: {type:0},
+              type:1
             }
           }
-        }
-
-        if (startModel?.bpmnType == 'Comment' || endModel?.bpmnType == 'Comment') {
-          //注释为协会、以及直线、无箭头
           
-          return {
-            modelCode: "1000601",
-            bpmnSubType: 5,
-            dash: [4, 4],
-            sp : {type:0},
-            ep: {type:0},
-            type:1
-          }
         }
-        
-      }
-      return originalFunc.apply(this, arguments);
-    };
+        return originalFunc.apply(this, arguments);
+      };
+    }else{
+      return originalFunc
+    }
   }
 
   createGetModelInitJSONProxy(originalFunc) {
-    return function proxy() {
-      let ddInstance = arguments[0]
-      let model = arguments[1]
-      let createControls = arguments[2]
-      if (ddInstance && model && createControls?.length > 0){
-        
-        if ((model.bpmnType == 'EndEvent' && model.bpmnSubType == 7)
-          || (model.bpmnType == 'IntermediateEvent' && (model.bpmnSubType == 28 || model.bpmnSubType == 29))
-          || (model.bpmnType == 'StartEvent' && model.bpmnSubType == 17)
-        ) {
-          //增加补偿标志
-          createControls.forEach(c=>{
-            c.isCompensation = 1
-          });
-          return createControls;
+    if (originalFunc.name != 'ddeiFlowGetModelInitJSONProxy') {
+      return function ddeiFlowGetModelInitJSONProxy() {
+        let ddInstance = arguments[0]
+        let model = arguments[1]
+        let createControls = arguments[2]
+        if (ddInstance && model && createControls?.length > 0){
+          
+          if ((model.bpmnType == 'EndEvent' && model.bpmnSubType == 7)
+            || (model.bpmnType == 'IntermediateEvent' && (model.bpmnSubType == 28 || model.bpmnSubType == 29))
+            || (model.bpmnType == 'StartEvent' && model.bpmnSubType == 17)
+          ) {
+            //增加补偿标志
+            createControls.forEach(c=>{
+              c.isCompensation = 1
+            });
+            return createControls;
+          }
         }
-      }
-      return originalFunc.apply(this, arguments);
-    };
+        return originalFunc.apply(this, arguments);
+      };
+    }else{
+      return originalFunc
+    }
   }
 
-  
+  static modify(fn) {
+    return DDeiFlow.defaultIns.modify(fn)
+  }
 
   static configuration(options) {
     let core = new DDeiFlow(options);

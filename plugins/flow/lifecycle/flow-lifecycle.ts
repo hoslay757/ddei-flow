@@ -597,6 +597,10 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
     return DDeiFlowLifeCycle;
   }
 
+  static modify(fn) {
+    return DDeiFlowLifeCycle.defaultIns.modify(fn)
+  }
+
   mouseMoveInControl(operate, data, ddInstance, evt) {
     //循环每个models，验证是否为本插件的控件，只有本插件的控件才响应
     let models = data?.models

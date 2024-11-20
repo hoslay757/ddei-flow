@@ -51,6 +51,11 @@ class DDeiKeyActionCancelChooseActivity extends DDeiKeyAction {
     }
     return DDeiKeyActionCancelChooseActivity;
   }
+
+  static modify(fn) {
+    return DDeiKeyActionCancelChooseActivity.defaultIns.modify(fn)
+  }
+
   // ============================ 方法 ===============================
   action(evt: Event, ddInstance: DDei, editor: DDeiEditor): void {
     

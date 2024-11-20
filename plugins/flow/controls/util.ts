@@ -193,6 +193,7 @@ const lineObiCheck = function(model, param){
       let len = distLinks.length
       let includeModels = getIncludeModels(model)
       //如果线的开始点和结束点之一是本subprocess，则作为障碍物
+      
       for (let i = 0; i < len; i++) {
         if (!distLinks[i].disabled) {
           if (distLinks[i].sm == model) {
@@ -200,6 +201,16 @@ const lineObiCheck = function(model, param){
           }
           //如果线的开始和结束节点之一是subprocess的子元素，则本subprocess不作为寻路障碍物
           else if (includeModels.indexOf(distLinks[i].sm) != -1) {
+            return false
+          }
+          
+        }
+      }
+      //如果当前节点为sm子节点，也不纳入判断
+      if (model.includePModelId) {
+        let parentModels = getParentModels(model)
+        for (let i = 0; i < len; i++) {
+          if (!distLinks[i].disabled && parentModels.indexOf(distLinks[i].sm) != -1) {
             return false
           }
         }

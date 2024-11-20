@@ -10,7 +10,7 @@ class DDeiFlowSettingButtonDialog extends DDeiPluginBase{
   static defaultIns: DDeiFlowSettingButtonDialog = new DDeiFlowSettingButtonDialog({
     buttons: [
       {
-        id: 'ddei-flow-change-bpmnsubtype'
+        id: 'ddei-flow-edit-property'
       },
       {
         id: 'ddei-flow-choose-activity'
@@ -32,6 +32,10 @@ class DDeiFlowSettingButtonDialog extends DDeiPluginBase{
 
   getDialogs(editor){
     return this.plugins;
+  }
+
+  static modify(fn) {
+    return DDeiFlowSettingButtonDialog.defaultIns.modify(fn)
   }
 
   static configuration(options, fullConfig: boolean = false) {

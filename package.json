@@ -1,6 +1,6 @@
 {
   "name": "ddei-flow",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": false,
   "type": "module",
   "author": "hoslay <3697355039@qq.com>",
@@ -8,7 +8,6 @@
   "description": "ddei在线设计器的流程设计器插件，用于绘制流程图和显示流转过程。",
   "keywords": [
     "ddei-flow",
-    "Apache",
     "流程图",
     "BPMN",
     "流程监控",
@@ -16,7 +15,7 @@
     "ddei",
     "ddei-editor"
   ],
-  "homepage": "http://docs.ddei.top",
+  "homepage": "http://dflow.ddei.top",
   "repository": {
     "type": "git",
     "url": "https://gitee.com/hoslay/ddei-flow.git"
@@ -49,7 +48,7 @@
     "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
   },
   "dependencies": {
-    "ddei-editor": "file:///Users/hoslay/work/ddei/ddei-editor/ddei-editor-1.2.43-5.tgz",
+    "ddei-editor": "^1.2.43",
     "html2canvas": "^1.4.1"
   },
   "devDependencies": {

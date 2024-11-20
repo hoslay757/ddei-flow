@@ -1,6 +1,6 @@
 import DDeiFlowGraph from "./graph";
-import DDeiSubProcess from "./subprocess"
-import { clone, merge } from "lodash"
+import DDeiFlowSubProcess from "./subprocess"
+import {  merge } from "lodash"
 import { DDeiEnumBusCommandType } from "ddei-editor"
 import { DDeiFlowAPI } from "..";
 
@@ -65,7 +65,7 @@ class DDeiFlowNode {
   /**
    * 所有层级子流程，按照最外层到最里层的顺序排序
    */
-  subProcesses: DDeiSubProcess[];
+  subProcesses: DDeiFlowSubProcess[];
 
 
 

@@ -115,6 +115,10 @@ for ( i in inputArray ) {
     return this.plugins;
   }
 
+  static modify(fn) {
+    return DDeiFlowElementSettingDialog.defaultIns.modify(fn)
+  }
+
   static configuration(options, fullConfig: boolean = false) {
     //解析options，只使用自己相关的
     if (options) {
@@ -135,7 +139,7 @@ for ( i in inputArray ) {
         return panels;
       }
     }
-    return DDeiFlowElementSettingDialog;
+    return DDeiFlowElementSettingDialog.defaultIns;
   }
 }
 

@@ -512,10 +512,12 @@ class DDeiFlowAPI {
           let attachNodes = []
           model.attachModels?.forEach(amid => {
             let attachModel = this.modelsCache[amid]
-            let attachNode = graph.nodes.get(attachModel[this.jsonKeyField] ? attachModel[this.jsonKeyField] : attachModel.id)
-            
-            attachNode.attachPNode = node
-            attachNodes.push(attachNode)
+            if (attachModel) {
+              let attachNode = graph.nodes.get(attachModel[this.jsonKeyField] ? attachModel[this.jsonKeyField] : attachModel.id)
+              
+              attachNode.attachPNode = node
+              attachNodes.push(attachNode)
+            }
           });
           if (attachNodes.length > 0){
             node.attachNodes = attachNodes

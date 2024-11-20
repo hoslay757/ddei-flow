@@ -322,7 +322,7 @@
           </div>
         </div>
       </div>
-      <component v-if="item.viewer" :is="item.viewer" :editor="editor" :options="options" :model="model" v-bind="item">
+      <component v-if="item.viewer && validItemCondition(item) " :is="item.viewer" :editor="editor" :options="options" :model="model" v-bind="item">
       </component>
     </div>
   </div>
