@@ -1,7 +1,7 @@
 import DDeiFlowNode from "./node";
-import { merge } from "lodash"
+import { merge } from "ddei-editor"
 import { DDeiEnumBusCommandType } from "ddei-editor"
-import { DDeiFlowAPI } from "..";
+import { DDeiFlowAPI } from "./api";
 
 /**
  *DDeiFlowGroup表示图形设计器被解析后的一个分组

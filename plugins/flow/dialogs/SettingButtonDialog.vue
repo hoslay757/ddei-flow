@@ -44,7 +44,7 @@
 <script lang="ts">
 import { DDeiEditorUtil, DDeiUtil, DDeiConfig, DDeiLink, DDeiAbstractShape, DDeiEditorState } from "ddei-editor";
 import DialogBase from "./dialog"
-import { Matrix3, Vector3 } from "three"
+import { Matrix3, Vector3 } from "ddei-editor"
 import { getIncludeModels } from "../controls/util"
 
 export default {

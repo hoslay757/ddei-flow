@@ -1,7 +1,6 @@
 import { DDeiEditor, DDeiUtil, DDeiAbstractShape, DDeiStage, DDeiEnumBusCommandType, DDeiFile, DDeiActiveType, DDeiFileState } from "ddei-editor"
 import { DDeiEditorState, DDeiEditorEnumBusCommandType, DDeiEditorUtil } from "ddei-editor"
 import {getIncludeModels} from "../controls/util"
-import html2canvas from "html2canvas"
 import DDeiFlowFile from "./file"
 import DDeiFlowGraph from "./graph";
 import DDeiFlowNode from "./node";
@@ -9,7 +8,7 @@ import DDeiFlowGroup from "./group";
 import DDeiFlowSequence from "./sequence"
 import DDeiFlowSubProcess from "./subprocess"
 import DDeiFlowBpmnXmlNode from "./bpmnxmlnode"
-import { merge } from "lodash"
+import { merge } from "ddei-editor"
 /**
  * DDeiFlow插件的API方法包，提供了API以及工具函数
  * 初始化时挂载到editor的flow属性上
@@ -118,31 +117,31 @@ class DDeiFlowAPI {
           promiseArr.push(new Promise((resolve, reject) => {
             let loadImage = false
             if(model.render.viewer){
-              let domElement = this.editor.viewerMap.get(model.id).el
-              let cloneElements = this.toSimpleSvg(domElement)
-              html2canvas(domElement,{
-                useCORS: true,
-                scale: rat1,
-                quality: 1,
-                logging:false,
-                // foreignObjectRendering:true,
-                ignoreElements: e=>{
-                  if (e.className == 'markers'){
-                    return true
-                  }
-                  return false
-                },
-              }).then(canvas => {
-                imageMap[model.id] = new Image()
-                // 创建一个图片元素
-                imageMap[model.id].src = canvas.toDataURL("image/png");
-                imageMap[model.id].onload = () => {
-                  cloneElements.forEach(ce=>{
-                    ce.remove()
-                  })
-                  resolve()
-                }
-              });
+              // let domElement = this.editor.viewerMap.get(model.id).el
+              // let cloneElements = this.toSimpleSvg(domElement)
+              // html2canvas(domElement,{
+              //   useCORS: true,
+              //   scale: rat1,
+              //   quality: 1,
+              //   logging:false,
+              //   // foreignObjectRendering:true,
+              //   ignoreElements: e=>{
+              //     if (e.className == 'markers'){
+              //       return true
+              //     }
+              //     return false
+              //   },
+              // }).then(canvas => {
+              //   imageMap[model.id] = new Image()
+              //   // 创建一个图片元素
+              //   imageMap[model.id].src = canvas.toDataURL("image/png");
+              //   imageMap[model.id].onload = () => {
+              //     cloneElements.forEach(ce=>{
+              //       ce.remove()
+              //     })
+              //     resolve()
+              //   }
+              // });
               loadImage = true
             }else if(model.render.tempCanvas){
               imageMap[model.id] = new Image()
@@ -2102,5 +2101,5 @@ class DDeiFlowAPI {
   
 }
 
-export { DDeiFlowAPI }
+export { DDeiFlowAPI, DDeiFlowFile, DDeiFlowGraph, DDeiFlowGroup, DDeiFlowNode, DDeiFlowSequence, DDeiFlowSubProcess,DDeiFlowBpmnXmlNode }
 export default DDeiFlowAPI

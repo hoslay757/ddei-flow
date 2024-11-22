@@ -1,8 +1,8 @@
 import DDeiFlowGraph from "./graph";
 import DDeiFlowSubProcess from "./subprocess"
-import {  merge } from "lodash"
+import {  merge } from "ddei-editor"
 import { DDeiEnumBusCommandType } from "ddei-editor"
-import { DDeiFlowAPI } from "..";
+import { DDeiFlowAPI } from "./api";
 
 /**
  * DDeiFlowNode表示图形设计器被解析后的一个节点

@@ -1,4 +1,4 @@
-import { DDeiFlowAPI } from "..";
+import { DDeiFlowAPI } from "./api";
 import DDeiFlowGraph from "./graph"
 /**
  * DDeiFlowFile表示图形设计器被解析后的一个文件对象

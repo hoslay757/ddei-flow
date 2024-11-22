@@ -1,6 +1,6 @@
 {
   "name": "ddei-flow",
-  "version": "1.0.0",
+  "version": "1.0.1-1",
   "private": false,
   "type": "module",
   "author": "hoslay <3697355039@qq.com>",
@@ -48,12 +48,10 @@
     "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
   },
   "dependencies": {
-    "ddei-editor": "^1.2.43",
-    "html2canvas": "^1.4.1"
+    "ddei-editor": "file:///Users/hoslay/work/ddei/ddei-editor/ddei-editor-1.2.44-4.tgz"
   },
   "devDependencies": {
     "@tsconfig/node18": "^18.2.0",
-    "@types/lodash": "^4.14.197",
     "@types/node": "^18.17.6",
     "@vitejs/plugin-vue": "^4.2.3",
     "@vue/tsconfig": "^0.4.0",

@@ -1,5 +1,5 @@
 import DDeiFlowNode from "./node";
-import { merge } from "lodash"
+import { merge } from "ddei-editor"
 import { DDeiEnumBusCommandType } from "ddei-editor"
 
 /**

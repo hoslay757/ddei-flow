@@ -1,9 +1,9 @@
-import { DDeiFlowAPI } from "..";
+import { DDeiFlowAPI } from "./api";
 import DDeiFlowFile from "./file";
 import DDeiFlowGroup from "./group";
 import DDeiFlowNode from "./node";
-import DDeiEnumBusCommandType from "ddei-editor"
-import { clone, merge } from "lodash"
+import {DDeiEnumBusCommandType} from "ddei-editor"
+import { clone, merge } from "ddei-editor"
 
 /**
  * DDeiFlowGraph表示图形设计器被解析后的一个图形
