@@ -396,19 +396,18 @@ export default {
       let paths = [property];
     
 
-      this.editor.ddInstance.stage.selectedModels.forEach((element) => {
-        //推送信息进入总线
-        this.editor.bus.push(
-          DDeiEnumBusCommandType.ModelChangeValue,
-          {
-            mids: [element.id],
-            paths: paths,
-            value: model[property]
-          },
-          null,
-          true
-        );
-      });
+      //推送信息进入总线
+      this.editor.bus.push(
+        DDeiEnumBusCommandType.ModelChangeValue,
+        {
+          mids: [model.id],
+          paths: paths,
+          value: model[property]
+        },
+        null,
+        true
+      );
+      
       
       this.editor.bus.push(DDeiEditorEnumBusCommandType.RefreshEditorParts, {
         parts: ["topmenu"],
@@ -554,7 +553,7 @@ export default {
       this.model.render.enableRefreshShape()
       editor.bus.push(DDeiEnumBusCommandType.RefreshShape);
       editor.bus.executeAll();
-
+      DDeiUtil.invokeCallbackFunc("EVENT_CONTENT_CHANGE_AFTER", "CHANGE", null, this.editor.ddInstance)
 
     },
 
@@ -573,6 +572,7 @@ export default {
       } else {
         this.model.dataType = ds[this.dataTypeIndex].value
       }
+      DDeiUtil.invokeCallbackFunc("EVENT_CONTENT_CHANGE_AFTER", "CHANGE", null, this.editor.ddInstance)
     },
 
     /**
@@ -590,6 +590,7 @@ export default {
       } else {
         this.model.timeType = ds[this.timeTypeIndex].value
       }
+      DDeiUtil.invokeCallbackFunc("EVENT_CONTENT_CHANGE_AFTER", "CHANGE", null, this.editor.ddInstance)
     },
 
     /**
@@ -636,6 +637,7 @@ export default {
         }
       }
       this.refreshPointType()
+      DDeiUtil.invokeCallbackFunc("EVENT_CONTENT_CHANGE_AFTER", "CHANGE", null, this.editor.ddInstance)
     },
 
     /**
@@ -659,6 +661,7 @@ export default {
       this.model.render.enableRefreshShape()
       editor.bus.push(DDeiEnumBusCommandType.RefreshShape);
       editor.bus.executeAll();
+      DDeiUtil.invokeCallbackFunc("EVENT_CONTENT_CHANGE_AFTER", "CHANGE", null, this.editor.ddInstance)
     },
 
     /**
@@ -705,6 +708,7 @@ export default {
       this.model.render.enableRefreshShape()
       editor.bus.push(DDeiEnumBusCommandType.RefreshShape);
       editor.bus.executeAll();
+      DDeiUtil.invokeCallbackFunc("EVENT_CONTENT_CHANGE_AFTER", "CHANGE", null, this.editor.ddInstance)
     },
 
     /**
@@ -716,6 +720,7 @@ export default {
       this.model.render.enableRefreshShape()
       editor.bus.push(DDeiEnumBusCommandType.RefreshShape);
       editor.bus.executeAll();
+      DDeiUtil.invokeCallbackFunc("EVENT_CONTENT_CHANGE_AFTER", "CHANGE", null, this.editor.ddInstance)
     },
 
     /**
@@ -731,11 +736,13 @@ export default {
       if (label == 'displayView'){
         delete this.model.upActivityId
       }
+
       this.model.render.clearCachedValue()
       this.model.initPVS()
       this.model.render.enableRefreshShape()
       editor.bus.push(DDeiEnumBusCommandType.RefreshShape);
       editor.bus.executeAll();
+      DDeiUtil.invokeCallbackFunc("EVENT_CONTENT_CHANGE_AFTER", "CHANGE", null, this.editor.ddInstance)
     }
   }
 };
