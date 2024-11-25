@@ -86,9 +86,9 @@ for ( i in inputArray ) {
       {
         id: 'ddei-flow-change-linepointtype'
       },
-      {
-        id: 'ddei-flow-callactivity-review'
-      },
+      // {
+      //   id: 'ddei-flow-callactivity-review'
+      // },
       {
         id: 'ddei-flow-change-activity-labels'
       },
