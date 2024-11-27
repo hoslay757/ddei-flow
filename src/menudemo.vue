@@ -19,7 +19,7 @@ export default {
   methods: {
     test(){
       let flowAPI = this.editor.flow
-      console.log(flowAPI.toFlowObject())
+      console.log(flowAPI.toBPMNXML(false,true))
     }
   }
 };

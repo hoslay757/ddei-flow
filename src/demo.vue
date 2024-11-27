@@ -69,6 +69,7 @@ const options = markRaw({
         <documentation>测试案例1</documentation>
         <startEvent id="startEvent1" name="启动" flowable:initiator="INITIATOR" flowable:formFieldValidation="true"></startEvent>
         <userTask id="sqr" name="申请人" flowable:formFieldValidation="true">
+            <documentation>流程发起人</documentation>
             <extensionElements>
                 <modeler:initiator-can-complete
                     xmlns:modeler="http://flowable.org/modeler">
@@ -177,9 +178,244 @@ const options = markRaw({
     </bpmndi:BPMNDiagram>
 </definitions>`
 
+            bpmnXMLDemo = `<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions id="6ec8a74c8a8367f98fd759dc33c274b1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="stage_1" isExecutable="true">
+   <bpmn:startEvent id="start_6"/>
+   <bpmn:userTask id="user_task_8">
+    <bpmn:incoming>line_9</bpmn:incoming>
+    <bpmn:outgoing>line_11</bpmn:outgoing>
+   </bpmn:userTask>
+   <bpmn:sequenceFlow id="line_9" sourceRef="start_6" targetRef="user_task_8"/>
+   <bpmn:scriptTask id="script_1" isForCompensation="true">
+    <bpmn:documentation><![CDATA[123123]]></bpmn:documentation>
+    <bpmn:incoming>line_11</bpmn:incoming>
+    <bpmn:outgoing>line_13</bpmn:outgoing>
+    <bpmn:outgoing>line_55</bpmn:outgoing>
+    <bpmn:multiInstanceLoopCharacteristics>
+     <bpmn:loopCardinality xsi:type="bpmn:tFormalExpression">2</bpmn:loopCardinality>
+    </bpmn:multiInstanceLoopCharacteristics>
+   </bpmn:scriptTask>
+   <bpmn:sequenceFlow id="line_11" sourceRef="user_task_8" targetRef="script_1"/>
+   <bpmn:parallelGateway id="parallel_gateway_12">
+    <bpmn:incoming>line_13</bpmn:incoming>
+    <bpmn:outgoing>line_20</bpmn:outgoing>
+    <bpmn:outgoing>line_28</bpmn:outgoing>
+    <bpmn:outgoing>line_30</bpmn:outgoing>
+   </bpmn:parallelGateway>
+   <bpmn:sequenceFlow id="line_13" sourceRef="script_1" targetRef="parallel_gateway_12"/>
+   <bpmn:transaction id="subprocess_16">
+    <bpmn:startEvent id="start_18"/>
+    <bpmn:userTask id="user_task_21"/>
+    <bpmn:userTask id="user_task_23"/>
+    <bpmn:endEvent id="end_25"/>
+   </bpmn:transaction>
+   <bpmn:sequenceFlow id="line_20" sourceRef="parallel_gateway_12" targetRef="subprocess_16"/>
+   <bpmn:sequenceFlow id="line_22" sourceRef="start_18" targetRef="user_task_21"/>
+   <bpmn:sequenceFlow id="line_24" sourceRef="user_task_21" targetRef="user_task_23"/>
+   <bpmn:sequenceFlow id="line_26" sourceRef="user_task_23" targetRef="end_25"/>
+   <bpmn:userTask id="user_task_27">
+    <bpmn:incoming>line_28</bpmn:incoming>
+    <bpmn:outgoing>line_37</bpmn:outgoing>
+    <bpmn:outgoing>line_62</bpmn:outgoing>
+   </bpmn:userTask>
+   <bpmn:sequenceFlow id="line_28" sourceRef="parallel_gateway_12" targetRef="user_task_27"/>
+   <bpmn:userTask id="user_task_29">
+    <bpmn:incoming>line_30</bpmn:incoming>
+    <bpmn:outgoing>line_39</bpmn:outgoing>
+   </bpmn:userTask>
+   <bpmn:sequenceFlow id="line_30" sourceRef="parallel_gateway_12" targetRef="user_task_29"/>
+   <bpmn:complexGateway id="complex_gateway_33">
+    <bpmn:incoming>line_36</bpmn:incoming>
+    <bpmn:incoming>line_37</bpmn:incoming>
+    <bpmn:incoming>line_40</bpmn:incoming>
+    <bpmn:outgoing>line_42</bpmn:outgoing>
+   </bpmn:complexGateway>
+   <bpmn:sequenceFlow id="line_36" sourceRef="subprocess_16" targetRef="complex_gateway_33"/>
+   <bpmn:sequenceFlow id="line_37" sourceRef="user_task_27" targetRef="complex_gateway_33"/>
+   <bpmn:scriptTask id="script_task_38">
+    <bpmn:incoming>line_39</bpmn:incoming>
+    <bpmn:outgoing>line_40</bpmn:outgoing>
+   </bpmn:scriptTask>
+   <bpmn:sequenceFlow id="line_39" sourceRef="user_task_29" targetRef="script_task_38"/>
+   <bpmn:sequenceFlow id="line_40" sourceRef="script_task_38" targetRef="complex_gateway_33"/>
+   <bpmn:endEvent id="end_41"/>
+   <bpmn:sequenceFlow id="line_42" sourceRef="complex_gateway_33" targetRef="end_41"/>
+   <bpmn:boundaryEvent id="boundaryevent_43" cancelActivity="true" attachedToRef="script_1">
+    <bpmn:errorEventDefinition />
+   </bpmn:boundaryEvent>
+   <bpmn:subProcess id="subprocess_45" name="补偿" triggeredByEvent="true">
+    <bpmn:scriptTask id="script_task_47" name="补偿脚本"/>
+    <bpmn:scriptTask id="script_task_50" name="补偿脚本"/>
+   </bpmn:subProcess>
+   <bpmn:sequenceFlow id="line_49" sourceRef="boundaryevent_43" targetRef="subprocess_45"/>
+   <bpmn:sequenceFlow id="line_52" sourceRef="script_task_47" targetRef="script_task_50"/>
+   <bpmn:textAnnotation id="comment_53">
+     <bpmn:text>自动执行脚本</bpmn:text>
+   </bpmn:textAnnotation>
+   <bpmn:association id="line_55" targetRef="comment_53" sourceRef="script_1" associationDirection="None"/>
+   <bpmn:dataObject id="data_56" name="数据" itemSubjectRef="xsd:string"/>
+   <bpmn:task id="lsm_57"/>
+   <bpmn:dataStore id="ds_59" name="数据存储"/>
+   <bpmn:task id="lsm_60"/>
+   <bpmn:association id="line_62" sourceRef="user_task_27" targetRef="ds_59" associationDirection="None"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="Diagram_6ec8a74c8a8367f98fd759dc33c274b1">
+   <bpmndi:BPMNPlane id="Plane_stage_1" bpmnElement="stage_1">
+    <bpmndi:BPMNShape id="start_6_id" bpmnElement="start_6">
+     <dc:Bounds x="636.5198768402898" y="1551.4017666040695" width="39.9996163981607" height="39.99961639816047"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="user_task_8_id" bpmnElement="user_task_8">
+     <dc:Bounds x="736.5194932384507" y="1536.4015748031497" width="109.99999999999977" height="70"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNEdge id="line_9_id" bpmnElement="line_9">
+      <di:waypoint x="676.5194932384505" y="1571.4015748031497"/>
+      <di:waypoint x="736.5194932384505" y="1571.4015748031497"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNShape id="script_1_id" bpmnElement="script_1">
+     <dc:Bounds x="906.5194932384503" y="1536.4015748031497" width="110.00000000000023" height="70"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNEdge id="line_11_id" bpmnElement="line_11">
+      <di:waypoint x="846.5194932384505" y="1571.4015748031497"/>
+      <di:waypoint x="906.5194932384503" y="1571.4015748031497"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNShape id="parallel_gateway_12_id" bpmnElement="parallel_gateway_12">
+     <dc:Bounds x="1076.5194932384507" y="1546.4015748031497" width="50" height="50"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNEdge id="line_13_id" bpmnElement="line_13">
+      <di:waypoint x="1016.5194932384505" y="1571.4015748031497"/>
+      <di:waypoint x="1076.5194932384507" y="1571.4015748031497"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNShape id="subprocess_16_id" bpmnElement="subprocess_16">
+     <dc:Bounds x="1205.519685039371" y="1430" width="406.99999999999864" height="283"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="start_18_id" bpmnElement="start_18">
+     <dc:Bounds x="1210.5198768402897" y="1551.5001918009198" width="39.99961639816047" height="39.99961639816047"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="user_task_21_id" bpmnElement="user_task_21">
+     <dc:Bounds x="1284.5194932384502" y="1536.5" width="110" height="70"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="user_task_23_id" bpmnElement="user_task_23">
+     <dc:Bounds x="1420.0196850393704" y="1536.5" width="110" height="70"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="end_25_id" bpmnElement="end_25">
+     <dc:Bounds x="1565.0196850393704" y="1551.5001918009198" width="39.99961639816047" height="39.99961639816047"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNEdge id="line_20_id" bpmnElement="line_20">
+      <di:waypoint x="1126.5194932384507" y="1571.4015748031497"/>
+      <di:waypoint x="1205.5196850393709" y="1571.5"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="line_22_id" bpmnElement="line_22">
+      <di:waypoint x="1250.5194932384502" y="1571.5"/>
+      <di:waypoint x="1284.5194932384502" y="1571.5"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="line_24_id" bpmnElement="line_24">
+      <di:waypoint x="1394.5194932384502" y="1571.5"/>
+      <di:waypoint x="1420.0196850393704" y="1571.5"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="line_26_id" bpmnElement="line_26">
+      <di:waypoint x="1530.0196850393704" y="1571.5"/>
+      <di:waypoint x="1565.0196850393704" y="1571.5"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNShape id="user_task_27_id" bpmnElement="user_task_27">
+     <dc:Bounds x="1205.5196850393709" y="1300.4015748031497" width="109.99999999999955" height="70"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNEdge id="line_28_id" bpmnElement="line_28">
+      <di:waypoint x="1101.5194932384507" y="1546.4015748031497"/>
+      <di:waypoint x="1101.5194932384507" y="1335.4015748031497"/>
+      <di:waypoint x="1205.5196850393709" y="1335.4015748031497"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNShape id="user_task_29_id" bpmnElement="user_task_29">
+     <dc:Bounds x="1205.5196850393709" y="1761.4015748031497" width="109.99999999999955" height="70"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNEdge id="line_30_id" bpmnElement="line_30">
+      <di:waypoint x="1101.5194932384507" y="1596.4015748031497"/>
+      <di:waypoint x="1101.5194932384507" y="1796.4015748031497"/>
+      <di:waypoint x="1205.5196850393704" y="1796.4015748031497"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNShape id="complex_gateway_33_id" bpmnElement="complex_gateway_33">
+     <dc:Bounds x="1652.4864532214024" y="1546.4015748031497" width="50.00000000000091" height="50"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNEdge id="line_36_id" bpmnElement="line_36">
+      <di:waypoint x="1612.51968503937" y="1571.5"/>
+      <di:waypoint x="1652.4864532214037" y="1571.4015748031497"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="line_37_id" bpmnElement="line_37">
+      <di:waypoint x="1315.51968503937" y="1335.4015748031497"/>
+      <di:waypoint x="1677.4864532214028" y="1335.4015748031497"/>
+      <di:waypoint x="1677.4864532214028" y="1546.4015748031497"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNShape id="script_task_38_id" bpmnElement="script_task_38">
+     <dc:Bounds x="1375.5196850393706" y="1761.4015748031497" width="109.99999999999955" height="70"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNEdge id="line_39_id" bpmnElement="line_39">
+      <di:waypoint x="1315.51968503937" y="1796.4015748031497"/>
+      <di:waypoint x="1375.5196850393704" y="1796.4015748031497"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="line_40_id" bpmnElement="line_40">
+      <di:waypoint x="1485.5196850393704" y="1796.4015748031497"/>
+      <di:waypoint x="1677.4864532214028" y="1796.4015748031497"/>
+      <di:waypoint x="1677.4864532214028" y="1596.4015748031497"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNShape id="end_41_id" bpmnElement="end_41">
+     <dc:Bounds x="1762.4864532214042" y="1551.4017666040695" width="39.99961639815956" height="39.99961639816047"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNEdge id="line_42_id" bpmnElement="line_42">
+      <di:waypoint x="1702.4864532214024" y="1571.4015748031497"/>
+      <di:waypoint x="1762.4864532214037" y="1571.4015748031497"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNShape id="boundaryevent_43_id" bpmnElement="boundaryevent_43">
+     <dc:Bounds x="947.4039550755106" y="1592.2860366402099" width="28.231076325879712" height="28.231076325879712"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="subprocess_45_id" bpmnElement="subprocess_45">
+     <dc:Bounds x="849.0194932384503" y="1680.4015748031497" width="225.00000000000034" height="151"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="script_task_47_id" bpmnElement="script_task_47">
+     <dc:Bounds x="863.0194932384504" y="1722.1515748031497" width="87" height="67.5"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="script_task_50_id" bpmnElement="script_task_50">
+     <dc:Bounds x="973.0194932384507" y="1722.1515748031497" width="87" height="67.5"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNEdge id="line_49_id" bpmnElement="line_49">
+      <di:waypoint x="961.5194932384504" y="1620.517248336048"/>
+      <di:waypoint x="961.5194932384504" y="1680.4015748031497"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="line_52_id" bpmnElement="line_52">
+      <di:waypoint x="950.0194932384504" y="1755.9015748031497"/>
+      <di:waypoint x="973.0194932384507" y="1755.9015748031497"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNShape id="comment_53_id" bpmnElement="comment_53">
+     <dc:Bounds x="932.7694932384505" y="1429.9015748031497" width="105.50000000000011" height="40.25"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNEdge id="line_55_id" bpmnElement="line_55">
+     <di:waypoint x="961.5194932384504" y="1536.4015748031497"/>
+     <di:waypoint x="985.5194932384505" y="1470.1515748031497"/>
+    </bpmndi:BPMNEdge>
+    <bpmndi:BPMNShape id="data_56_id" bpmnElement="data_56">
+     <dc:Bounds x="1089.903859175051" y="1370.9015748031497" width="23.231268126799478" height="25.5"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="lsm_57_id" bpmnElement="lsm_57">
+     <dc:Bounds x="1077.0194932384507" y="1396.4015748031497" width="49" height="17.25"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="ds_59_id" bpmnElement="ds_59">
+     <dc:Bounds x="1332.0196850393697" y="1241.4265748031498" width="50.000000000000455" height="37.19999999999982"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="lsm_60_id" bpmnElement="lsm_60">
+     <dc:Bounds x="1332.5196850393697" y="1278.6265748031497" width="49.000000000000455" height="17.25"/>
+    </bpmndi:BPMNShape>
+    <bpmndi:BPMNEdge id="line_62_id" bpmnElement="line_62">
+     <di:waypoint x="1272.7507613652501" y="1300.4015748031497"/>
+     <di:waypoint x="1332.0196850393704" y="1260.0265748031497"/>
+    </bpmndi:BPMNEdge>
+   </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>`
+
             //获取流程API
             let flowAPI = editor.flow
-            console.log(bpmnXMLDemo)
+            flowAPI.setJsonKeyField("code");
+            flowAPI.loadFromBpmnXML(bpmnXMLDemo)
           }
         },
         {
@@ -260,5 +496,5 @@ const options = markRaw({
 </script>
 
 <template>
-    <DDeiEditorView ref="ddei_editor_1" :options="options" id="ddei_editor_1"></DDeiEditorView>
+  <DDeiEditorView ref="ddei_editor_1" :options="options" id="ddei_editor_1"></DDeiEditorView>
 </template>

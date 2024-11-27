@@ -1,4 +1,4 @@
-import { DDeiEditor, DDeiUtil, DDeiAbstractShape, DDeiStage, DDeiEnumBusCommandType, DDeiFile, DDeiActiveType, DDeiFileState } from "ddei-editor"
+import { DDeiSheet,DDeiEditor, DDeiUtil, DDeiAbstractShape, DDeiStage, DDeiEnumBusCommandType, DDeiFile, DDeiActiveType, DDeiFileState } from "ddei-editor"
 import { DDeiEditorState, DDeiEditorEnumBusCommandType, DDeiEditorUtil } from "ddei-editor"
 import {getIncludeModels} from "../controls/util"
 import DDeiFlowFile from "./file"
@@ -9,6 +9,7 @@ import DDeiFlowSequence from "./sequence"
 import DDeiFlowSubProcess from "./subprocess"
 import DDeiFlowBpmnXmlNode from "./bpmnxmlnode"
 import { merge } from "ddei-editor"
+import { xml2graph } from "./request"
 /**
  * DDeiFlow插件的API方法包，提供了API以及工具函数
  * 初始化时挂载到editor的flow属性上
@@ -264,6 +265,73 @@ class DDeiFlowAPI {
     }
   }
 
+
+  /**
+   * 通过BpmnXML加载并刷新流程图
+   * @param designJson 设计器json
+   * @param dataJson 数据json
+   */
+  loadFromBpmnXML(xml: string,ratio:number = 1):void {
+    if (xml){
+      xml2graph(xml,(res)=>{
+        
+        if(res.status == 200){
+          try{
+            let data = eval(res.data);
+            
+            if (data.state == 'success' && data.graphs.length > 0){
+              //生成流程图
+              let graph = data.graphs[0];
+              let ddInstance = this.editor.ddInstance;
+              //清空已有的数据
+              ddInstance.stage?.destroyRender()
+
+              let file = this.editor.files[this.editor.currentFileIndex];
+              let sheet = file.sheets[file.currentSheetIndex];
+              sheet.name = graph.name
+              sheet.desc = graph.desc
+              let stage = DDeiStage.initByJSON({ id: graph.id, ratio: ratio }, { currentDdInstance: ddInstance })
+              sheet.stage = stage;
+
+              //刷新页面  
+              ddInstance.stage = stage;
+              //加载场景渲染器
+              stage.initRender();
+
+              graph.controls.forEach(control => {
+                if (!control[this.jsonKeyField]){
+                  control[this.jsonKeyField] = control.id
+                }
+              });
+              
+              this.editor.addControls(graph.controls, true, false)
+        
+              this.editor.addLines(graph.lines)
+              
+
+              
+      
+              this.editor.changeState(DDeiEditorState.DESIGNING);
+              ddInstance.bus.push(
+                DDeiEditorEnumBusCommandType.ClearTemplateUI
+              );
+              ddInstance.bus.push(
+                DDeiEditorEnumBusCommandType.RefreshEditorParts
+              );
+              ddInstance?.bus?.push(DDeiEnumBusCommandType.RefreshShape);
+              ddInstance?.bus?.executeAll();
+                
+              DDeiEditorUtil.invokeCallbackFunc("EVENT_ADD_FILE_AFTER", "LOAD_FILE", { file: file }, this.editor.ddInstance)
+              
+            }
+          }catch(e){
+            console.error(e)
+          }
+        }
+        
+      })
+    }
+  }
   /**
    * 加载并刷新流程图
    * @param designJson 设计器json
@@ -945,13 +1013,13 @@ class DDeiFlowAPI {
         tabStr += " "
       }
       if (node) {
-        contentStr += tabStr +'<bpmn:startEvent id="' + node.id + '"'
+        contentStr += tabStr + '<bpmn:startEvent id="' + (node[this.jsonKeyField] ? node[this.jsonKeyField] : node.id) + '"'
         if (node.name) {
           contentStr += 'name="' + node.name + '"'
         }
         //依附的taskid
-        if (node.attachPModel) {
-          contentStr += ' attachedToRef="' + node.attachPModel + '"'
+        if (node.attachPNode) {
+          contentStr += ' attachedToRef="' + (node.attachPNode[this.jsonKeyField] ? node.attachPNode[this.jsonKeyField] : node.attachPNode.id) + '"'
         }
 
         if (node.bpmnSubType != 9 && node.notInterrupting) {
@@ -1044,7 +1112,7 @@ class DDeiFlowAPI {
         tabStr += " "
       }
       if (node) {
-        contentStr += tabStr + '<bpmn:boundaryEvent id="' + node.id + '"'
+        contentStr += tabStr + '<bpmn:boundaryEvent id="' + (node[this.jsonKeyField] ? node[this.jsonKeyField] : node.id) + '"'
         if (node.name) {
           contentStr += 'name="' + node.name + '"'
         }
@@ -1055,15 +1123,16 @@ class DDeiFlowAPI {
         } else {
           contentStr += ' cancelActivity="true"'
         }
+        
         //依附的taskid
-        if (node.attachPModel){
-          contentStr += ' attachedToRef="' + node.attachPModel +'"'
+        if (node.attachPNode){
+          contentStr += ' attachedToRef="' + (node.attachPNode[this.jsonKeyField] ? node.attachPNode[this.jsonKeyField] : node.attachPNode.id) +'"'
         }
 
         let childXML = ''
         //消息
         if (!node.bpmnSubType || node.bpmnSubType == 1) {
-          defineStr += '  <bpmn:message id="' + node.id + '_msg" name="' + (node.messageName ? node.messageName : '') + '" />\n'
+          defineStr += '  <bpmn:message id="' + (node[this.jsonKeyField] ? node[[this.jsonKeyField]] : node.id) + '_msg" name="' + (node.messageName ? node.messageName : '') + '" />\n'
           childXML += tabStr + ' <bpmn:messageEventDefinition messageRef="' + node.id + '_msg" />\n'
           
         }
@@ -1388,7 +1457,11 @@ class DDeiFlowAPI {
           nodeTag = "bpmn:callActivity"
         } else if (node.bpmnType == 'ChoreographyTask') {
           nodeTag = "bpmn:choreography"
+        } else if (node.bpmnType == 'BusinessTask') {
+          nodeTag = "bpmn:businessRuleTask"
         }
+
+        
         contentStr += tabStr + '<' + nodeTag + ' id="' + (node[this.jsonKeyField] ? node[this.jsonKeyField] : node.id) + '"'
         if (node.name) {
           contentStr += ' name="' + node.name + '"'
@@ -1768,7 +1841,7 @@ class DDeiFlowAPI {
           childXML = currentProcessStr + childXML
         }
         if (childXML) {
-          contentStr += '>\n' + childXML + tabStr + '<' + nodeTag +'/>\n'
+          contentStr += '>\n' + childXML + tabStr + '</' + nodeTag +'>\n'
         } else {
           contentStr += '/>\n'
         }
@@ -2025,6 +2098,14 @@ class DDeiFlowAPI {
             let nodeModel = this.modelsCache[node.id];
             let childXML = tabStr + ' <dc:Bounds x="' + nodeModel.essBounds.x + '" y="' + nodeModel.essBounds.y + '" width="' + nodeModel.essBounds.width + '" height="' + nodeModel.essBounds.height+'"/>\n'
             returnStr += '>\n' + childXML + tabStr + '</' + nodeTag + '>\n'
+            if (node.bpmnType == 'SubProcess') {
+              node.nodes.forEach(subNode => {
+                let nodeXML = this.node2BPMNDIXML(subNode, 4)
+                if (nodeXML) {
+                  returnStr += nodeXML
+                }
+              })
+            }
           }
         }
         return returnStr;

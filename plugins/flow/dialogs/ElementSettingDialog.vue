@@ -907,6 +907,11 @@ export default {
           input {
             width: 95%;
             height: 18px;
+            background: white;
+            &::placeholder {
+              color: grey;
+              
+            }
           }
         }
 
@@ -933,6 +938,10 @@ export default {
           text-align: left;
 
           textarea {
+            background: white;
+            &::placeholder{
+              color:grey;
+            }
             width: 95%;
             height: 55px;
           }
