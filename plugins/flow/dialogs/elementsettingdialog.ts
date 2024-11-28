@@ -75,6 +75,9 @@ for ( i in inputArray ) {
         id: 'ddei-flow-signal-setting'
       },
       {
+        id: 'ddei-flow-escal-setting'
+      },
+      {
         id: 'ddei-flow-error-setting'
       },
       {

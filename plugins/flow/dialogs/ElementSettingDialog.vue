@@ -114,6 +114,17 @@
           </div>
         </div>
         <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-escal-setting' && ((model.bpmnType == 'StartEvent' && model.bpmnSubType == 8) || (model.bpmnType == 'EndEvent' && model.bpmnSubType == 5) || (model.bpmnType == 'BoundaryEvent' && model.bpmnSubType == 7) || (model.bpmnType == 'IntermediateThrowEvent' && model.bpmnSubType == 6)) && validItemCondition(item)">
+          <div class="change-property-text" :title="item.desc">
+            <div class="change-property-text-title">
+              {{ editor.i18n('ddei.flow.escalation') }}
+            </div>
+            <div class="change-property-text-input">
+              <input v-model="model.escalName" :placeholder="editor.i18n('ddei.flow.escalname')">
+            </div>
+          </div>
+        </div>
+        <div class="row"
           v-if="!item.viewer && item.id == 'ddei-flow-error-setting' && ((model.bpmnType == 'StartEvent' && model.bpmnSubType == 9) || (model.bpmnType == 'IntermediateEvent' && model.bpmnSubType == 27) || (model.bpmnType == 'EndEvent' && model.bpmnSubType == 6) || (model.bpmnType == 'BoundaryEvent' && model.bpmnSubType == 4)) && validItemCondition(item)">
           <div class="change-property-text" :title="item.desc">
             <div class="change-property-text-title">
@@ -125,7 +136,7 @@
           </div>
         </div>
         <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-condition-setting' && (model.bpmnBaseType == 'Sequence' && model.bpmnSubType == 2) && validItemCondition(item)">
+          v-if="!item.viewer && item.id == 'ddei-flow-condition-setting' && ((model.bpmnBaseType == 'Sequence' && model.bpmnSubType == 2) || (model.bpmnType == 'StartEvent' && model.bpmnSubType == 4) || (model.bpmnType == 'StartEvent' && model.bpmnSubType == 4) ) && validItemCondition(item)">
           <div class="change-property-text" :title="item.desc">
             <div class="change-property-text-title">
               {{ editor.i18n('ddei.flow.condition') }}
@@ -223,7 +234,7 @@
           </div>
         </div>
         <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnBaseType == 'Activity'">
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && (model.bpmnType == 'SubProcess' || model.bpmnType == 'ChoreographySubProcess')">
           <div class="change-bpmn-marker" @click="changeBpmnLabel('isLoop')">
             <div :class="{ 'chk_state': model?.isLoop != 1, 'chk_state_checked': model?.isLoop == 1 }">
               <span>{{ model?.isLoop == 1 ? '✓' :''}}</span>
@@ -243,7 +254,7 @@
           </div>
         </div>
         <div class="row"
-          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model.multiInstance">
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && (model.multiInstance || (model.bpmnType == 'StartEvent' && model.bpmnSubType == 6) || (model.bpmnType == 'BoundaryEvent' && model.bpmnSubType == 9) || (model.bpmnType == 'EndEvent' && model.bpmnSubType == 4) || (model.bpmnType == 'IntermediateCatchEvent' && model.bpmnSubType == 6) || (model.bpmnType == 'IntermediateThrowEvent' && model.bpmnSubType == 5))">
           <div class="change-property-text" :title="item.desc">
             <div class="change-property-text-title">
               {{ editor.i18n('ddei.flow.insnum') }}
@@ -262,70 +273,73 @@
             {{ editor.i18n('ddei.flow.parallel') }}
           </div>
         </div>
-        <div class="row" v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model.bpmnType == 'ChoreographySubProcess'">
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model.bpmnType == 'ChoreographySubProcess'">
           <div class=" change-bpmn-marker" @click="changeBpmnLabel('isAdHoc')">
-          <div :class="{ 'chk_state': model?.isAdHoc != 1, 'chk_state_checked': model?.isAdHoc == 1 }">
-            <span>{{ model?.isAdHoc == 1 ? '✓' : '' }}</span>
+            <div :class="{ 'chk_state': model?.isAdHoc != 1, 'chk_state_checked': model?.isAdHoc == 1 }">
+              <span>{{ model?.isAdHoc == 1 ? '✓' : '' }}</span>
+            </div>
+            {{ editor.i18n('ddei.flow.property.custom') }}
           </div>
-          {{ editor.i18n('ddei.flow.property.custom') }}
         </div>
-      </div>
-      <div class="row"
-        v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && ((model.bpmnType == 'BoundaryEvent' && (model.bpmnSubType == 1 || !model.bpmnSubType || model.bpmnSubType == 2 || model.bpmnSubType == 7 || model.bpmnSubType == 8 || model.bpmnSubType == 9)) || (model.bpmnType == 'StartEvent' && (model.bpmnSubType >= 2 && model.bpmnSubType <=8) || model.bpmnSubType == 10))">
-        <div class="change-bpmn-marker" @click="changeBpmnLabel('notInterrupting')">
-          <div :class="{ 'chk_state': model?.notInterrupting != 1, 'chk_state_checked': model?.notInterrupting == 1 }">
-            <span>{{ model?.notInterrupting == 1 ? '✓' : '' }}</span>
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && ((model.bpmnType == 'BoundaryEvent' && (model.bpmnSubType == 1 || !model.bpmnSubType || model.bpmnSubType == 2 || model.bpmnSubType == 7 || model.bpmnSubType == 8 || model.bpmnSubType == 9)) || (model.bpmnType == 'StartEvent' && (model.bpmnSubType >= 2 && model.bpmnSubType <=8) || model.bpmnSubType == 10))">
+          <div class="change-bpmn-marker" @click="changeBpmnLabel('notInterrupting')">
+            <div
+              :class="{ 'chk_state': model?.notInterrupting != 1, 'chk_state_checked': model?.notInterrupting == 1 }">
+              <span>{{ model?.notInterrupting == 1 ? '✓' : '' }}</span>
+            </div>
+            {{ editor.i18n('ddei.flow.notInterrupting') }}
           </div>
-          {{ editor.i18n('ddei.flow.notInterrupting') }}
         </div>
-      </div>
-      <div class="row"
-        v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnBaseType == 'Activity'">
-        <div class="change-bpmn-marker" @click="changeBpmnLabel('isCompensation')">
-          <div :class="{ 'chk_state': model?.isCompensation != 1, 'chk_state_checked': model?.isCompensation == 1 }">
-            <span>{{ model?.isCompensation == 1 ? '✓' : '' }}</span>
-          </div>
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnBaseType == 'Activity'">
+          <div class="change-bpmn-marker" @click="changeBpmnLabel('isCompensation')">
+            <div :class="{ 'chk_state': model?.isCompensation != 1, 'chk_state_checked': model?.isCompensation == 1 }">
+              <span>{{ model?.isCompensation == 1 ? '✓' : '' }}</span>
+            </div>
 
-          {{ editor.i18n('ddei.flow.compensation') }}
-        </div>
-      </div>
-      <div class="row"
-        v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnType == 'DataObject'">
-        <div class="change-bpmn-marker" @click="changeBpmnLabel('isCollection')">
-          <div :class="{ 'chk_state': model?.isCollection != 1, 'chk_state_checked': model?.isCollection == 1 }">
-            <span>{{ model?.isCollection == 1 ? '✓' : '' }}</span>
-          </div>
-          {{ editor.i18n('ddei.flow.datacoll') }}
-        </div>
-      </div>
-      <div class="row" v-if="!item.viewer && item.id == 'ddei-flow-property-editor-text' && validItemCondition(item)">
-        <div class="change-property-text" :title="item.desc">
-          <div class="change-property-text-title">
-            {{ editor.i18n(item.label) }}
-          </div>
-          <div class="change-property-text-input">
-            <input v-model="model[item.property]" @change="modelChangeProperty(model,item.property)"
-              :placeholder="editor.i18n(item.desc)">
+            {{ editor.i18n('ddei.flow.compensation') }}
           </div>
         </div>
-      </div>
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-change-activity-labels' && validItemCondition(item) && model?.bpmnType == 'DataObject'">
+          <div class="change-bpmn-marker" @click="changeBpmnLabel('isCollection')">
+            <div :class="{ 'chk_state': model?.isCollection != 1, 'chk_state_checked': model?.isCollection == 1 }">
+              <span>{{ model?.isCollection == 1 ? '✓' : '' }}</span>
+            </div>
+            {{ editor.i18n('ddei.flow.datacoll') }}
+          </div>
+        </div>
+        <div class="row" v-if="!item.viewer && item.id == 'ddei-flow-property-editor-text' && validItemCondition(item)">
+          <div class="change-property-text" :title="item.desc">
+            <div class="change-property-text-title">
+              {{ editor.i18n(item.label) }}
+            </div>
+            <div class="change-property-text-input">
+              <input v-model="model[item.property]" @change="modelChangeProperty(model,item.property)"
+                :placeholder="editor.i18n(item.desc)">
+            </div>
+          </div>
+        </div>
 
-      <div class="row"
-        v-if="!item.viewer && item.id == 'ddei-flow-property-editor-textarea' && validItemCondition(item) ">
-        <div class="change-property-textarea" :title="item.desc">
-          <div class="change-property-textarea-title">
-            {{ editor.i18n(item.label) }}
-          </div>
-          <div class="change-property-textarea-input">
-            <textarea v-model="model[item.property]" @change="modelChangeProperty(model, item.property)"
-              :placeholder="editor.i18n(item.desc) "></textarea>
+        <div class="row"
+          v-if="!item.viewer && item.id == 'ddei-flow-property-editor-textarea' && validItemCondition(item) ">
+          <div class="change-property-textarea" :title="item.desc">
+            <div class="change-property-textarea-title">
+              {{ editor.i18n(item.label) }}
+            </div>
+            <div class="change-property-textarea-input">
+              <textarea v-model="model[item.property]" @change="modelChangeProperty(model, item.property)"
+                :placeholder="editor.i18n(item.desc) "></textarea>
+            </div>
           </div>
         </div>
+        <component v-if="item.viewer && validItemCondition(item) " :is="item.viewer" :editor="editor" :options="options"
+          :model="model" v-bind="item">
+        </component>
       </div>
-      <component v-if="item.viewer && validItemCondition(item) " :is="item.viewer" :editor="editor" :options="options" :model="model" v-bind="item">
-      </component>
     </div>
-  </div>
   </div>
 </template>
 
@@ -908,6 +922,7 @@ export default {
             width: 95%;
             height: 18px;
             background: white;
+            color: black;
             &::placeholder {
               color: grey;
               
@@ -939,6 +954,7 @@ export default {
 
           textarea {
             background: white;
+            color: black;
             &::placeholder{
               color:grey;
             }

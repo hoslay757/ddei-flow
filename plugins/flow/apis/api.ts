@@ -21,7 +21,7 @@ class DDeiFlowAPI {
   /**
    * 配置的属性
    */
-  jsonField: string[] = ["id", "name", "code", "text", "ep", "sp", "desc", "isUnlimited", "capacity", "condition", "default", "bpmnType", "bpmnSubType", "scriptFormat", "dataType","customDataType","isCollection", "loopCardinality", "script", "bpmnBaseType","ordering", "activityId", "errorCode", "timeType", "timeValue", "potentialOwner","humanPerformer","notInterrupting", "messageName","signalName","isLoop", "isLoop","isTransaction", "multiInstance", "isParallel", "isCompensation","essBounds"]
+  jsonField: string[] = ["id", "name", "code", "text", "ep", "sp", "desc", "isUnlimited", "capacity", "condition", "default", "bpmnType", "bpmnSubType", "scriptFormat", "dataType", "customDataType", "isCollection", "loopCardinality", "script", "bpmnBaseType", "ordering", "activityId", "errorCode", "timeType", "timeValue", "potentialOwner", "humanPerformer", "notInterrupting","escalName", "messageName","signalName","isLoop", "isLoop","isTransaction", "multiInstance", "isParallel", "isCompensation","essBounds"]
 
   /**
    * json中以哪个字段作为key，默认为id，可以指定为code或其他字段
@@ -1040,24 +1040,26 @@ class DDeiFlowAPI {
         else if (node.bpmnSubType == 3) {
           childXML += tabStr + ' <bpmn:timerEventDefinition>\n'
           if (node.timeType == 'timeDuration') {
-            childXML += tabStr + '   <bpmn:timeCycle>' + (node.timeValue ? node.timeValue : '') + '</timeCycle>\n'
+            childXML += tabStr + '   <bpmn:timeCycle>' + (node.timeValue ? node.timeValue : '') + '</bpmn:timeCycle>\n'
           } else if (node.timeType == 'CRON') {
-            childXML += tabStr + '   <bpmn:timeCycle>' + (node.timeValue ? node.timeValue : '') + '</timeCycle>\n'
+            childXML += tabStr + '   <bpmn:timeCycle>' + (node.timeValue ? node.timeValue : '') + '</bpmn:timeCycle>\n'
           } else {
-            childXML += tabStr + '   <bpmn:timeDate>' + (node.timeValue ? node.timeValue : '') +'</timeDate>\n'
+            childXML += tabStr + '   <bpmn:timeDate>' + (node.timeValue ? node.timeValue : '') +'</bpmn:timeDate>\n'
           }
           childXML += tabStr + ' </bpmn:timerEventDefinition>\n'
         }
         //条件
         else if (node.bpmnSubType == 4) {
           childXML += tabStr + ' <bpmn:conditionalEventDefinition>\n'
-          childXML += tabStr + '  <bpmn:condition xsi:type="bpmn:tFormalExpression">${1+1&gt;2}</bpmn:condition>\n'
+          childXML += tabStr + '  <bpmn:condition xsi:type="bpmn:tFormalExpression">'
+          childXML += tabStr + '    <![CDATA[' + (node.condition ? node.condition : '') + ']]>\n'
+          childXML += tabStr + '  </bpmn:condition>\n'
           childXML += tabStr + ' </bpmn:conditionalEventDefinition>\n'
         }
         //信号
         else if (node.bpmnSubType == 5) {
           defineStr += '  <bpmn:signal id="' + node.id + '_signal" name="' + (node.signalName ? node.signalName : '') + '" />\n'
-          childXML += tabStr + ' <bpmn:signalEventDefinition id="'+node.id+'_signal_def" signalRef="'+node.id+'_signal">\n'
+          childXML += tabStr + ' <bpmn:signalEventDefinition id="'+node.id+'_signal_def" signalRef="'+node.id+'_signal"/>\n'
         }
         //错误
         else if (node.bpmnSubType == 9) {
@@ -1065,13 +1067,36 @@ class DDeiFlowAPI {
             defineStr += '  <bpmn:error id="' + node.id + '_error" errorCode="' + node.errorCode + '" />\n'
             childXML += tabStr + ' <bpmn:errorEventDefinition errorRef="' + node.id + '_error" />\n'
           } else {
-            childXML += tabStr + ' <bpmn:errorEventDefinition />\n'
+            childXML += tabStr + ' <bpmn:errorEventDefinition/>\n'
           }
         }//补偿
         else if (node.bpmnSubType == 10) {
           childXML += tabStr + ' <bpmn:compensateEventDefinition />\n'
         }
-        
+        //升级
+        else if (node.bpmnSubType == 8) {
+          defineStr += '  <bpmn:escalation id="' + node.id + '_escal" name="' + node.escalName + '" />\n'
+          childXML += tabStr + ' <bpmn:escalationEventDefinition escalationRef="' + node.id + '_escal"/>\n'
+        }
+        //并行
+        else if (node.bpmnSubType == 7) {
+          contentStr += ' parallelMultiple="true"'
+        }
+        //多次
+        else if (node.bpmnSubType == 6) {
+          childXML += tabStr + ' <bpmn:multiInstanceLoopCharacteristics isSequential="false">\n'
+          //实例数量
+          if (node.loopCardinality) {
+            childXML += tabStr + '  <bpmn:loopCardinality xsi:type="bpmn:tFormalExpression">'
+            childXML += tabStr + '   <![CDATA[' + (node.loopCardinality ? node.loopCardinality : '') + ']]>\n'
+            childXML += tabStr + '  </bpmn:loopCardinality>\n'
+          }
+          childXML += tabStr + ' </bpmn:multiInstanceLoopCharacteristics>\n'
+        }
+        //非中断
+        if (node.notInterrupting){
+          childXML += tabStr + '<bpmn:nonInterrupting>true</bpmn:nonInterrupting>\n'
+        }
         if (childXML){
           contentStr += '>\n' + childXML + tabStr +'</bpmn:startEvent>\n'
         }else{
@@ -1140,11 +1165,11 @@ class DDeiFlowAPI {
         else if (node.bpmnSubType == 2) {
           childXML += tabStr + ' <bpmn:timerEventDefinition>\n'
           if (node.timeType == 'timeDuration') {
-            childXML += tabStr + '   <bpmn:timeCycle>' + (node.timeValue ? node.timeValue : '')  + '</timeCycle>\n'
+            childXML += tabStr + '   <bpmn:timeCycle>' + (node.timeValue ? node.timeValue : '')  + '</bpmn:timeCycle>\n'
           } else if (node.timeType == 'CRON') {
-            childXML += tabStr + '   <bpmn:timeCycle>' + (node.timeValue ? node.timeValue : '') + '</timeCycle>\n'
+            childXML += tabStr + '   <bpmn:timeCycle>' + (node.timeValue ? node.timeValue : '') + '</bpmn:timeCycle>\n'
           } else {
-            childXML += tabStr + '   <bpmn:timeDate>' + (node.timeValue ? node.timeValue : '') + '</timeDate>\n'
+            childXML += tabStr + '   <bpmn:timeDate>' + (node.timeValue ? node.timeValue : '') + '</bpmn:timeDate>\n'
           }
           childXML += tabStr + ' </bpmn:timerEventDefinition>\n'
         }
@@ -1159,7 +1184,7 @@ class DDeiFlowAPI {
             defineStr += '  <bpmn:error id="' + node.id + '_error" errorCode="' + node.errorCode + '" />\n'
             childXML += tabStr + ' <bpmn:errorEventDefinition errorRef="' + node.id + '_error" />\n'
           }else{
-            childXML += tabStr + ' <bpmn:errorEventDefinition />\n'
+            childXML += tabStr + ' <bpmn:errorEventDefinition/>\n'
           }
           
         }
@@ -1171,13 +1196,32 @@ class DDeiFlowAPI {
         else if (node.bpmnSubType == 5) {
           childXML += tabStr + ' <bpmn:compensateEventDefinition />\n'
         }
-        //多次
-        else if (node.bpmnSubType == 9) {
+        //并行
+        else if (node.bpmnSubType == 8) {
           contentStr += ' parallelMultiple="true"'
         }
+        //多次
+        else if (node.bpmnSubType == 9) {
+          childXML += tabStr + ' <bpmn:multiInstanceLoopCharacteristics isSequential="false">\n'
+          //实例数量
+          if (node.loopCardinality) {
+            childXML += tabStr + '  <bpmn:loopCardinality xsi:type="bpmn:tFormalExpression">'
+            childXML += tabStr + '   <![CDATA[' + (node.loopCardinality ? node.loopCardinality : '') + ']]>\n'
+            childXML += tabStr + '  </bpmn:loopCardinality>\n'
+          }
+          childXML += tabStr + ' </bpmn:multiInstanceLoopCharacteristics>\n'
+        }
         
-        
+        //升级
+        else if (node.bpmnSubType == 7) {
+          defineStr += '  <bpmn:escalation id="' + node.id + '_escal" name="' + node.escalName + '" />\n'
+          childXML += tabStr + ' <bpmn:escalationEventDefinition escalationRef="' + node.id + '_escal"/>\n'
+        }
       
+        //非中断
+        if (node.notInterrupting) {
+          childXML += tabStr + '<bpmn:nonInterrupting>true</bpmn:nonInterrupting>\n'
+        }
 
         if (childXML) {
           contentStr += '>\n' + childXML + tabStr + '</bpmn:boundaryEvent>\n'
@@ -1235,11 +1279,11 @@ class DDeiFlowAPI {
         else if (!node.bpmnSubType || node.bpmnSubType == 1) {
           childXML += tabStr + ' <bpmn:timerEventDefinition>\n'
           if (node.timeType == 'timeDuration') {
-            childXML += tabStr + '   <bpmn:timeCycle>' + (node.timeValue ? node.timeValue : '') + '</timeCycle>\n'
+            childXML += tabStr + '   <bpmn:timeCycle>' + (node.timeValue ? node.timeValue : '') + '</bpmn:timeCycle>\n'
           } else if (node.timeType == 'CRON') {
-            childXML += tabStr + '   <bpmn:timeCycle>' + (node.timeValue ? node.timeValue : '') + '</timeCycle>\n'
+            childXML += tabStr + '   <bpmn:timeCycle>' + (node.timeValue ? node.timeValue : '') + '</bpmn:timeCycle>\n'
           } else {
-            childXML += tabStr + '   <bpmn:timeDate>' + (node.timeValue ? node.timeValue : '') + '</timeDate>\n'
+            childXML += tabStr + '   <bpmn:timeDate>' + (node.timeValue ? node.timeValue : '') + '</bpmn:timeDate>\n'
           }
           childXML += tabStr + ' </bpmn:timerEventDefinition>\n'
         }
@@ -1248,9 +1292,24 @@ class DDeiFlowAPI {
           defineStr += '  <bpmn:signal id="' + node.id + '_signal" name="' + (node.signalName ? node.signalName : '') + '" />\n'
           childXML += tabStr + ' <bpmn:signalEventDefinition id="' + node.id + '_signal_def" signalRef="' + node.id + '_signal" />\n'
         }
+        //并行
+        else if (node.bpmnSubType == 5) {
+          contentStr += ' parallelMultiple="true"'
+        }
+        //链接
+        if (node.bpmnSubType == 4) {
+          childXML += tabStr + '<bpmn:linkEventDefinition/>\n'
+        }
         //多次
         else if (node.bpmnSubType == 6) {
-          contentStr += ' parallelMultiple="true"'
+          childXML += tabStr + ' <bpmn:multiInstanceLoopCharacteristics isSequential="false">\n'
+          //实例数量
+          if (node.loopCardinality) {
+            childXML += tabStr + '  <bpmn:loopCardinality xsi:type="bpmn:tFormalExpression">'
+            childXML += tabStr + '   <![CDATA[' + (node.loopCardinality ? node.loopCardinality : '') + ']]>\n'
+            childXML += tabStr + '  </bpmn:loopCardinality>\n'
+          }
+          childXML += tabStr + ' </bpmn:multiInstanceLoopCharacteristics>\n'
         }
 
 
@@ -1315,9 +1374,34 @@ class DDeiFlowAPI {
           childXML += tabStr + ' <bpmn:compensateEventDefinition />\n'
         }
 
+        //非中断
+        if (node.notInterrupting) {
+          childXML += tabStr + '<bpmn:nonInterrupting>true</bpmn:nonInterrupting>\n'
+        }
+        //链接
+        if (node.bpmnSubType == 7) {
+          childXML += tabStr + '<bpmn:linkEventDefinition/>\n'
+        }
+
+        //升级
+        else if (node.bpmnSubType == 6) {
+          defineStr += '  <bpmn:escalation id="' + node.id + '_escal" name="' + node.escalName + '" />\n'
+          childXML += tabStr + ' <bpmn:escalationEventDefinition escalationRef="' + node.id + '_escal"/>\n'
+        }
+        //多次
+        else if (node.bpmnSubType == 5) {
+          childXML += tabStr + ' <bpmn:multiInstanceLoopCharacteristics isSequential="false">\n'
+          //实例数量
+          if (node.loopCardinality) {
+            childXML += tabStr + '  <bpmn:loopCardinality xsi:type="bpmn:tFormalExpression">'
+            childXML += tabStr + '   <![CDATA[' + (node.loopCardinality ? node.loopCardinality : '') + ']]>\n'
+            childXML += tabStr + '  </bpmn:loopCardinality>\n'
+          }
+          childXML += tabStr + ' </bpmn:multiInstanceLoopCharacteristics>\n'
+        }
 
         if (childXML) {
-          contentStr += '>\n' + childXML + tabStr + '</bpmn:intermediateCatchEvent>\n'
+          contentStr += '>\n' + childXML + tabStr + '</bpmn:intermediateThrowEvent>\n'
         } else {
           contentStr += '/>\n'
         }
@@ -1365,9 +1449,9 @@ class DDeiFlowAPI {
         if (node.bpmnSubType == 6) {
           if (node.errorCode){
             defineStr += '  <bpmn:error id="' + node.id + '_error" errorCode="' + node.errorCode + '" />\n'
-            childXML += tabStr + ' <bpmn:errorEventDefinition errorRef="' + node.id + '_error">\n'
+            childXML += tabStr + ' <bpmn:errorEventDefinition errorRef="' + node.id + '_error"/>\n'
           } else {
-            childXML += tabStr + ' <bpmn:errorEventDefinition />\n'
+            childXML += tabStr + ' <bpmn:errorEventDefinition/>\n'
           }
         }
         //中断
@@ -1381,25 +1465,39 @@ class DDeiFlowAPI {
         //信号
         else if (node.bpmnSubType == 3) {
           defineStr += '  <bpmn:signal id="' + node.id + '_signal" name="' + (node.signalName ? node.signalName : '') + '" />\n'
-          childXML += tabStr + ' <bpmn:signalEventDefinition id="' + node.id + '_signal_def" signalRef="' + node.id + '_signal">\n'
+          childXML += tabStr + ' <bpmn:signalEventDefinition id="' + node.id + '_signal_def" signalRef="' + node.id + '_signal"/>\n'
         }
        
         //补偿
         else if (node.bpmnSubType == 7) {
           childXML += tabStr + ' <bpmn:compensateEventDefinition />\n'
         }
-        //多次
-        else if (node.bpmnSubType == 4) {
-          contentStr += ' parallelMultiple="true"'
-        } 
         //消息
         else if (node.bpmnSubType == 2) {
             defineStr += '  <bpmn:message id="' + node.id + '_msg" name="' + (node.messageName ? node.messageName : '') + '" />\n'
             childXML += tabStr + ' <bpmn:messageEventDefinition messageRef="' + node.id + '_msg" />\n'
+        }
+        //升级
+        else if (node.bpmnSubType == 5) {
+          defineStr += '  <bpmn:escalation id="' + node.id + '_escal" name="' + node.escalName + '" />\n'
+          childXML += tabStr + ' <bpmn:escalationEventDefinition escalationRef="' + node.id + '_escal"/>\n'
+        }
+
+        //多次
+        else if (node.bpmnSubType == 4) {
+          childXML += tabStr + ' <bpmn:multiInstanceLoopCharacteristics isSequential="false">\n'
+          //实例数量
+          if (node.loopCardinality) {
+            childXML += tabStr + '  <bpmn:loopCardinality xsi:type="bpmn:tFormalExpression">'
+            childXML += tabStr + '   <![CDATA[' + (node.loopCardinality ? node.loopCardinality : '') + ']]>\n'
+            childXML += tabStr + '  </bpmn:loopCardinality>\n'
           }
-
-        
-
+          childXML += tabStr + ' </bpmn:multiInstanceLoopCharacteristics>\n'
+        }
+        //非中断
+        if (node.notInterrupting) {
+          childXML += tabStr + '<bpmn:nonInterrupting>true</bpmn:nonInterrupting>\n'
+        }
         if (childXML) {
           contentStr += '>\n' + childXML + tabStr + '</bpmn:endEvent>\n'
         } else {
@@ -1467,7 +1565,9 @@ class DDeiFlowAPI {
           contentStr += ' name="' + node.name + '"'
         }
         //补偿
+        
         if (node.isCompensation){
+          debugger
           contentStr += ' isForCompensation="true"'
         }
         if (node.bpmnType == 'ScriptTask') {
@@ -1940,7 +2040,7 @@ class DDeiFlowAPI {
         //条件
         if (sequence.bpmnSubType == 2 && sequence.condition){
           childXML += tabStr + ' <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">\n'
-          childXML += tabStr + '  <![CDATA[' + sequence.condition +']]>\n'
+          childXML += tabStr + '  <![CDATA[' + (sequence.condition ? sequence.condition : '') +']]>\n'
           childXML += tabStr + ' </bpmn:conditionExpression>\n'
         }
         if (childXML){
@@ -1970,7 +2070,9 @@ class DDeiFlowAPI {
     for (let i = 0; i < tabLevel; i++) {
       tabStr += " "
     }
-    if (node.multiInstance){
+    if (node.isLoop && !node.multiInstance){
+      returnStr += tabStr + '<bpmn:loopCharacteristics isSequential="true"/>\n'
+    }else if (node.multiInstance){
       returnStr += tabStr + '<bpmn:multiInstanceLoopCharacteristics'
       if (!node.isParallel){
         returnStr += ' isSequential="true"'
@@ -1978,7 +2080,9 @@ class DDeiFlowAPI {
       returnStr += '>\n'
       //实例数量
       if (node.loopCardinality){
-        returnStr += tabStr + ' <bpmn:loopCardinality xsi:type="bpmn:tFormalExpression">' + node.loopCardinality +'</bpmn:loopCardinality>\n'
+        returnStr += tabStr + ' <bpmn:loopCardinality xsi:type="bpmn:tFormalExpression">'
+        returnStr += tabStr + '    <![CDATA[' + (node.loopCardinality ? node.loopCardinality : '') + ']]>\n'
+        returnStr += tabStr + '</bpmn:loopCardinality>\n'
       }
       returnStr += tabStr + '</bpmn:multiInstanceLoopCharacteristics>\n'
     }

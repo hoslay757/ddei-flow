@@ -1,4 +1,4 @@
-import { showSettingButton } from "../util"
+import { showSettingButton, lineObiCheck } from "../util"
 import BpmnUserViewer from "../views/bpmn-user-viewer.vue"
 
 export default {
@@ -59,6 +59,9 @@ export default {
   icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
         <use xlink:href="#icon-ddei-flow-user"></use>
       </svg>`,
+  filters: {
+    LINE_OBI_FILTER: lineObiCheck
+  },
   EVENT_MOUSE_MOVE_IN_CONTROL: showSettingButton
 }
 

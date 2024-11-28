@@ -186,6 +186,13 @@ const updateCallActivityView = function (stage,layer,dragParentActiveIds){
 
 const lineObiCheck = function(model, param){
   let line = param.line
+  if (model) {
+    let ignoreCodes = ['1000501', '1000506', '1000507', '1000505', '1000504']
+    if (ignoreCodes.indexOf(model.modelCode) != -1 || (model.depModel && ignoreCodes.indexOf(model.depModel.modelCode))){
+      
+      return false
+    }
+  }
   if (line) {
     
     let distLinks = line.stage.getDistModelLinks(line.id);

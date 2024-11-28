@@ -61,6 +61,8 @@ export default {
       calltask: '调用',
       busitask: '业务规则',
       loading:'加载中',
+      escalation:'升级',
+      escalname:'事件',
       property:{
         notInterrupting:'非中断',
         dataType: '数据类型',

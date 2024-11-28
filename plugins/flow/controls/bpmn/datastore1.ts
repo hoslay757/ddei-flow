@@ -1,4 +1,4 @@
-import { showSettingButton } from "../util"
+import { showSettingButton, lineObiCheck } from "../util"
 
 export default {
   id: '1000507',
@@ -53,6 +53,9 @@ export default {
         },
       ]
     }
+  },
+  filters: {
+    LINE_OBI_FILTER: lineObiCheck
   },
   EVENT_MOUSE_MOVE_IN_CONTROL: showSettingButton
 }
