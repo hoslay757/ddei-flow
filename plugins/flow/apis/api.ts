@@ -271,7 +271,7 @@ class DDeiFlowAPI {
    * @param designJson 设计器json
    * @param dataJson 数据json
    */
-  loadFromBpmnXML(xml: string,ratio:number = 1):void {
+  loadFromBpmnXML(xml: string, dataJson: string | object | null = null, ratio: number = 1):void {
     if (xml){
       xml2graph(xml,(res)=>{
         
@@ -282,6 +282,23 @@ class DDeiFlowAPI {
             if (data.state == 'success' && data.graphs.length > 0){
               //生成流程图
               let graph = data.graphs[0];
+              if (dataJson) {
+                dataJson = typeof (dataJson) == 'string' ? JSON.parse(dataJson) : dataJson;
+                graph.controls?.forEach(control => {
+                  let key = control[this.jsonKeyField] ? control[this.jsonKeyField] : control.id
+                  if (dataJson[key]) {
+                    merge(control, dataJson[key])
+                  }
+                });
+                graph.lines?.forEach(control => {
+                  let key = control[this.jsonKeyField] ? control[this.jsonKeyField] : control.id
+                  if (dataJson[key]) {
+                    merge(control, dataJson[key])
+                  }
+                });
+                
+
+              }
               let ddInstance = this.editor.ddInstance;
               //清空已有的数据
               ddInstance.stage?.destroyRender()
@@ -1567,7 +1584,6 @@ class DDeiFlowAPI {
         //补偿
         
         if (node.isCompensation){
-          debugger
           contentStr += ' isForCompensation="true"'
         }
         if (node.bpmnType == 'ScriptTask') {

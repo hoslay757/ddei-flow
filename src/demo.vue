@@ -204,7 +204,7 @@ const options = markRaw({
   <bpmn:signal id="boundaryevent_115_signal" name="bound_sign" />
   <bpmn:message id="boundaryevent_111_msg" name="bound_msg" />
   <bpmn:process id="stage_1" isExecutable="true">
-   <bpmn:userTask id="user_task_8">
+   <bpmn:userTask id="st1">
     <bpmn:incoming>line_9</bpmn:incoming>
     <bpmn:outgoing>line_11</bpmn:outgoing>
    </bpmn:userTask>
@@ -306,7 +306,7 @@ const options = markRaw({
     <bpmn:incoming>line_39</bpmn:incoming>
     <bpmn:outgoing>line_40</bpmn:outgoing>
    </bpmn:scriptTask>
-   <bpmn:scriptTask id="script_task_10">
+   <bpmn:scriptTask id="userTask1">
     <bpmn:incoming>line_11</bpmn:incoming>
     <bpmn:outgoing>line_13</bpmn:outgoing>
     <bpmn:outgoing>line_55</bpmn:outgoing>
@@ -405,7 +405,7 @@ const options = markRaw({
    <bpmn:boundaryEvent id="boundaryevent_98" cancelActivity="true">
     <bpmn:messageEventDefinition messageRef="boundaryevent_98_msg" />
    </bpmn:boundaryEvent>
-   <bpmn:boundaryEvent id="boundaryevent_43" cancelActivity="true" attachedToRef="script_task_10">
+   <bpmn:boundaryEvent id="boundaryevent_43" cancelActivity="true" attachedToRef="userTask1">
     <bpmn:errorEventDefinition/>
    </bpmn:boundaryEvent>
    <bpmn:boundaryEvent id="boundaryevent_135" cancelActivity="false">
@@ -462,9 +462,9 @@ const options = markRaw({
    <bpmn:boundaryEvent id="boundaryevent_111" cancelActivity="true">
     <bpmn:messageEventDefinition messageRef="boundaryevent_111_msg" />
    </bpmn:boundaryEvent>
-   <bpmn:sequenceFlow id="line_9" sourceRef="start_6" targetRef="user_task_8"/>
-   <bpmn:sequenceFlow id="line_11" sourceRef="user_task_8" targetRef="script_task_10"/>
-   <bpmn:sequenceFlow id="line_13" sourceRef="script_task_10" targetRef="parallel_gateway_12"/>
+   <bpmn:sequenceFlow id="line_9" sourceRef="start_6" targetRef="st1"/>
+   <bpmn:sequenceFlow id="line_11" sourceRef="st1" targetRef="userTask1"/>
+   <bpmn:sequenceFlow id="line_13" sourceRef="userTask1" targetRef="parallel_gateway_12"/>
    <bpmn:sequenceFlow id="line_20" sourceRef="parallel_gateway_12" targetRef="subprocess_16"/>
    <bpmn:sequenceFlow id="line_22" sourceRef="start_18" targetRef="user_task_21"/>
    <bpmn:sequenceFlow id="line_24" sourceRef="user_task_21" targetRef="user_task_23"/>
@@ -478,7 +478,7 @@ const options = markRaw({
    <bpmn:sequenceFlow id="line_42" sourceRef="complex_gateway_33" targetRef="end_41"/>
    <bpmn:sequenceFlow id="line_49" sourceRef="boundaryevent_43" targetRef="subprocess_45"/>
    <bpmn:sequenceFlow id="line_52" sourceRef="script_task_47" targetRef="script_task_50"/>
-   <bpmn:association id="line_55" targetRef="comment_53" sourceRef="script_task_10" associationDirection="None"/>
+   <bpmn:association id="line_55" targetRef="comment_53" sourceRef="userTask1" associationDirection="None"/>
    <bpmn:association id="line_62" sourceRef="user_task_27" targetRef="ds_59" associationDirection="None"/>
    <bpmn:callActivity id="call_98" calledElement="subprocess_16">
     <bpmn:multiInstanceLoopCharacteristics isSequential="true">
@@ -493,7 +493,7 @@ const options = markRaw({
 
   <bpmndi:BPMNDiagram id="Diagram_5b998cd6006e65c687237399493c452f">
    <bpmndi:BPMNPlane id="Plane_stage_1" bpmnElement="stage_1">
-    <bpmndi:BPMNShape id="user_task_8_id" bpmnElement="user_task_8">
+    <bpmndi:BPMNShape id="st1_id" bpmnElement="st1">
      <dc:Bounds x="880.3697850393701" y="1495.9394148031497" width="110" height="70"/>
     </bpmndi:BPMNShape>
     <bpmndi:BPMNShape id="user_task_29_id" bpmnElement="user_task_29">
@@ -589,7 +589,7 @@ const options = markRaw({
     <bpmndi:BPMNShape id="script_task_38_id" bpmnElement="script_task_38">
      <dc:Bounds x="1519.3699050393705" y="1720.9394148031497" width="109.99999999999955" height="70"/>
     </bpmndi:BPMNShape>
-    <bpmndi:BPMNShape id="script_task_10_id" bpmnElement="script_task_10">
+    <bpmndi:BPMNShape id="userTask1_id" bpmnElement="userTask1">
      <dc:Bounds x="1050.3697830393698" y="1495.9394148031497" width="110" height="70"/>
     </bpmndi:BPMNShape>
     <bpmndi:BPMNShape id="parallel_gateway_12_id" bpmnElement="parallel_gateway_12">
@@ -816,10 +816,32 @@ const options = markRaw({
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>`
 
+
+            let busiData = {
+              st1: {
+                border: {
+                  color: "green",
+                  width: 5
+                },
+                fill: {
+                  type: 0
+                },
+                name: "已加载"
+              },
+              userTask1: {
+                border: {
+                  color: "green",
+                  width: 5
+                },
+                fill: {
+                  type: 0
+                }
+              }
+            }
             //获取流程API
             let flowAPI = editor.flow
             flowAPI.setJsonKeyField("code");
-            flowAPI.loadFromBpmnXML(bpmnXMLDemo)
+            flowAPI.loadFromBpmnXML(bpmnXMLDemo, busiData)
           }
         },
         {
