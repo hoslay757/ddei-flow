@@ -2,14 +2,156 @@ import DDeiFlowControls from "./controls";
 import { DDeiPluginBase, DDeiEditor, DDeiUtil, DDeiCoreToolboxSimplePanel, DDeiCoreTopMenuSimplePanel } from "ddei-editor";
 import DDeiFlowLifeCycles from "./lifecycle"
 import DDeiFlowDialogs from "./dialogs"
+import DDeiFlowPanels from "./panels"
 import DDeiFlowHotkeys from "./hotkeys";
 import DDeiFlowAPI from "./apis/api";
-import { DDeiEditorUtil, DDeiExtSearch, DDeiExtQuickControl, DDeiConfig } from "ddei-editor"
+import { DDeiEditorUtil, DDeiExtSearch, DDeiExtQuickControl, DDeiConfig, DDeiCoreMobileLayout } from "ddei-editor"
 
 class DDeiFlow extends DDeiPluginBase {
   type: string = "package"
 
+  static{
 
+    if(DDeiUtil.isMobile()){
+      DDeiFlow.toolboxConfig = {
+        direct: 1,//方向，1纵向，2横向
+        position: 8,//位置1-9顺时针，1为左上角，9为中心
+        drag: 0,//是否允许拖拽位置
+        dragCreate: 0,//是否在选择控件时创建一个控件
+        groups: [
+          {
+            controls: [
+              "1000001",
+              "1000004",
+              "1000002",
+              "1000005",
+              "1000003",
+            ]
+          },
+          {
+            controls: [
+              "1000011",
+              "1000021",
+              "1000031",
+              "1000041",
+              "1000051",
+              "1000061",
+              "1000071",
+              "1000081",
+              "1000091",
+              "1000101",
+              "1000102",
+            ]
+          },
+          {
+            controls: [
+              "1000201",
+              "1000202",
+              "1000203",
+              "1000204",
+              "1000205",
+            ]
+          },
+          {
+            controls: [
+              "1000401",
+            ]
+          },
+          {
+            controls: [
+              "1000701",
+            ]
+          },
+          {
+            controls: [
+              "1000501",
+              "1000504",
+              "1000505",
+              "1000506",
+              "1000507",
+            ]
+          }
+        ]
+      }
+      DDeiFlow.layout = "ddei-core-layout-mobile"
+    }else{
+      DDeiFlow.toolboxConfig = {
+        direct: 1,//方向，1纵向，2横向
+        position: 8,//位置1-9顺时针，1为左上角，9为中心
+        drag: 1,//是否允许拖拽位置
+        dragCreate: 1,//是否在选择控件时创建一个控件
+        groups: [
+          {
+            editMode: 1,
+            desc: "ddei.choose",
+            icon: `<svg class="icon" style="width: 28px; height: 28px;margin-left:-1px;margin-top:2px; " aria-hidden="true">
+              <use xlink: href = "#icon-selector">< /use>
+            </svg>`
+          },
+          {
+            editMode: 4,
+            desc: "ddei.flow.sequence",
+            controls: [
+              "1000601"
+            ]
+          },
+          {
+            controls: [
+              "1000001",
+              "1000004",
+              "1000002",
+              "1000005",
+              "1000003",
+            ]
+          },
+          {
+            controls: [
+              "1000011",
+              "1000021",
+              "1000031",
+              "1000041",
+              "1000051",
+              "1000061",
+              "1000071",
+              "1000081",
+              "1000091",
+              "1000101",
+              "1000102",
+            ]
+          },
+          {
+            controls: [
+              "1000201",
+              "1000202",
+              "1000203",
+              "1000204",
+              "1000205",
+            ]
+          },
+          {
+            controls: [
+              "1000401",
+            ]
+          },
+          {
+            controls: [
+              "1000701",
+            ]
+          },
+          {
+            controls: [
+              "1000501",
+              "1000504",
+              "1000505",
+              "1000506",
+              "1000507",
+            ]
+          }
+        ]
+      }
+      DDeiFlow.layout = "ddei-core-layout-simple"
+    }
+  }
   /**
    * 缺省实例
    */
@@ -17,87 +159,20 @@ class DDeiFlow extends DDeiPluginBase {
     initConfig: {
       //覆盖
       rewrite: {
-        currentLayout: "ddei-core-layout-simple"
+        currentLayout: DDeiFlow.layout
       },
       //追加
       append: {
         extensions: [
+          DDeiCoreMobileLayout.configuration({
+            other: ['ddei-core-panel-toolbox-simple', 'ddei-core-panel-topmenu-simple'],
+            middle: ['ddei-core-panel-canvasview'],
+            before: [],
+            after: ['ddei-flow-element-setting-panel']
+          }),
           DDeiExtSearch,
           DDeiExtQuickControl,
-          DDeiCoreToolboxSimplePanel.configuration({
-            direct: 1,//方向，1纵向，2横向
-            position: 8,//位置1-9顺时针，1为左上角，9为中心
-            drag: 1,//是否允许拖拽位置
-            dragCreate: 1,//是否在选择控件时创建一个控件
-            groups: [
-              {
-                editMode: 1,
-                desc: "ddei.choose",
-                icon: `<svg class="icon" style="width: 28px; height: 28px;margin-left:-1px;margin-top:2px; " aria-hidden="true">
-            <use xlink: href = "#icon-selector">< /use>
-          </svg>`
-              },
-              {
-                editMode: 4,
-                desc: "ddei.flow.sequence",
-                controls: [
-                  "1000601"
-                ]
-              },
-              {
-                controls: [
-                  "1000001",
-                  "1000004",
-                  "1000002",
-                  "1000005",
-                  "1000003",
-                ]
-              },
-              {
-                controls: [
-                  "1000011",
-                  "1000021",
-                  "1000031",
-                  "1000041",
-                  "1000051",
-                  "1000061",
-                  "1000071",
-                  "1000081",
-                  "1000091",
-                  "1000101",
-                  "1000102",
-                ]
-              },
-              {
-                controls: [
-                  "1000201",
-                  "1000202",
-                  "1000203",
-                  "1000204",
-                  "1000205",
-                ]
-              },
-              {
-                controls: [
-                  "1000401",
-                ]
-              },
-              {
-                controls: [
-                  "1000701",
-                ]
-              },
-              {
-                controls: [
-                  "1000501",
-                  "1000504",
-                  "1000505",
-                  "1000506",
-                  "1000507",
-                ]
-              }
-            ]
-          }),
+          DDeiCoreToolboxSimplePanel.configuration(DDeiFlow.toolboxConfig),
           DDeiCoreTopMenuSimplePanel.configuration({
             direct: 2,//方向，1纵向，2横向
             position: 2,//位置1-9顺时针，1为左上角，9为中心
@@ -115,6 +190,8 @@ class DDeiFlow extends DDeiPluginBase {
   lifecycles: object = DDeiFlowLifeCycles;
 
   dialogs: object = DDeiFlowDialogs;
+
+  panels: object = DDeiFlowPanels;
 
 
   //获取默认配置
@@ -139,7 +216,7 @@ class DDeiFlow extends DDeiPluginBase {
   
   getOptions(): object {
     let options = {}
-    let array = [this.controls, this.lifecycles,this.dialogs]
+    let array = [this.controls, this.lifecycles,this.dialogs,this.panels]
     array.forEach(plugin => {
       if (DDeiPluginBase.isSubclass(plugin, DDeiPluginBase)) {
         options = Object.assign({}, options, plugin.defaultIns.getOptions())
@@ -180,6 +257,15 @@ class DDeiFlow extends DDeiPluginBase {
       return this.dialogs.defaultIns.getDialogs(editor);
     } else if (this.dialogs instanceof DDeiPluginBase) {
       return this.dialogs.getDialogs(editor);
+    }
+  }
+  
+
+  getPanels(editor) {
+    if (DDeiPluginBase.isSubclass(this.panels, DDeiPluginBase)) {
+      return this.panels.defaultIns.getPanels(editor);
+    } else if (this.panels instanceof DDeiPluginBase) {
+      return this.panels.getPanels(editor);
     }
   }
 
@@ -345,5 +431,6 @@ export * from "./lifecycle"
 export * from "./hotkeys"
 export * from "./apis/api"
 export * from "./dialogs"
+export * from "./panels"
 export { DDeiFlow }
 export default DDeiFlow;

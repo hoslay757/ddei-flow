@@ -1,6 +1,7 @@
 import {DDeiPluginBase} from "ddei-editor";
 import DDeiFlowElementSettingDialog from "./elementsettingdialog"
 import DDeiFlowSettingButtonDialog from "./settingbuttondialog"
+import DDeiFlowSettingButtonPanel from "./elementsettingpanel"
 
 class DDeiFlowDialogs extends DDeiPluginBase {
 

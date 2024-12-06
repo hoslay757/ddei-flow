@@ -15,7 +15,9 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
    * 鼠标移动进入控件的钩子，该插件由它来进行整体分发
    */
   EVENT_MOUSE_MOVE_IN_CONTROL: DDeiFuncData | null = new DDeiFuncData("ddei-flow-mouse-move-in-control", 1, (operateType, data, ddInstance, evt) => {
-    return this.mouseMoveInControl(operateType, data, ddInstance, evt)
+    if (!DDeiUtil.isMobile()) {
+      return this.mouseMoveInControl(operateType, data, ddInstance, evt)
+    }
   });
 
   EVENT_MOUSE_OPERATING: DDeiFuncData | null = new DDeiFuncData("ddei-flow-hidden-eles", 1, (operateType, data, ddInstance, evt) => { return this.mouseOperating(operateType,data,ddInstance,evt) });
@@ -583,7 +585,9 @@ class DDeiFlowLifeCycle extends DDeiLifeCycle {
   * 鼠标移动进入画布的钩子
   */
   EVENT_MOUSE_MOVE_IN_LAYER: DDeiFuncData | null = new DDeiFuncData("ddei-flow-mouse-move-in-control", 1, (operateType, data, ddInstance, evt) => {
-    return this.mouseMoveInLayer(operateType, data, ddInstance, evt)
+    if (!DDeiUtil.isMobile()) {
+      return this.mouseMoveInLayer(operateType, data, ddInstance, evt)
+    }
   });
 
   static configuration(options) {
