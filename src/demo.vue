@@ -18,7 +18,8 @@ const designDemoData = `
 
 const options = markRaw({
   config: {
-    EXT_STAGE_WIDTH: false,
+    readonly:true,
+    grid:0,
     initData: { // [!code focus:8]
       controls: [
         {
@@ -57,128 +58,6 @@ const options = markRaw({
           name: "导入",
           action: function (editor) {
             let bpmnXMLDemo = `<?xml version="1.0" encoding="UTF-8"?>
-<definitions
-    xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:flowable="http://flowable.org/bpmn"
-    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-    xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
-    xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef" exporter="Flowable Open Source Modeler" exporterVersion="6.8.0">
-    <process id="demo_qjlc" name="案例-请假申请流程" isExecutable="true">
-        <documentation>测试案例1</documentation>
-        <startEvent id="startEvent1" name="启动" flowable:initiator="INITIATOR" flowable:formFieldValidation="true"></startEvent>
-        <userTask id="sqr" name="申请人" flowable:formFieldValidation="true">
-            <documentation>流程发起人</documentation>
-            <extensionElements>
-                <modeler:initiator-can-complete
-                    xmlns:modeler="http://flowable.org/modeler">
-                    <![CDATA[false]]>
-                </modeler:initiator-can-complete>
-            </extensionElements>
-        </userTask>
-        <sequenceFlow id="sid-EEF0DA1F-554E-4439-920E-0382841D7DE2" sourceRef="startEvent1" targetRef="sqr"></sequenceFlow>
-        <userTask id="leader" name="主管" flowable:assignee="#{leader}" flowable:formFieldValidation="true">
-            <extensionElements>
-                <modeler:initiator-can-complete
-                    xmlns:modeler="http://flowable.org/modeler">
-                    <![CDATA[false]]>
-                </modeler:initiator-can-complete>
-            </extensionElements>
-            <multiInstanceLoopCharacteristics isSequential="false"  flowable:elementVariable="leader">
-                <extensionElements></extensionElements>
-                <completionCondition></completionCondition>
-            </multiInstanceLoopCharacteristics>
-        </userTask>
-        <sequenceFlow id="sid-5DE8C566-4721-456A-9240-CF4BF3DC7A61" sourceRef="sqr" targetRef="leader"></sequenceFlow>
-        <userTask id="hr" name="HR" flowable:assignee="lisi" flowable:formFieldValidation="true">
-            <extensionElements>
-                <modeler:initiator-can-complete
-                    xmlns:modeler="http://flowable.org/modeler">
-                    <![CDATA[false]]>
-                </modeler:initiator-can-complete>
-            </extensionElements>
-        </userTask>
-        <endEvent id="sid-B951D5DB-EA64-4CD3-8F35-6463CA83A154" name="归档"></endEvent>
-        <exclusiveGateway id="sid-38DE5F46-A270-4060-87D2-3DB97997B861"></exclusiveGateway>
-        <sequenceFlow id="sid-D0666311-783F-49EC-95F7-13C648383566" sourceRef="leader" targetRef="sid-38DE5F46-A270-4060-87D2-3DB97997B861"></sequenceFlow>
-        <sequenceFlow id="sid-ADD2E384-E8CC-4136-B881-93CFDC340A4E" sourceRef="hr" targetRef="sid-B951D5DB-EA64-4CD3-8F35-6463CA83A154"></sequenceFlow>
-        <userTask id="leader2" name="最高主管" flowable:assignee="wangwu" flowable:formFieldValidation="true">
-            <extensionElements>
-                <modeler:initiator-can-complete
-                    xmlns:modeler="http://flowable.org/modeler">
-                    <![CDATA[false]]>
-                </modeler:initiator-can-complete>
-            </extensionElements>
-        </userTask>
-        <sequenceFlow id="sid-753BBA2E-1D21-41EA-B44F-E8A0CDEE3D17" name="请假天数&lt;7" sourceRef="sid-38DE5F46-A270-4060-87D2-3DB97997B861" targetRef="hr">
-            <conditionExpression xsi:type="tFormalExpression">
-                <![CDATA[#{days < 7}]]>
-            </conditionExpression>
-        </sequenceFlow>
-        <sequenceFlow id="sid-5F44C7A8-94DB-4EA3-A77F-5DF3092F1C56" name="请假天数&gt;=7" sourceRef="sid-38DE5F46-A270-4060-87D2-3DB97997B861" targetRef="leader2">
-            <conditionExpression xsi:type="tFormalExpression">
-                <![CDATA[days >= 7]]>
-            </conditionExpression>
-        </sequenceFlow>
-        <sequenceFlow id="sid-6A8F54F5-165A-430F-A218-F8B6A054B784" sourceRef="leader2" targetRef="hr"></sequenceFlow>
-    </process>
-    <bpmndi:BPMNDiagram id="BPMNDiagram_demo_qjlc">
-        <bpmndi:BPMNPlane bpmnElement="demo_qjlc" id="BPMNPlane_demo_qjlc">
-            <bpmndi:BPMNShape bpmnElement="startEvent1" id="BPMNShape_startEvent1">
-                <omgdc:Bounds height="30.0" width="30.0" x="120.0" y="145.625"></omgdc:Bounds>
-            </bpmndi:BPMNShape>
-            <bpmndi:BPMNShape bpmnElement="sqr" id="BPMNShape_sqr">
-                <omgdc:Bounds height="80.0" width="100.0" x="195.0" y="120.0"></omgdc:Bounds>
-            </bpmndi:BPMNShape>
-            <bpmndi:BPMNShape bpmnElement="leader" id="BPMNShape_leader">
-                <omgdc:Bounds height="80.0" width="100.0" x="330.0" y="120.0"></omgdc:Bounds>
-            </bpmndi:BPMNShape>
-            <bpmndi:BPMNShape bpmnElement="hr" id="BPMNShape_hr">
-                <omgdc:Bounds height="80.0" width="100.0" x="645.0" y="120.625"></omgdc:Bounds>
-            </bpmndi:BPMNShape>
-            <bpmndi:BPMNShape bpmnElement="sid-B951D5DB-EA64-4CD3-8F35-6463CA83A154" id="BPMNShape_sid-B951D5DB-EA64-4CD3-8F35-6463CA83A154">
-                <omgdc:Bounds height="28.0" width="28.0" x="870.0" y="146.625"></omgdc:Bounds>
-            </bpmndi:BPMNShape>
-            <bpmndi:BPMNShape bpmnElement="sid-38DE5F46-A270-4060-87D2-3DB97997B861" id="BPMNShape_sid-38DE5F46-A270-4060-87D2-3DB97997B861">
-                <omgdc:Bounds height="40.0" width="40.0" x="475.0" y="140.625"></omgdc:Bounds>
-            </bpmndi:BPMNShape>
-            <bpmndi:BPMNShape bpmnElement="leader2" id="BPMNShape_leader2">
-                <omgdc:Bounds height="80.0" width="100.0" x="445.0" y="315.0"></omgdc:Bounds>
-            </bpmndi:BPMNShape>
-            <bpmndi:BPMNEdge bpmnElement="sid-EEF0DA1F-554E-4439-920E-0382841D7DE2" id="BPMNEdge_sid-EEF0DA1F-554E-4439-920E-0382841D7DE2" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
-                <omgdi:waypoint x="149.94976375101032" y="160.53977407408564"></omgdi:waypoint>
-                <omgdi:waypoint x="194.99999999999565" y="160.28380681818183"></omgdi:waypoint>
-            </bpmndi:BPMNEdge>
-            <bpmndi:BPMNEdge bpmnElement="sid-D0666311-783F-49EC-95F7-13C648383566" id="BPMNEdge_sid-D0666311-783F-49EC-95F7-13C648383566" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
-                <omgdi:waypoint x="429.95000000000005" y="160.27146739130436"></omgdi:waypoint>
-                <omgdi:waypoint x="475.0672391445236" y="160.5168918918919"></omgdi:waypoint>
-            </bpmndi:BPMNEdge>
-            <bpmndi:BPMNEdge bpmnElement="sid-5F44C7A8-94DB-4EA3-A77F-5DF3092F1C56" id="BPMNEdge_sid-5F44C7A8-94DB-4EA3-A77F-5DF3092F1C56" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
-                <omgdi:waypoint x="495.0" y="180.5698708060162"></omgdi:waypoint>
-                <omgdi:waypoint x="495.0" y="315.0"></omgdi:waypoint>
-            </bpmndi:BPMNEdge>
-            <bpmndi:BPMNEdge bpmnElement="sid-ADD2E384-E8CC-4136-B881-93CFDC340A4E" id="BPMNEdge_sid-ADD2E384-E8CC-4136-B881-93CFDC340A4E" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
-                <omgdi:waypoint x="744.9499999999675" y="160.625"></omgdi:waypoint>
-                <omgdi:waypoint x="870.0" y="160.625"></omgdi:waypoint>
-            </bpmndi:BPMNEdge>
-            <bpmndi:BPMNEdge bpmnElement="sid-753BBA2E-1D21-41EA-B44F-E8A0CDEE3D17" id="BPMNEdge_sid-753BBA2E-1D21-41EA-B44F-E8A0CDEE3D17" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
-                <omgdi:waypoint x="514.9450149924147" y="160.625"></omgdi:waypoint>
-                <omgdi:waypoint x="645.0" y="160.625"></omgdi:waypoint>
-            </bpmndi:BPMNEdge>
-            <bpmndi:BPMNEdge bpmnElement="sid-5DE8C566-4721-456A-9240-CF4BF3DC7A61" id="BPMNEdge_sid-5DE8C566-4721-456A-9240-CF4BF3DC7A61" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
-                <omgdi:waypoint x="294.9499999999527" y="160.0"></omgdi:waypoint>
-                <omgdi:waypoint x="329.99999999997203" y="160.0"></omgdi:waypoint>
-            </bpmndi:BPMNEdge>
-            <bpmndi:BPMNEdge bpmnElement="sid-6A8F54F5-165A-430F-A218-F8B6A054B784" id="BPMNEdge_sid-6A8F54F5-165A-430F-A218-F8B6A054B784" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
-                <omgdi:waypoint x="536.1061093247588" y="315.0"></omgdi:waypoint>
-                <omgdi:waypoint x="653.8424437299035" y="200.575"></omgdi:waypoint>
-            </bpmndi:BPMNEdge>
-        </bpmndi:BPMNPlane>
-    </bpmndi:BPMNDiagram>
-</definitions>`
-
-            bpmnXMLDemo = `<?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions id="5b998cd6006e65c687237399493c452f" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" targetNamespace="http://bpmn.io/schema/bpmn">
   <bpmn:escalation id="start_91_escal" name="up1" />
   <bpmn:signal id="start_84_signal" name="sig02" />
@@ -845,6 +724,1533 @@ const options = markRaw({
           }
         },
         {
+          name: "流转过程",
+          action: function (editor) {
+            let flowData = `{
+"groups":[
+  "登记","初审","办理","处室办理"
+],
+"config":{
+  "root": {
+    "width": 150,
+    "height": 100,
+    "textField": "group",
+    "groupField": "groupId",
+    "font": { "size": 16 }
+  },
+  "task": { 
+    "width": 150,
+    "height": 100,
+    "textField": "group",
+    "groupField": "groupId",
+    "font": { "size": 16 },
+    "fields":[
+      {
+        "key":"name",
+        "field":"chrusername"
+      }
+    ]
+  },
+  "sxly": { 
+    "model":"1000031",
+    "width": 150,
+    "height": 100,
+    "textField": "group",
+    "groupField": "groupId",
+    "font": { "size": 16 },
+    "fields":[
+      {
+        "key":"name",
+        "field":"chrusername"
+      }
+    ]
+  },
+  "dj": { 
+    "model":"1000041",
+    "width": 150,
+    "height": 125,
+    "textField": "group",
+    "groupField": "groupId",
+    "font": { "size": 16 },
+    "fields":[
+      {
+        "key":"name",
+        "field":"chrusername"
+      },
+      {
+        "key":"border",
+        "field":"border"
+      },
+      {
+        "key":"font",
+        "field":"font"
+      }
+    ]
+  },
+  "msrl": { 
+    "model":"1000031",
+    "width": 125,
+    "height": 150,
+    "textField": "group",
+    "groupField": "groupId",
+    "font": { "size": 16 },
+    "fields":[
+      {
+        "key":"name",
+        "field":"chrusername"
+      },
+      {
+        "key":"border",
+        "field":"border"
+      },
+      {
+        "key":"font",
+        "field":"font"
+      }
+    ]
+  },
+  "ldrl": { 
+    "model":"1000041",
+    "width": 125,
+    "height": 125,
+    "textField": "group",
+    "groupField": "groupId",
+    "font": { "size": 24,"color":"yellow" },
+    "fields":[
+      {
+        "key":"name",
+        "field":"chrusername"
+      }
+    ]
+  },
+  "ff": { 
+    "width": 125,
+    "height": 160,
+    "textField": "group",
+    "groupField": "groupId",
+    "font": { "size": 16 },
+    "fields":[
+      {
+        "key":"name",
+        "field":"chrusername"
+      }
+    ]
+  },
+  "bl": { 
+    "width": 125,
+    "height": 200,
+    "textField": "group",
+    "groupField": "groupId",
+    "font": { "size": 16 },
+    "fields":[
+      {
+        "key":"name",
+        "field":"chrusername"
+      }
+    ]
+  },
+  "default": { 
+    "width": 150,
+    "height": 100,
+    "textField": "group",
+    "groupField": "groupId",
+    "font": { "size": 16 }
+  }
+},
+"direct":3,
+"data":
+    {
+        "desc": "",
+        "id": "1707220394630533101",
+        "link": "",
+        "name": "收文",
+        "type": "sxly",
+        "chrusername": "收文转办人",
+        
+        
+        "groupId": "2007220394630533102",
+        "group": "事项来源",
+        "children": [
+            {
+                "desc": "",
+                "id": "1707220394630533102",
+                "link": "",
+                "name": "登记（状态）",
+                "chrusername": "登记人数据下表1",
+                "type": "dj",
+                "font":{
+                  "size":24,
+                  "color":"green"
+                },
+                
+                "groupId": "2007220394630533103",
+                "group": "登记分发",
+                "children": [
+                    {
+                        "desc": "",
+                        "id": "1707220394630533103",
+                        "link": "",
+                        "name": "秘书认领（状态）",
+                        "chrusername": "秘书下标1",
+                        "type": "msrl",
+                        "border":{
+                          "color":"red",
+                          "width":5
+                        },
+                        "groupId": "2007220394630533103",
+                        "group": "登记分发",
+                        "children": [
+                            {
+                                "desc": "",
+                                "id": "1707220394630572205",
+                                "link": "",
+                                "name": "领导认领（状态）",
+                                "chrusername": "领导下下标1",
+                                "type": "ldrl",
+                                
+                                
+                                "groupId": "2007220394630533103",
+                                "group": "登记分发",
+                                "children": [
+                                    {
+                                        "desc": "",
+                                        "id": "1707220394630572206",
+                                        "link": "",
+                                        "name": "分发（状态）",
+                                        "chrusername": "分发人下标1",
+                                        "type": "ff",
+                                        
+                                        
+                                        "groupId": "2007220394630533103",
+                                        "group": "登记分发",
+                                        "children": [
+                                            {
+                                                "desc": "",
+                                                "id": "1707220394630572207",
+                                                "link": "",
+                                                "name": "签收（状态）",
+                                                "chrusername": "签收人下标1",
+                                                "type": "qs",
+                                                
+                                                
+                                                "groupId": "2007220394630533104",
+                                                "group": "办理反馈",
+                                                "children": [
+                                                    {
+                                                        "desc": "",
+                                                        "id": "1707220394630572208",
+                                                        "link": "",
+                                                        "name": "审批（状态）",
+                                                        "chrusername": "审批人下标1",
+                                                        "type": "blsp",
+                                                        
+                                                        
+                                                        "groupId": "2007220394630533104",
+                                                        "group": "办理反馈",
+                                                        "children": [
+                                                            {
+                                                                "desc": "",
+                                                                "id": "2707220394630572209",
+                                                                "link": "",
+                                                                "name": "办理（状态）",
+                                                                "chrusername": "办理人下标1",
+                                                                "type": "bl",
+                                                                
+                                                                
+                                                                "groupId": "2007220394630533104",
+                                                                "group": "办理反馈",
+                                                                "tbzqlist": [],
+                                                                "children": [
+                                                                    {
+                                                                        "desc": "",
+                                                                        "id": "1707220394630572210",
+                                                                        "link": "",
+                                                                        "name": "审核（状态）",
+                                                                        "chrusername": "审核人下标1",
+                                                                        "type": "sh",
+                                                                        
+                                                                        
+                                                                        "groupId": "2007220394630533104",
+                                                                        "group": "办理反馈",
+                                                                        "children": [
+                                                                            {
+                                                                                "desc": "",
+                                                                                "id": "1707220394630572211",
+                                                                                "link": "",
+                                                                                "name": "内容核查（状态）",
+                                                                                "chrusername": "内容核查人下标1",
+                                                                                "type": "nrhc",
+                                                                                
+                                                                                
+                                                                                "groupId": "2007220394630533105",
+                                                                                "group": "审核评价",
+                                                                                "children": [
+                                                                                    {
+                                                                                        "desc": "",
+                                                                                        "id": "1707220394630572212",
+                                                                                        "link": "",
+                                                                                        "name": "审批（状态）",
+                                                                                        "chrusername": "审批人下标1-1",
+                                                                                        "type": "hcsp",
+                                                                                        
+                                                                                        
+                                                                                        "groupId": "2007220394630533105",
+                                                                                        "group": "审核评价",
+                                                                                        "children": [
+                                                {
+                                                "desc": "",
+                                                "id": "1707220394631672212",
+                                                "link": "",
+                                                "name": "审批（状态）",
+                                                "chrusername": "审批人下标1-2",
+                                                "type": "hcsp",
+                                                
+                                                
+                                                "groupId": "2007220394630533105",
+                                                "group": "审核评价"
+                                                }
+                                            ]
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "desc": "",
+                        "id": "1707220394630533104",
+                        "link": "",
+                        "name": "秘书认领（状态）",
+                        "chrusername": "秘书下标2",
+                        "type": "msrl",
+                        
+                        
+                        "groupId": "2007220394630533103",
+                        "group": "登记分发",
+                        "children": [
+                            {
+                                "desc": "",
+                                "id": "1707220394630533105",
+                                "link": "",
+                                "name": "领导认领（状态）",
+                                "chrusername": "领导下标2",
+                                "type": "ldrl",
+                                
+                                
+                                "groupId": "2007220394630533103",
+                                "group": "登记分发",
+                                "children": [
+                                    {
+                                        "desc": "",
+                                        "id": "1707220394630533106",
+                                        "link": "",
+                                        "name": "分发（状态）",
+                                        "chrusername": "分发下标2",
+                                        "type": "ff",
+                                        
+                                        
+                                        "groupId": "2007220394630533103",
+                                        "group": "登记分发",
+                                        "children": [
+                                            {
+                                                "desc": "",
+                                                "id": "1707220394630533107",
+                                                "link": "",
+                                                "name": "签收（状态）",
+                                                "chrusername": "签收下标2",
+                                                "type": "qs",
+                                                
+                                                
+                                                "groupId": "2007220394630533104",
+                                                "group": "办理反馈",
+                                                "children": [
+                                                    {
+                                                        "desc": "",
+                                                        "id": "1707220394630533108",
+                                                        "link": "",
+                                                        "name": "审批（状态）",
+                                                        "chrusername": "审批下标2",
+                                                        "type": "blsp",
+                                                        
+                                                        
+                                                        "groupId": "2007220394630533104",
+                                                        "group": "办理反馈",
+                                                        "children": [
+                                                            {
+                                                                "desc": "",
+                                                                "id": "1707220394630533109",
+                                                                "link": "",
+                                                                "name": "办理（状态）",
+                                                                "chrusername": "办理人下标2",
+                                                                "type": "bl",
+                                                                
+                                                                
+                                                                "groupId": "2007220394630533104",
+                                                                "group": "办理反馈",
+                                                                "tbzqlist": [],
+                                                                "children": [
+                                                                    {
+                                                                        "desc": "",
+                                                                        "id": "1707220394630533110",
+                                                                        "link": "",
+                                                                        "name": "审核（状态）",
+                                                                        "chrusername": "审核人下标2",
+                                                                        "type": "sh",
+                                                                        
+                                                                        
+                                                                        "groupId": "2007220394630533104",
+                                                                        "group": "办理反馈",
+                                                                        "children": [
+                                                                            {
+                                                                                "desc": "",
+                                                                                "id": "1707220394630533111",
+                                                                                "link": "",
+                                                                                "name": "内容核查（状态）",
+                                                                                "chrusername": "内容核查人下标2",
+                                                                                "type": "nrhc",
+                                                                                
+                                                                                
+                                                                                "groupId": "2007220394630533105",
+                                                                                "group": "审核评价",
+                                                                                "children": [
+                                                                                    {
+                                                                                        "desc": "",
+                                                                                        "id": "1707220394630533112",
+                                                                                        "link": "",
+                                                                                        "name": "审批（状态）",
+                                                                                        "chrusername": "审批人下标2",
+                                                                                        "type": "hcsp",
+                                                                                        
+                                                                                        
+                                                                                        "groupId": "2007220394630533105",
+                                                                                        "group": "审核评价",
+                                                                                        "link": "1707220394630572213",
+                                                                                        "children": [
+                                                                                        {
+                                                                                                "desc": "",
+                                                                                                "id": "1707220394630572213",
+                                                                                                "link": "",
+                                                                                                "name": "汇总（状态）",
+                                                                                                "chrusername": "汇总人下标2",
+                                                                                                "type": "hz",
+                                                                                                
+                                                                                                
+                                                                                                "groupId": "2007220394630533105",
+                                                                                                "group": "审核评价",
+                                                                                                "children": [
+                                                                                                    {
+                                                                                                        "desc": "",
+                                                                                                        "id": "1707220394630572214",
+                                                                                                        "link": "",
+                                                                                                        "name": "单位审核（状态）",
+                                                                                                        "chrusername": "单位审核人下标2",
+                                                                                                        "type": "dwsh",
+                                                                                                        
+                                                                                                        
+                                                                                                        "groupId": "2007220394630533105",
+                                                                                                        "group": "审核评价",
+                                                                                                        "children": [
+                                                                                                            {
+                                                                                                                "desc": "",
+                                                                                                                "id": "1707220394630572215",
+                                                                                                                "link": "",
+                                                                                                                "name": "批示审批（状态）",
+                                                                                                                "chrusername": "批示审批人下标2-1",
+                                                                                                                "type": "pssp",
+                                                                                                                
+                                                                                                                
+                                                                                                                "groupId": "2007220394630533105",
+                                                                                                                "group": "审核评价",
+                                                                                                                "children": [
+                                                                                                                    {
+                                                                                                                        "desc": "",
+                                                                                                                        "id": "1707220394630572216",
+                                                                                                                        "link": "",
+                                                                                                                        "name": "上报（状态）",
+                                                                                                                        "chrusername": "上报人下标2",
+                                                                                                                        "type": "sb",
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        "groupId": "2007220394630533105",
+                                                                                                                        "group": "审核评价",
+                                                                                                                        "children": [
+                                                                                                                            {
+                                                                                                                                "desc": "",
+                                                                                                                                "id": "1707220394630572217",
+                                                                                                                                "link": "",
+                                                                                                                                "name": "办结（状态）",
+                                                                                                                                "chrusername": "办结人下标2",
+                                                                                                                                "type": "bj",
+                                                                                                                                
+                                                                                                                                
+                                                                                                                                "groupId": "2007220394630533105",
+                                                                                                                                "group": "审核评价",
+                                                                "children": [
+                                                                    {
+                                                                    "desc": "",
+                                                                    "id": "1707220394730572217",
+                                                                    "link": "",
+                                                                    "name": "办结（状态）",
+                                                                    "chrusername": "办结人下标2-1",
+                                                                    "type": "bj",
+                                                                    
+                                                                    
+                                                                    "groupId": "2007220394630533105",
+                                                                    "group": "审核评价",
+                                                                    "children":[
+                                                                        {
+                                                                            "desc": "",
+                                                                            "id": "1707220395110572217",
+                                                                            "link": "",
+                                                                            "name": "办结（状态）",
+                                                                            "chrusername": "办结人下标2-1-1",
+                                                                            "type": "bj",
+                                                                            
+                                                                            
+                                                                            "groupId": "2007220394630533105",
+                                                                            "group": "审核评价",
+                                                                            "children":[
+                                                                            {
+                                                                                "desc": "",
+                                                                                "id": "1707220395111572217",
+                                                                                "link": "",
+                                                                                "name": "办结（状态）",
+                                                                                "chrusername": "办结人下标2-1-1-1",
+                                                                                "type": "bj",
+                                                                                
+                                                                                
+                                                                                "groupId": "2007220394630533105",
+                                                                                "group": "审核评价"
+                                                                            },
+                                                                            {
+                                                                                "desc": "",
+                                                                                "id": "1707220395112572217",
+                                                                                "link": "",
+                                                                                "name": "办结（状态）",
+                                                                                "chrusername": "办结人下标2-1-1-2",
+                                                                                "type": "bj",
+                                                                                
+                                                                                
+                                                                                "groupId": "2007220394630533105",
+                                                                                "group": "审核评价",
+                                                                                "children":[
+                                                                                {
+                                                                                    "desc": "",
+                                                                                    "id": "170722039511780000",
+                                                            
+                                                                                    "name": "办结（状态）",
+                                                                                    "chrusername": "分支1",
+                                                                                    "type": "bj",
+                                                                                    
+                                                                                    
+                                                                                    "groupId": "2007220394630533105",
+                                                                                    "group": "审核评价",
+                                                                                    "link":"170722039511780002"
+                                                                                },
+                                                                                {
+                                                                                    "desc": "",
+                                                                                    "id": "170722039511780001",
+                                                                                    "link": "",
+                                                                                    "name": "办结（状态）",
+                                                                                    "chrusername": "分支2",
+                                                                                    "type": "bj",
+                                                                                    
+                                                                                    
+                                                                                    "groupId": "2007220394630533105",
+                                                                                    "group": "审核评价",
+                                                                                    "children":[
+                                                                                    {
+                                                                                        "desc": "",
+                                                                                        "id": "170722039511780002",
+                                                                                        "link": "",
+                                                                                        "name": "办结（状态）",
+                                                                                        "chrusername": "分支2-1",
+                                                                                        "type": "bj",
+                                                                                        
+                                                                                        
+                                                                                        "groupId": "2007220394630533105",
+                                                                                        "group": "审核评价",
+                                                                                        "children":[
+                                                                                        {
+                                                                                            "desc": "",
+                                                                                            "id": "170722039511780003",
+                                                                                            "link": "",
+                                                                                            "name": "办结（状态）",
+                                                                                            "chrusername": "分支2-1-1",
+                                                                                            "type": "bj",
+                                                                                            
+                                                                                            
+                                                                                            "groupId": "2007220394630533105",
+                                                                                            "group": "审核评价",
+                                                                                            "children":[
+                                                                                            {
+                                                                                                "desc": "",
+                                                                                                "id": "170722039511780004",
+                                                                                                "link": "",
+                                                                                                "name": "办结（状态）",
+                                                                                                "chrusername": "分支2-1-1-1",
+                                                                                                "type": "bj",
+                                                                                                
+                                                                                                
+                                                                                                "groupId": "2007220394630533105",
+                                                                                                "group": "审核评价",
+                                                                                                "children":[
+                                                                                                {
+                                                                                                    "desc": "",
+                                                                                                    "id": "170722039511810000",
+                                                                                                    "link": "",
+                                                                                                    "name": "办结（状态）",
+                                                                                                    "chrusername": "新开",
+                                                                                                    "type": "bj",
+                                                                                                    
+                                                                                                    
+                                                                                                    "groupId": "2007220394630533105",
+                                                                                                    "group": "审核评价",
+                                                                                                    "children":[
+                                                                                                    {
+                                                                                                        "desc": "",
+                                                                                                        "id": "170722039511810001",
+                                                                                                        "link": "170722039511990000",
+                                                                                                        "name": "办结（状态）",
+                                                                                                        "chrusername": "新开1",
+                                                                                                        "type": "bj",
+                                                                                                        
+                                                                                                        
+                                                                                                        "groupId": "2007220394630533105",
+                                                                                                        "group": "审核评价",
+                                                                                                        "children":[
+                                                                                                        
+                                                                                                        ]
+                                                                                                    },
+                                                                                                    {
+                                                                                                        "desc": "",
+                                                                                                        "id": "170722039511810002",
+                                                                                                        "link": "170722039511990000",
+                                                                                                        "name": "办结（状态）",
+                                                                                                        "chrusername": "新开2",
+                                                                                                        "type": "bj",
+                                                                                                        
+                                                                                                        
+                                                                                                        "groupId": "2007220394630533105",
+                                                                                                        "group": "审核评价",
+                                                                                                        "children":[
+                                                                                                        
+                                                                                                        ]
+                                                                                                    },
+                                                                                                    {
+                                                                                                        "desc": "",
+                                                                                                        "id": "170722039511810003",
+                                                                                                        "link": "170722039511990000",
+                                                                                                        "name": "办结（状态）",
+                                                                                                        "chrusername": "新开3",
+                                                                                                        "type": "bj",
+                                                                                                        
+                                                                                                        
+                                                                                                        "groupId": "2007220394630533105",
+                                                                                                        "group": "审核评价",
+                                                                                                        "children":[
+                                                                                                        
+                                                                                                        ]
+                                                                                                    }
+                                                                                                    ]
+                                                                                                }
+                                                                                                ]
+                                                                                            },
+                                                                                            {
+                                                                                                "desc": "",
+                                                                                                "id": "170722039511780005",
+                                                                                                "link": "170722039511810000",
+                                                                                                "name": "办结（状态）",
+                                                                                                "chrusername": "分支2-1-1-2",
+                                                                                                "type": "bj",
+                                                                                                
+                                                                                                
+                                                                                                "groupId": "2007220394630533105",
+                                                                                                "group": "审核评价",
+                                                                                                "children":[
+                                                                                                
+                                                                                                ]
+                                                                                            }
+                                                                                            ]
+                                                                                        }
+                                                                                        ]
+                                                                                    }
+                                                                                    ]
+                                                                                }
+                                                                                ]
+                                                                            },
+                                                                            {
+                                                                                "desc": "",
+                                                                                "id": "1707220395113572217",
+                                                                                "link":"170722039511780002",
+                                                                                "name": "办结（状态）",
+                                                                                "chrusername": "办结人下标2-1-1-3",
+                                                                                "type": "bj",
+                                                                                
+                                                                                
+                                                                                "groupId": "2007220394630533105",
+                                                                                "group": "审核评价"
+                                                                            },
+                                                                            {
+                                                                                "desc": "",
+                                                                                "id": "1707220395114572217",
+                                                                                "link": "",
+                                                                                "name": "办结（状态）",
+                                                                                "chrusername": "办结人下标2-1-1-4",
+                                                                                "type": "bj",
+                                                                                
+                                                                                
+                                                                                "groupId": "2007220394630533105",
+                                                                                "group": "审核评价"
+                                                                            }
+
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "desc": "",
+                                                                            "id": "1707220395120572217",
+                                                                            "link": "",
+                                                                            "name": "办结（状态）",
+                                                                            "chrusername": "办结人下标2-1-2",
+                                                                            "type": "bj",
+                                                                            
+                                                                            
+                                                                            "groupId": "2007220394630533105",
+                                                                            "group": "审核评价"
+                                                                        },
+                                                                        {
+                                                                            "desc": "",
+                                                                            "id": "1707220395130572217",
+                                                                            "link": "",
+                                                                            "name": "办结（状态）",
+                                                                            "chrusername": "办结人下标2-1-3",
+                                                                            "type": "bj",
+                                                                            
+                                                                            
+                                                                            "groupId": "2007220394630533105",
+                                                                            "group": "审核评价"
+                                                                        }
+                                                                    ]
+                                                                    
+                                                                    },
+                                                                    {
+                                                                    "desc": "",
+                                                                    "id": "1707220394830572217",
+                                                                    "link": "",
+                                                                    "name": "办结（状态）",
+                                                                    "chrusername": "办结人下标2-2",
+                                                                    "type": "bj",
+                                                                    
+                                                                    
+                                                                    "groupId": "2007220394630533105",
+                                                                    "group": "审核评价",
+                                                                    "children":[
+                                                                        {
+                                                                        "desc": "",
+                                                                        "id": "1707230394830572217",
+                                                                        "link":"170722039511780002",
+                                                                        "name": "办结（状态）",
+                                                                        "chrusername": "办结人下标2-2-1",
+                                                                        "type": "bj",
+                                                                        
+                                                                        
+                                                                        "groupId": "2007220394630533105",
+                                                                        "group": "审核评价",
+                                                                        "children":[
+                                                                            
+                                                                        ]
+                                                                        }
+                                                                    ]
+                                                                    },
+                                                                    {
+                                                                    "desc": "",
+                                                                    "id": "1707220394930572217",
+                                                                    "link": "",
+                                                                    "name": "办结（状态）",
+                                                                    "chrusername": "办结人下标2-3",
+                                                                    "type": "bj",
+                                                                    
+                                                                    
+                                                                    "groupId": "2007220394630533105",
+                                                                    "group": "审核评价"
+                                                                    },
+                                                                    {
+                                                                    "desc": "",
+                                                                    "id": "1707220394930572219",
+                                                                    "link": "",
+                                                                    "name": "办结（状态）",
+                                                                    "chrusername": "办结人下标2-4",
+                                                                    "type": "bj",
+                                                                    
+                                                                    
+                                                                    "groupId": "2007220394630533105",
+                                                                    "group": "审核评价",
+                                                                    "children":[
+                                                                        {
+                                                                        "desc": "",
+                                                                        "id": "170722039511790000",
+                                                                        "name": "办结（状态）",
+                                                                        "chrusername": "分支11",
+                                                                        "type": "bj",
+                                                                        
+                                                                        
+                                                                        "groupId": "2007220394630533105",
+                                                                        "group": "审核评价",
+                                                                        "children":[
+                                                                        {
+                                                                            "desc": "",
+                                                                            "id": "170722039511990000",
+                                                                            "name": "结束",
+                                                                            "chrusername": "结束",
+                                                                            "type": "bj",
+                                                                            
+                                                                            
+                                                                            "groupId": "2007220234630533105",
+                                                                            "group": "结束"
+                                                                        }
+                                                                        ]
+                                                                    },
+                                                                    {
+                                                                        "desc": "",
+                                                                        "id": "170722039511790001",
+                                                                        "link": "",
+                                                                        "name": "办结（状态）",
+                                                                        "chrusername": "分支2",
+                                                                        "type": "bj",
+                                                                        
+                                                                        
+                                                                        "groupId": "2007220394630533105",
+                                                                        "group": "审核评价",
+                                                                        "children":[
+                                                                        {
+                                                                            "desc": "",
+                                                                            "id": "170722039511790002",
+                                                                            "link": "",
+                                                                            "name": "办结（状态）",
+                                                                            "chrusername": "分支2-1",
+                                                                            "type": "bj",
+                                                                            
+                                                                            
+                                                                            "groupId": "2007220394630533105",
+                                                                            "group": "审核评价",
+                                                                            "children":[
+                                                                            {
+                                                                                "desc": "",
+                                                                                "id": "170722039511790003",
+                                                                                "link": "",
+                                                                                "name": "办结（状态）",
+                                                                                "chrusername": "分支2-1-1",
+                                                                                "type": "bj",
+                                                                                
+                                                                                
+                                                                                "groupId": "2007220394630533105",
+                                                                                "group": "审核评价",
+                                                                                "children":[
+                                                                                {
+                                                                                    "desc": "",
+                                                                                    "id": "170722039511790004",
+                                                                                    "link": "",
+                                                                                    "name": "办结（状态）",
+                                                                                    "chrusername": "分支2-1-1-1",
+                                                                                    "type": "bj",
+                                                                                    
+                                                                                    
+                                                                                    "groupId": "2007220394630533105",
+                                                                                    "group": "审核评价",
+                                                                                    "children":[
+                                                                                    {
+                                                                                        "desc": "",
+                                                                                        "id": "170722039511790100",
+                                                                                        "link": "",
+                                                                                        "name": "办结（状态）",
+                                                                                        "chrusername": "分支2-1-1-1",
+                                                                                        "type": "bj",
+                                                                                        
+                                                                                        
+                                                                                        "groupId": "2007220394630533105",
+                                                                                        "group": "审核评价",
+                                                                                        "children":[
+                                                                                        {
+                                                                                            "desc": "",
+                                                                                            "id": "170722039511790101",
+                                                                                            "link": "170722039511990000",
+                                                                                            "name": "办结（状态）",
+                                                                                            "chrusername": "分支2-1-1-1-1",
+                                                                                            "type": "bj",
+                                                                                            
+                                                                                            
+                                                                                            "groupId": "2007220394630533105",
+                                                                                            "group": "审核评价",
+                                                                                            "children":[
+                                                                                            
+                                                                                            ]
+                                                                                        }
+                                                                                        ]
+                                                                                    }
+                                                                                    ]
+                                                                                },
+                                                                                {
+                                                                                    "desc": "",
+                                                                                    "id": "170722039511790005",
+                                                                                    "link": "170722039511990000",
+                                                                                    "name": "办结（状态）",
+                                                                                    "chrusername": "分支2-1-1-2",
+                                                                                    "type": "bj",
+                                                                                    
+                                                                                    
+                                                                                    "groupId": "2007220394630533105",
+                                                                                    "group": "审核评价",
+                                                                                    "children":[
+                                                                                    
+                                                                                    ]
+                                                                                },
+                                                                                {
+                                                                                    "desc": "",
+                                                                                    "id": "170722039511790006",
+                                                                                    "link": "170722039511990000",
+                                                                                    "name": "办结（状态）",
+                                                                                    "chrusername": "分支2-1-1-3",
+                                                                                    "type": "bj",
+                                                                                    
+                                                                                    
+                                                                                    "groupId": "2007220394630533105",
+                                                                                    "group": "审核评价",
+                                                                                    "children":[
+                                                                                    
+                                                                                    ]
+                                                                                }
+                                                                                ]
+                                                                            }
+                                                                            ]
+                                                                        }
+                                                                        ]
+                                                                    }
+                                                                    ]
+                                                                    }
+                                                                
+                                                                ]
+                                                                                                                            }
+                                                                                                                        ]
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            }
+                                                                                                        ]
+                                                                                                    }
+                                                                                                ]
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "desc": "",
+                        "id": "2707220394630533104",
+                        "link": "",
+                        "name": "秘书认领（状态）",
+                        "chrusername": "秘书下标3",
+                        "type": "msrl",
+                        
+                        
+                        "groupId": "2007220394630533103",
+                        "group": "登记分发",
+                        "children": [
+                            {
+                                "desc": "",
+                                "id": "2707220394630533105",
+                                "link": "",
+                                "name": "领导认领（状态）",
+                                "chrusername": "领导下标3",
+                                "type": "ldrl",
+                                
+                                
+                                "groupId": "2007220394630533103",
+                                "group": "登记分发",
+                                "children": [
+                                    {
+                                        "desc": "",
+                                        "id": "2707220394630533106",
+                                        "link": "",
+                                        "name": "分发（状态）",
+                                        "chrusername": "分发人下标3",
+                                        "type": "ff",
+                                        
+                                        
+                                        "groupId": "2007220394630533103",
+                                        "group": "登记分发",
+                                        "children": [
+                                            {
+                                                "desc": "",
+                                                "id": "2707220394630533107",
+                                                "link": "",
+                                                "name": "签收（状态）",
+                                                "chrusername": "签收人下标3",
+                                                "type": "qs",
+                                                
+                                                
+                                                "groupId": "2007220394630533104",
+                                                "group": "办理反馈",
+                                                "children": [
+                                                    {
+                                                        "desc": "",
+                                                        "id": "2707220394630533108",
+                                                        "link": "",
+                                                        "name": "审批（状态）",
+                                                        "chrusername": "审批人下标3",
+                                                        "type": "blsp",
+                                                        
+                                                        
+                                                        "groupId": "2007220394630533104",
+                                                        "group": "办理反馈",
+                                                        "children": [
+                                                            {
+                                                                "desc": "",
+                                                                "id": "2707220394630533109",
+                                                                "link": "",
+                                                                "name": "办理（状态）",
+                                                                "chrusername": "办理人下标3",
+                                                                "type": "bl",
+                                                                
+                                                                
+                                                                "groupId": "2007220394630533104",
+                                                                "group": "办理反馈",
+                                                                "tbzqlist": [],
+                                                                "children": [
+                                                                    {
+                                                                        "desc": "",
+                                                                        "id": "2707220394630533110",
+                                                                        "link": "",
+                                                                        "name": "审核（状态）",
+                                                                        "chrusername": "审核人下标3",
+                                                                        "type": "sh",
+                                                                        
+                                                                        
+                                                                        "groupId": "2007220394630533104",
+                                                                        "group": "办理反馈",
+                                                                        "children": [
+                                                                            {
+                                                                                "desc": "",
+                                                                                "id": "2707220394630533111",
+                                                                                "link": "",
+                                                                                "name": "内容核查（状态）",
+                                                                                "chrusername": "内容核查人下标3",
+                                                                                "type": "nrhc",
+                                                                                
+                                                                                
+                                                                                "groupId": "2007220394630533105",
+                                                                                "group": "审核评价",
+                                                                                "children": [
+                                                                                    {
+                                                                                        "desc": "",
+                                                                                        "id": "2707220394630533112",
+                                                                                        "link": "1707220394630572213",
+                                                                                        "name": "审批（状态）",
+                                                                                        "chrusername": "审批人下标3-1",
+                                                                                        "type": "hcsp",
+                                                                                        
+                                                                                        
+                                                                                        "groupId": "2007220394630533105",
+                                                                                        "group": "审核评价"
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "desc": "",
+                        "id": "3707220394630533104",
+                        "link": "",
+                        "name": "秘书认领（状态）",
+                        "chrusername": "秘书下标4",
+                        "type": "msrl",
+                        
+                        
+                        "groupId": "2007220394630533103",
+                        "group": "登记分发",
+                        "children": [
+                            {
+                                "desc": "",
+                                "id": "3707220394630533105",
+                                "link": "",
+                                "name": "领导认领（状态）",
+                                "chrusername": "领导下标4",
+                                "type": "ldrl",
+                                
+                                
+                                "groupId": "2007220394630533103",
+                                "group": "登记分发",
+                                "children": [
+                                    {
+                                        "desc": "",
+                                        "id": "3707220394630533106",
+                                        "link": "",
+                                        "name": "分发（状态）",
+                                        "chrusername": "分发人下标4",
+                                        "type": "ff",
+                                        
+                                        
+                                        "groupId": "2007220394630533103",
+                                        "group": "登记分发",
+                                        "children": [
+                                            {
+                                                "desc": "",
+                                                "id": "3707220394630533107",
+                                                "link": "",
+                                                "name": "签收（状态）",
+                                                "chrusername": "签收人下标4",
+                                                "type": "qs",
+                                                
+                                                
+                                                "groupId": "2007220394630533104",
+                                                "group": "办理反馈",
+                                                "children": [
+                                                    {
+                                                        "desc": "",
+                                                        "id": "3707220394630533108",
+                                                        "link": "",
+                                                        "name": "审批（状态）",
+                                                        "chrusername": "审批人下标4",
+                                                        "type": "blsp",
+                                                        
+                                                        
+                                                        "groupId": "2007220394630533104",
+                                                        "group": "办理反馈",
+                                                        "children": [
+                                                            {
+                                                                "desc": "",
+                                                                "id": "3707220394630533109",
+                                                                "link": "",
+                                                                "name": "办理（状态）",
+                                                                "chrusername": "办理人下标4",
+                                                                "type": "bl",
+                                                                
+                                                                
+                                                                "groupId": "2007220394630533104",
+                                                                "group": "办理反馈",
+                                                                "tbzqlist": [],
+                                                                "children": [
+                                                                    {
+                                                                        "desc": "",
+                                                                        "id": "3707220394630533110",
+                                                                        "link": "",
+                                                                        "name": "审核（状态）",
+                                                                        "chrusername": "审核人下标4",
+                                                                        "type": "sh",
+                                                                        
+                                                                        
+                                                                        "groupId": "2007220394630533104",
+                                                                        "group": "办理反馈",
+                                                                        "children": [
+                                                                            {
+                                                                                "desc": "",
+                                                                                "id": "3707220394630533111",
+                                                                                "link": "",
+                                                                                "name": "内容核查（状态）",
+                                                                                "chrusername": "内容核查人下标4",
+                                                                                "type": "nrhc",
+                                                                                
+                                                                                
+                                                                                "groupId": "2007220394630533105",
+                                                                                "group": "审核评价",
+                                                                                "children": [
+                                                                                    {
+                                                                                        "desc": "",
+                                                                                        "id": "3707220394630533112",
+                                                                                        "name": "审批（状态）",
+                                                                                        "chrusername": "审批人下标4-1",
+                                                                                        "type": "hcsp",
+                                                                                        
+                                                                                        
+                                                                                        "groupId": "2007220394630533105",
+                                                                                        "group": "审核评价",
+                                                                                        "link": "1707220394630572213"
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+            {
+                        "desc": "",
+                        "id": "1707220394641533103",
+                        "link": "",
+                        "name": "秘书认领（状态）",
+                        "chrusername": "秘书下标-插队1",
+                        "type": "msrl",
+                        
+                        
+                        "groupId": "2007220394630533103",
+                        "group": "登记分发",
+            "period": [
+                {
+                "zq": "周期一",
+                "blfk": "啊士大夫啊士大夫阿萨德发生的发生的阿萨德阿萨德",
+                "file": "啊士大夫啊士大夫.doc",
+                "bldw": "发改委",
+                "blr": "魏如萱",
+                "date": "2024-06-02",
+                "ksrq": "6月1日",
+                "jsrq": "7月2日",
+                "fz": "95分",
+                "bjzt": "按时办结",
+                "ddsl": "1",
+                "cbsl": "1"
+                },
+                {
+                "zq": "周期二",
+                "blfk": "啊士大夫啊士大夫阿萨德发生的发生的阿萨德阿萨德",
+                "file": "啊士大夫啊士大夫.doc",
+                "bldw": "发改委",
+                "blr": "魏如萱",
+                "date": "2024-06-02",
+                "ksrq": "7月3日",
+                "jsrq": "8月3日",
+                "fz": "95分",
+                "bjzt": "按时办结",
+                "ddsl": "1",
+                "cbsl": "1"
+                }
+            ],
+                        "children": [
+                {
+                "desc": "",
+                "id": "1707220394642533103",
+                "link": "",
+                "name": "秘书认领（状态）",
+                "chrusername": "秘书下标-插队1-1",
+                "type": "msrl",
+                
+                
+                "groupId": "2007220394630533103",
+                "group": "登记分发",
+                "children": [
+                    {
+                    "desc": "",
+                    "id": "1707220394643533103",
+                    "link": "",
+                    "name": "秘书认领（状态）",
+                    "chrusername": "秘书下标-插队1-2",
+                    "type": "msrl",
+                    
+                    
+                    "groupId": "2007220394630533103",
+                    "group": "登记分发",
+                    "children": [
+                        {
+                        "desc": "",
+                        "id": "1707220394644533103",
+                        "link": "",
+                        "name": "秘书认领（状态）",
+                        "chrusername": "秘书下标-插队1-3",
+                        "type": "msrl",
+                        
+                        
+                        "groupId": "2007220394630533104",
+                        "group": "办理反馈",
+                        "children": [
+                            {
+                            "desc": "",
+                            "id": "1707220394645533103",
+                            "link": "",
+                            "name": "秘书认领（状态）",
+                            "chrusername": "秘书下标-插队1-4",
+                            "type": "msrl",
+                            
+                            
+                            "groupId": "2007220394630533104",
+                            "group": "办理反馈",
+                            "children": [
+                                {
+                                "desc": "",
+                                "id": "1707220394646533103",
+                                "link": "",
+                                "name": "秘书认领（状态）",
+                                "chrusername": "秘书下标-插队1-5",
+                                "type": "msrl",
+                                
+                                
+                                "groupId": "2007220394630533104",
+                                "group": "办理反馈",
+                                "children": [
+                                    {
+                                    "desc": "",
+                                    "id": "1707220394647533103",
+                                    "link": "",
+                                    "name": "秘书认领（状态）",
+                                    "chrusername": "秘书下标-插队1-6",
+                                    "type": "msrl",
+                                    
+                                    
+                                    "groupId": "2007220394630533104",
+                                    "group": "办理反馈",
+                                    "children": [
+                                        {
+                                        "desc": "",
+                                        "id": "1707220394744533103",
+                                        "link": "",
+                                        "name": "秘书认领（状态）",
+                                        "chrusername": "秘书下标-插队1-7",
+                                        "type": "msrl",
+                                        
+                                        
+                                        "groupId": "2007220394630533104",
+                                        "group": "办理反馈",
+                                        "children": [
+                                            {
+                                            "desc": "",
+                                            "id": "1707220394844533103",
+                                            "link": "",
+                                            "name": "秘书认领（状态）",
+                                            "chrusername": "秘书下标-插队1-8",
+                                            "type": "msrl",
+                                            
+                                            
+                                            "groupId": "2007220394630533105",
+                                            "group": "审核评价",
+                                            "children": [
+                                                {
+                                                "desc": "",
+                                                "id": "1707220394944533103",
+                                                "link": "",
+                                                "name": "秘书认领（状态）",
+                                                "chrusername": "秘书下标-插队1-9",
+                                                "type": "msrl",
+                                                
+                                                
+                                                "groupId": "2007220394630533105",
+                                                "group": "审核评价",
+                                                "children": [
+                                                    {
+                                                    "desc": "",
+                                                    "id": "1707220395044533103",
+                                                    "link": "",
+                                                    "name": "秘书认领（状态）",
+                                                    "chrusername": "秘书下标-插队1-10",
+                                                    "type": "msrl",
+                                                    
+                                                    
+                                                    "groupId": "2007220394630533105",
+                                                    "group": "审核评价",
+                                                    "children": [
+                                                        {
+                                                        "desc": "",
+                                                        "id": "1707220395144533103",
+                                                        "link": "",
+                                                        "name": "秘书认领（状态）",
+                                                        "chrusername": "秘书下标-插队1-11",
+                                                        "type": "msrl",
+                                                        
+                                                        
+                                                        "groupId": "2007220394630533105",
+                                                        "group": "审核评价",
+                                                        "children": [
+                                                        ]
+                                                        }
+                                                    ]
+                                                    }
+                                                ]
+                                                }
+                                            ]
+                                            }
+                                        ]
+                                        }
+                                    ]
+                                    }
+                                ]
+                                }
+                            ]
+                            }
+                        ]
+                        }
+                    ]
+                    }
+                ]
+                }
+            ]
+            },
+                    {
+                        "desc": "",
+                        "id": "4707220394630533104",
+                        "link": "",
+                        "name": "秘书认领（状态）",
+                        "chrusername": "秘书下标5",
+                        "type": "msrl",
+                        
+                        
+                        "groupId": "2007220394630533103",
+                        "group": "登记分发",
+                        "children": [
+                            {
+                                "desc": "",
+                                "id": "4707220394630533105",
+                                "link": "",
+                                "name": "领导认领（状态）",
+                                "chrusername": "领导下标5",
+                                "type": "ldrl",
+                                
+                                
+                                "groupId": "2007220394630533103",
+                                "group": "登记分发",
+                                "children": [
+                                    {
+                                        "desc": "",
+                                        "id": "4707220394630533106",
+                                        "link": "",
+                                        "name": "分发（状态）",
+                                        "chrusername": "分发人下标5",
+                                        "type": "ff",
+                                        
+                                        
+                                        "groupId": "2007220394630533103",
+                                        "group": "登记分发",
+                                        "children": [
+                                            {
+                                                "desc": "",
+                                                "id": "4707220394630533107",
+                                                "link": "",
+                                                "name": "签收（状态）",
+                                                "chrusername": "签收人下标5",
+                                                "type": "qs",
+                                                
+                                                
+                                                "groupId": "2007220394630533104",
+                                                "group": "办理反馈",
+                                                "children": [
+                                                    {
+                                                        "desc": "",
+                                                        "id": "4707220394630533108",
+                                                        "link": "",
+                                                        "name": "审批（状态）",
+                                                        "chrusername": "审批人下标5",
+                                                        "type": "blsp",
+                                                        
+                                                        
+                                                        "groupId": "2007220394630533104",
+                                                        "group": "办理反馈",
+                                                        "children": [
+                                                            {
+                                                                "desc": "",
+                                                                "id": "4707220394630533109",
+                                                                "link": "",
+                                                                "name": "办理（状态）",
+                                                                "chrusername": "办理人下标5",
+                                                                "type": "bl",
+                                                                
+                                                                
+                                                                "groupId": "2007220394630533104",
+                                                                "group": "办理反馈",
+                                                                "tbzqlist": [],
+                                                                "children": [
+                                                                    {
+                                                                        "desc": "",
+                                                                        "id": "4707220394630533110",
+                                                                        "link": "",
+                                                                        "name": "审核（状态）",
+                                                                        "chrusername": "审核人下标5",
+                                                                        "type": "sh",
+                                                                        
+                                                                        
+                                                                        "groupId": "2007220394630533104",
+                                                                        "group": "办理反馈",
+                                                                        "children": [
+                                                                            {
+                                                                                "desc": "",
+                                                                                "id": "4707220394630533111",
+                                                                                "link": "",
+                                                                                "name": "内容核查（状态）",
+                                                                                "chrusername": "内容审核人下标5",
+                                                                                "type": "nrhc",
+                                                                                
+                                                                                
+                                                                                "groupId": "2007220394630533105",
+                                                                                "group": "审核评价",
+                                                                                "children": [
+                                                                                    {
+                                                                                        "desc": "",
+                                                                                        "id": "4707220394630533112",
+                                                                                        "name": "审批（状态）",
+                                                                                        "chrusername": "审批人下标5-1",
+                                                                                        "type": "hcsp",
+                                                                                        
+                                                                                        
+                                                                                        "groupId": "2007220394630533105",
+                                                                                        "group": "审核评价",
+                                                                                        "link": "1707220394630572213"
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}`;
+            //获取流程API
+            let flowAPI = editor.flow
+            flowAPI.loadFromFlowData(flowData,true);
+          }
+        },
+        {
           viewer: menudemo
         }
       ]
@@ -860,7 +2266,7 @@ const options = markRaw({
       ]
       plugin.options.items.push(...newItems)
     }),
-    DDeiExtQuickStyle,
+    // DDeiExtQuickStyle,
     // DDeiFlowSettingButtonDialog.configuration({
     //   buttons:[
     //     {

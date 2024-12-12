@@ -9,7 +9,8 @@ import DDeiFlowSequence from "./sequence"
 import DDeiFlowSubProcess from "./subprocess"
 import DDeiFlowBpmnXmlNode from "./bpmnxmlnode"
 import { merge } from "ddei-editor"
-import { xml2graph } from "./request"
+import { xml2graph, autolayout } from "./request"
+import {Matrix3} from 'ddei-editor'
 /**
  * DDeiFlow插件的API方法包，提供了API以及工具函数
  * 初始化时挂载到editor的flow属性上
@@ -265,6 +266,227 @@ class DDeiFlowAPI {
     }
   }
 
+  /**
+   * 通过flowData加载流程图
+   * @param flowData 流程流转数据
+   */
+  loadFromFlowData(flowData: string | object, centerModel:boolean = true,ratio:number = 1){
+    if (flowData) {
+      
+      autolayout(flowData, (res) => {
+        if (res.status == 200) {
+          try {
+            let flowDataObj = flowData
+            if(typeof(flowData) == 'string'){
+              flowDataObj = JSON.parse(flowData);
+            }
+
+            let layoutData = eval(res.data);
+
+            if (layoutData.state == 'success') {
+              
+              //获取编辑器实例
+              let editor: DDeiEditor = this.editor;
+
+              editor.clearModels(true, false);
+              // //创建图层
+              let stage = editor.ddInstance.stage
+              // //添加图层，默认在0位置
+              stage.removeLayer(0, false)
+              //以下代码读取layoutData生成可视化图形控件，用于查看效果
+              //第一个控件，用于初始化定位
+              let firstModel = null
+              layoutData.tasks?.forEach(task => {
+                let model = "1000011"
+                let sconfig = flowDataObj.config[task.type] ? flowDataObj.config[task.type] : flowDataObj.config['default']
+                if(sconfig.model){
+                  model = sconfig.model;
+                }
+                let initJSON = {
+                  id: "task_" + task.id,
+                  model: model,
+                  code: task.id,
+                  width: task.width,
+                  height: task.height,
+                  font: sconfig.font,
+                  border: sconfig.border,
+                  textStyle: sconfig.textStyle,
+                  fill: sconfig.fill,
+                  x: task.x,
+                  y: task.y
+                }
+                if (sconfig.fields){
+                  sconfig.fields.forEach(field => {
+                    initJSON[field.key] = task[field.field]
+                  });
+                }
+                let models = editor.addControls([
+                  initJSON
+                ], true, false)
+                
+                if (task == layoutData.root || task.id == layoutData.root.id) {
+                  
+                  firstModel = models[0]
+                }
+              });
+              //建立连接
+              let promiseArr = []
+              for (let i = 0; i < layoutData.lines?.length; i++) {
+                promiseArr.push(new Promise((resolve, reject) => {
+                  let line = layoutData.lines[i]
+
+                  //将points换算为spvs
+                  let spvs = null
+                  if (line.points.length > 2) {
+                    spvs = []
+                    //只保留中间的点，忽略开始和结束点
+                    let startP = line.points[0]
+                    for (let pi = 1; pi < line.points.length - 1; pi++) {
+                      let point = line.points[pi]
+                      spvs.push({ x: point.x - startP.x, y: point.y - startP.y })
+                    }
+
+                  }
+                  //建立连线
+                  editor.addLines([
+                    {
+                      model: '1000601',
+                      type: line.lineType ? line.lineType : 2,
+                      dash: line.dash ? line.dash : null,
+                      round: 5, //圆角5
+                      startPoint: { x: line.sx, y: line.sy },
+                      endPoint: { x: line.ex, y: line.ey },
+                      pvs: line.points,
+                      spvs: spvs,
+                      smodel: { id: "task_" + line.startId, x: line.sx, y: line.sy, rate: line.rate, sita: line.startSita },
+                      emodel: { id: "task_" + line.endId, x: line.ex, y: line.ey, rate: line.rate, sita: line.endSita }
+                    },
+                  ], false, true, false)
+                  resolve(true)
+                }))
+
+              }
+              
+              //根据返回的信息创建groups,用一个新的图层来展示group
+              if (layoutData.groups?.length > 0) {
+                //添加图层，默认在0位置
+                let groupLayer = stage.addLayer({ bg: { type: -1 } }, 0, false)
+                //获取最小x、y、最大x1、y1
+                let minX = Infinity, minY = Infinity, maxX1 = -Infinity, maxY1 = -Infinity
+                layoutData.groups.forEach(group => {
+                  let x1 = group.x + group.width
+                  let y1 = group.y + group.height
+                  minX = Math.min(minX, group.x)
+                  minY = Math.min(minY, group.y)
+                  maxX1 = Math.max(maxX1, x1)
+                  maxY1 = Math.max(maxY1, y1)
+                });
+                groupLayer.initRender()
+                
+                layoutData.groups.forEach(group => {
+                  if (flowDataObj.direct == 1) {
+                    group.x = minX
+                    group.width = maxX1 - minX
+                  } else if (flowDataObj.direct == 2) {
+                    group.y = minY
+                    group.height = maxY1 - minY
+                  } else if (flowDataObj.direct == 3) {
+                    group.x = minX
+                    group.width = maxX1 - minX
+                  } else if (flowDataObj.direct == 4) {
+                    group.y = minY
+                    group.height = maxY1 - minY
+                  }
+                  //在图层下创建分组甬道
+                  let gw = group.width, gh = group.height, gx = group.x, gy = group.y
+                  
+                  if (flowDataObj.direct == 1) {
+                    gw = 30
+                    gx = group.x - group.width / 2 - 15
+                  } else if (flowDataObj.direct == 2) {
+                    gh = 30
+                    gy = group.y - group.height / 2 - 15
+                  } else if (flowDataObj.direct == 3) {
+                    gw = 30
+                    gx = group.x - group.width / 2 - 15
+                  } else if (flowDataObj.direct == 4) {
+                    gh = 30
+                    gy = group.y - group.height / 2 - 15
+                  }
+                  
+                  editor.addControlsToLayer([
+                    {
+
+                      model: '100002',
+                      code: group.id,
+                      width: group.width,
+                      height: group.height,
+                      x: group.x,
+                      y: group.y,
+                      fill: {
+                        color: "blue", opacity: 0.2
+                      },
+                      border: {
+                        width: 1,
+                        dash: [10, 5]
+                      }
+                    }
+                    , {
+                      model: '100002',
+                      code: group.id,
+                      width: gw,
+                      height: gh,
+                      text: group.name,
+                      x: gx,
+                      y: gy,
+                      font: { size: 16 }
+                    }
+                  ], 0, true, false)
+                });
+                stage.changeLayer(1);
+                stage.displayLayer(null, true);
+              }
+              if (ratio != 1 && ratio > 0) {
+                editor.ddInstance.stage.setStageRatio(ratio);
+              }
+              Promise.all(promiseArr).then(all => {
+                let stage = editor.ddInstance.stage
+                let models = stage.getLayerModels(null,100);
+                let outRect = DDeiAbstractShape.getOutRectByPV(models);
+                
+                let moveMatrix = new Matrix3(
+                  1,
+                  0,
+                  -outRect.x,
+                  0,
+                  1,
+                  -outRect.y,
+                  0,
+                  0,
+                  1
+                );
+                models.forEach(model => {
+                  model.transVectors(moveMatrix);
+                })
+                
+                stage.spv.applyMatrix3(moveMatrix)
+                
+                editor.notifyChange();
+                if (firstModel && centerModel){
+                  editor.centerModels(stage,firstModel.id)
+                }
+                
+              })
+              
+            }
+          }catch(e){
+            console.error(e)
+          }
+        }
+      });
+    }
+  }
+
 
   /**
    * 通过BpmnXML加载并刷新流程图
@@ -349,6 +571,7 @@ class DDeiFlowAPI {
       })
     }
   }
+  
   /**
    * 加载并刷新流程图
    * @param designJson 设计器json

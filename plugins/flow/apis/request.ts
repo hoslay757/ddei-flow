@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const baseURL = 'https://www.ddei.top/dflow/api';
+const baseURL = 'http://127.0.0.1:8080';
+// const baseURL = 'https://www.ddei.top/dflow/api';
 
 const post = function(api,data,successFn,errorFn){
 
@@ -25,11 +26,15 @@ const post = function(api,data,successFn,errorFn){
     });
 }
 
-const xml2graph = function(xml,fn){
-  post("/bpmn/xml2graph",xml,fn)
+const xml2graph = function (xml, fn) {
+  post("/bpmn/xml2graph", xml, fn)
 }
 
-export { xml2graph }
+const autolayout = function (json, fn) {
+  post("/flow/layout", json, fn)
+}
+
+export { xml2graph, autolayout }
 
 
 
