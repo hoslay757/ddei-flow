@@ -302,6 +302,7 @@ class DDeiFlowAPI {
                 if(sconfig.model){
                   model = sconfig.model;
                 }
+                
                 let initJSON = {
                   id: "task_" + task.id,
                   model: model,
@@ -317,7 +318,9 @@ class DDeiFlowAPI {
                 }
                 if (sconfig.fields){
                   sconfig.fields.forEach(field => {
-                    initJSON[field.key] = task[field.field]
+                    if (task[field.field] != undefined){
+                      initJSON[field.key] = task[field.field]
+                    }
                   });
                 }
                 let models = editor.addControls([

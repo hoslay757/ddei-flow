@@ -793,7 +793,7 @@ const options = markRaw({
     "height": 150,
     "textField": "group",
     "groupField": "groupId",
-    "font": { "size": 16 },
+    "font": { "size": 20 },
     "fields":[
       {
         "key":"name",
@@ -806,6 +806,10 @@ const options = markRaw({
       {
         "key":"font",
         "field":"font"
+      },
+      {
+        "key":"textStyle",
+        "field":"textStyle"
       }
     ]
   },
@@ -857,7 +861,7 @@ const options = markRaw({
     "font": { "size": 16 }
   }
 },
-"direct":3,
+"direct":2,
 "data":
     {
         "desc": "",
@@ -897,6 +901,8 @@ const options = markRaw({
                           "color":"red",
                           "width":5
                         },
+                        "font": { "size": 16,"color":"green" },
+                        "textStyle": { "bold": 1 },
                         "groupId": "2007220394630533103",
                         "group": "登记分发",
                         "children": [
