@@ -14,19 +14,25 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
   /**
    * 鼠标移动进入控件的钩子，该插件由它来进行整体分发
    */
-  EVENT_EDITOR_INIT: DDeiFuncData | null = new DDeiFuncData("ddei-flow-mouse-move-in-control", 1, (operateType, data, ddInstance, evt) => {
+  EVENT_EDITOR_INIT: DDeiFuncData | null = new DDeiFuncData("ddei-quickflow-editor-init", 1, (operateType, data, ddInstance, evt) => {
     let editor = DDeiEditorUtil.getEditorInsByDDei(ddInstance);
     if (editor?.flow){
       let flowAPI = editor.flow;
-      //加载初始化数据
-      //position，图像在画布的整体位置，0正中，1上、2右、3下、4左
-      let flowData = `{
+
+      let stage = ddInstance.stage;
+      if (!stage.flowDesignData){
+        //加载初始化数据
+        //position，图像在画布的整体位置，0正中，1上、2右、3下、4左
+        let flowData = `{
 "direct":3,
 "position":1,
 "marginY":20,
+"spaceHeight":40,
 "config":{
   "begin": {
     "model":"1000001",
+    "width":50,
+    "height":50,
     "textField": "name",
     "fields":[
       {
@@ -37,6 +43,8 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
   },
   "usertask": {
     "model":"1000011",
+    "width":160,
+    "height":80,
     "textField": "name",
      "fields":[
       {
@@ -47,6 +55,8 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
   },
   "scripttask": {
     "model":"1000021",
+    "width":160,
+    "height":80,
     "textField": "name",
     "fields":[
       {
@@ -57,6 +67,8 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
   },
   "end": {
     "model":"1000003",
+    "width":50,
+    "height":50,
     "textField": "name",
     "fields":[
       {
@@ -87,10 +99,37 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
       ]
     }
 }`;
-      flowAPI.loadFromFlowData(flowData, true);
+        stage.flowDesignData = JSON.parse(flowData);
+      }
+    
+      flowAPI.loadFromFlowData(stage.flowDesignData, true);
+      editor.ddInstance["AC_DESIGN_DRAG"] = false
+      editor.ddInstance["AC_DESIGN_LINK"] = false
+      editor.ddInstance["AC_DESIGN_ROTATE"] = false
+      editor.ddInstance["AC_DESIGN_SCALE"] = false
+      
     }
     
   });
+
+
+  EVENT_CONTROL_VIEW: DDeiFuncData | null = new DDeiFuncData("ddei-quickflow-control-view-after", 1, (operateType, data, ddInstance, evt) => {
+    data?.models?.forEach(model => {
+      if (model.bpmnBaseType == 'Sequence'){
+        if (operateType == 'VIEW-HIDDEN'){
+          
+        } else if (operateType == 'VIEW'){
+          
+        }
+      }
+    });
+  });
+
+
+
+
+  
+
 
 }
 

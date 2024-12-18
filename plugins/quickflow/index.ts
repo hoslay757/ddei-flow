@@ -1,6 +1,6 @@
 import { DDeiPluginBase, DDeiEditor, DDeiUtil, DDeiCoreToolboxSimplePanel, DDeiCoreTopMenuSimplePanel } from "ddei-editor";
 import DDeiQuickFlowLifeCycles from "./lifecycle"
-import { DDeiEditorUtil, DDeiExtSearch, DDeiExtQuickControl, DDeiConfig, DDeiCoreMobileLayout } from "ddei-editor"
+import { DDeiEditorUtil, DDeiExtSearch, DDeiExtQuickControl, DDeiConfig, DDeiCoreSimpleLayout,DDeiCoreMobileLayout } from "ddei-editor"
 
 class DDeiQuickFlow extends DDeiPluginBase {
   type: string = "package"
@@ -9,9 +9,23 @@ class DDeiQuickFlow extends DDeiPluginBase {
    * 缺省实例
    */
   static defaultIns: DDeiQuickFlow = new DDeiQuickFlow({
-    initConfig: {
-      
-     
+    initConfig:{
+      append:{
+        extensions: [
+          DDeiCoreMobileLayout.configuration({
+            other: ['ddei-core-panel-topmenu-simple'],
+            middle: ['ddei-core-panel-canvasview'],
+            before: [],
+            after: ['ddei-flow-element-setting-panel']
+          }),
+          DDeiCoreSimpleLayout.configuration({
+            other: ['ddei-core-panel-topmenu-simple'],
+            middle: ['ddei-core-panel-canvasview'],
+            before: [],
+            after: ['ddei-flow-element-setting-panel']
+          })
+        ]
+      }
     }
   });
 
@@ -46,6 +60,25 @@ class DDeiQuickFlow extends DDeiPluginBase {
     } else if (this.lifecycles instanceof DDeiPluginBase) {
       return this.lifecycles.getLifeCyclies(editor);
     }
+  }
+
+  allInstalled(editor: DDeiEditor) {
+    let removePlugins = []
+    
+    editor.plugins?.forEach(plugin => {
+      
+      if (plugin instanceof DDeiExtQuickControl){
+        removePlugins.push(plugin)
+      }
+    });
+    if(editor.flow){
+      editor.flow.getFlowDesignData = ()=>{
+        return editor.ddInstance.stage.flowDesignData;
+      }
+    }
+    removePlugins.forEach(rp=>{
+      rp.unmount(editor)
+    })
   }
 
   static modify(fn) {
