@@ -1,4 +1,4 @@
-import { DDeiSheet,DDeiEditor, DDeiUtil, DDeiAbstractShape, DDeiStage, DDeiEnumBusCommandType, DDeiFile, DDeiActiveType, DDeiFileState } from "ddei-editor"
+import { DDeiModelArrtibuteValue,DDeiEditor, DDeiUtil, DDeiAbstractShape, DDeiStage, DDeiEnumBusCommandType, DDeiFile, DDeiActiveType, DDeiFileState } from "ddei-editor"
 import { DDeiEditorState, DDeiEditorEnumBusCommandType, DDeiEditorUtil } from "ddei-editor"
 import {getIncludeModels} from "../controls/util"
 import DDeiFlowFile from "./file"
@@ -272,15 +272,32 @@ class DDeiFlowAPI {
    */
   loadFromFlowData(flowData: string | object, centerModel:boolean = true,ratio:number = 1){
     if (flowData) {
-      
-      autolayout(flowData, (res) => {
+      let flowDataObj = flowData
+      if (typeof (flowData) == 'string') {
+        flowDataObj = JSON.parse(flowData);
+      }
+      if (flowDataObj?.config){
+        for(let key in flowDataObj.config){
+          let configObj = flowDataObj.config[key]
+          if (configObj.model && (!configObj.width || !configObj.height)){
+            
+            let controlDefine = DDeiEditorUtil.getControlDefine({modelCode:configObj.model});
+            if (controlDefine?.define){
+              if (!configObj.width) {
+                configObj.width = controlDefine.define.width;
+              }
+              if (!configObj.height) {
+                configObj.height = controlDefine.define.height;
+              }
+            }
+          }
+          
+        }
+      }
+      autolayout(JSON.stringify(flowDataObj), (res) => {
+        
         if (res.status == 200) {
           try {
-            let flowDataObj = flowData
-            if(typeof(flowData) == 'string'){
-              flowDataObj = JSON.parse(flowData);
-            }
-
             let layoutData = eval(res.data);
 
             if (layoutData.state == 'success') {
@@ -323,6 +340,7 @@ class DDeiFlowAPI {
                     }
                   });
                 }
+                
                 let models = editor.addControls([
                   initJSON
                 ], true, false)
@@ -473,10 +491,104 @@ class DDeiFlowAPI {
                 })
                 
                 stage.spv.applyMatrix3(moveMatrix)
+
+                outRect = DDeiAbstractShape.getOutRectByPV(models);
+                let ox = -(outRect.x + outRect.width / 2) + stage.width / 2 + outRect.width / 2;
+                let oy = -(outRect.y + outRect.height / 2) + stage.height / 2 + outRect.height / 2;
+                //修正位置根据position和margin属性
+                let wpvX = Infinity, wpvY = Infinity
+                if(flowDataObj.position){
+                  //获取纸张配置
+                  let paperType
+                  if (stage.paper?.type) {
+                    paperType = stage.paper.type;
+                  } else if (stage.ddInstance.paper) {
+                    if (typeof (stage.ddInstance.paper) == 'string') {
+                      paperType = stage.ddInstance.paper;
+                    } else {
+                      paperType = stage.ddInstance.paper.type;
+                    }
+                  } else {
+                    paperType = DDeiModelArrtibuteValue.getAttrValueByState(stage, "paper.type", true);
+                  }
+                  let paperArea = null;
+                  if (paperType){
+                    paperArea = stage.getPaperArea(paperType);
+                  }
+                  let outerRect = null;
+                  //有纸张
+                  if (paperArea){
+                    outerRect = { x: paperArea.unitWidth / 2, y: paperArea.unitHeight / 2,w:paperArea.w-paperArea.unitWidth, h:paperArea.h-paperArea.unitHeight};
+                  }
+                  //无纸张
+                  else{
+                    outerRect = {x:0,y:0,w:stage.width,h:stage.height};
+                  }
+                  
+                  switch (flowDataObj.position){
+                    //顶
+                    case 1:
+                      oy = oy - stage.height / 2 +outRect.height/2 + outerRect.y
+                      wpvY = outerRect.y - 100
+                      break
+                    ;
+                    //右
+                    case 2: 
+                      ox = ox + stage.width / 2 - outRect.width / 2 - outerRect.x
+
+                      wpvX = stage.width - outerRect.x - stage.ddInstance.render.canvas.width / stage.ddInstance.render.ratio+100
+                      
+                      break;
+                    ;
+                    //底
+                    case 3: 
+                      oy = oy + stage.height / 2 - outRect.height / 2 - outerRect.y
+                      wpvY = stage.height - outerRect.y - stage.ddInstance.render.canvas.height / stage.ddInstance.render.ratio + 100
+                      break
+                    ;
+                    //左
+                    case 4: 
+                      ox = ox - stage.width / 2 + outRect.width / 2 + outerRect.x
+                      wpvX = outerRect.x - 100;
+                      break
+                    ;
+                  }
+                }
+                //横向修正
+                if (flowDataObj.marginX) {
+                  ox += flowDataObj.marginX
+                }
+                //纵向修正
+                if (flowDataObj.marginY) {
+                  oy += flowDataObj.marginY
+                }
+
+                let moveMatrix1 = new Matrix3(
+                  1,
+                  0,
+                  ox,
+                  0,
+                  1,
+                  oy,
+                  0,
+                  0,
+                  1
+                );
+                models.forEach(model => {
+                  model.transVectors(moveMatrix1);
+                })
                 
                 editor.notifyChange();
                 if (firstModel && centerModel){
                   editor.centerModels(stage,firstModel.id)
+                  
+                  if (wpvY != Infinity) {
+                    stage.wpv.y = -wpvY;
+                  }
+                  if (wpvX != Infinity) {
+                    stage.wpv.x = -wpvX;
+                  }
+                  
                 }
                 
               })

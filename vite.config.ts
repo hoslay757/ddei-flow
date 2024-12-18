@@ -13,6 +13,7 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       '@ddei-flow': fileURLToPath(new URL('./plugins/flow', import.meta.url)),
+      '@ddei-quickflow': fileURLToPath(new URL('./plugins/quickflow', import.meta.url))
     }
 
   },

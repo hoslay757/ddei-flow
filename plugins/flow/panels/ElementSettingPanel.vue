@@ -38,8 +38,9 @@
             <div class="change-property-text-title">
               {{editor.i18n('ddei.flow.busicls')}}
             </div>
-            <div class="change-property-text-input">
-              <input v-model="model.customDataType" :placeholder="editor.i18n('ddei.flow.busicls')">
+            <div :class="{'change-property-text-input':true,'readonly':readonly}">
+              <input v-model="model.customDataType" :readonly="readonly"
+                :placeholder="editor.i18n('ddei.flow.busicls')">
             </div>
           </div>
         </div>
@@ -64,8 +65,8 @@
             <div class="change-property-text-title">
               {{ editor.i18n('ddei.flow.time') }}
             </div>
-            <div class="change-property-text-input">
-              <input v-model="model.timeValue" placeholder="2011-03-11T12:13:14">
+            <div :class="{'change-property-text-input':true,'readonly':readonly}">
+              <input v-model="model.timeValue" :readonly="readonly" placeholder="2011-03-11T12:13:14">
             </div>
           </div>
         </div>
@@ -75,8 +76,8 @@
             <div class="change-property-text-title">
               {{ editor.i18n('ddei.flow.timeduration') }}
             </div>
-            <div class="change-property-text-input">
-              <input v-model="model.timeValue" placeholder="R3/PT10H/${EndDate}">
+            <div :class="{'change-property-text-input':true,'readonly':readonly}">
+              <input v-model="model.timeValue" :readonly="readonly" placeholder="R3/PT10H/${EndDate}">
             </div>
           </div>
         </div>
@@ -86,8 +87,8 @@
             <div class="change-property-text-title">
               {{ editor.i18n('ddei.flow.timecron') }}
             </div>
-            <div class="change-property-text-input">
-              <input v-model="model.timeValue" placeholder="0 0/5* * *？">
+            <div :class="{'change-property-text-input':true,'readonly':readonly}">
+              <input v-model="model.timeValue" :readonly="readonly" placeholder="0 0/5* * *？">
             </div>
           </div>
         </div>
@@ -97,8 +98,9 @@
             <div class="change-property-text-title">
               {{ editor.i18n('ddei.flow.message') }}
             </div>
-            <div class="change-property-text-input">
-              <input v-model="model.messageName" :placeholder="editor.i18n('ddei.flow.messagename') ">
+            <div :class="{'change-property-text-input':true,'readonly':readonly}">
+              <input v-model="model.messageName" :readonly="readonly"
+                :placeholder="editor.i18n('ddei.flow.messagename') ">
             </div>
           </div>
         </div>
@@ -108,8 +110,8 @@
             <div class="change-property-text-title">
               {{ editor.i18n('ddei.flow.signal') }}
             </div>
-            <div class="change-property-text-input">
-              <input v-model="model.signalName" :placeholder="editor.i18n('ddei.flow.signalname')">
+            <div :class="{'change-property-text-input':true,'readonly':readonly}">
+              <input v-model="model.signalName" :readonly="readonly" :placeholder="editor.i18n('ddei.flow.signalname')">
             </div>
           </div>
         </div>
@@ -119,8 +121,8 @@
             <div class="change-property-text-title">
               {{ editor.i18n('ddei.flow.escalation') }}
             </div>
-            <div class="change-property-text-input">
-              <input v-model="model.escalName" :placeholder="editor.i18n('ddei.flow.escalname')">
+            <div :class="{'change-property-text-input':true,'readonly':readonly}">
+              <input v-model="model.escalName" :readonly="readonly" :placeholder="editor.i18n('ddei.flow.escalname')">
             </div>
           </div>
         </div>
@@ -130,8 +132,8 @@
             <div class="change-property-text-title">
               {{ editor.i18n('ddei.flow.errorcode') }}
             </div>
-            <div class="change-property-text-input">
-              <input v-model="model.errorCode" :placeholder="editor.i18n('ddei.flow.errorcode')">
+            <div :class="{'change-property-text-input':true,'readonly':readonly}">
+              <input v-model="model.errorCode" :readonly="readonly" :placeholder="editor.i18n('ddei.flow.errorcode')">
             </div>
           </div>
         </div>
@@ -141,8 +143,9 @@
             <div class="change-property-text-title">
               {{ editor.i18n('ddei.flow.condition') }}
             </div>
-            <div class="change-property-text-input">
-              <input v-model="model.condition" :placeholder="'${' + editor.i18n('ddei.flow.conditionexpress') +'}'">
+            <div :class="{'change-property-text-input':true,'readonly':readonly}">
+              <input v-model="model.condition" :readonly="readonly"
+                :placeholder="'${' + editor.i18n('ddei.flow.conditionexpress') +'}'">
             </div>
           </div>
         </div>
@@ -259,8 +262,9 @@
             <div class="change-property-text-title">
               {{ editor.i18n('ddei.flow.insnum') }}
             </div>
-            <div class="change-property-text-input">
-              <input v-model="model.loopCardinality" :placeholder="editor.i18n('ddei.flow.insnum')">
+            <div :class="{'change-property-text-input':true,'readonly':readonly}">
+              <input v-model="model.loopCardinality" :readonly="readonly"
+                :placeholder="editor.i18n('ddei.flow.insnum')">
             </div>
           </div>
         </div>
@@ -317,7 +321,7 @@
             <div class="change-property-text-title">
               {{ editor.i18n(item.label) }}
             </div>
-            <div class="change-property-text-input">
+            <div :class="{'change-property-text-input':true,'readonly':readonly}">
               <input v-model="model[item.property]" @change="modelChangeProperty(model,item.property)"
                 :placeholder="editor.i18n(item.desc)">
             </div>
@@ -381,6 +385,7 @@ export default {
       ],
       dataTypeDataSource: null,
       dataTypeIndex: -1,
+      readonly:false,
     };
   },
   computed: {},
@@ -782,6 +787,14 @@ export default {
   background: var(--panel-background);
   border: 1px solid var(--panel-border); 
   color: black;
+
+  .readonly {
+  
+    >input,
+    textarea {
+      color: grey !important;
+    }
+  }
 
   .content {
     
