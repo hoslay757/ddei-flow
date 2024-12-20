@@ -43,7 +43,8 @@ export default {
       eventbasedgateway:'事件网关',
       
 
-      group:'分组',
+      group: '分组',
+      branch: '分支',
 
       sequence:'控制流',
       task:'任务',

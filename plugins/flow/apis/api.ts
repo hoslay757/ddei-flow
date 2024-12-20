@@ -270,13 +270,14 @@ class DDeiFlowAPI {
    * 通过flowData加载流程图
    * @param flowData 流程流转数据
    */
-  loadFromFlowData(flowData: string | object, centerModel:boolean = true,ratio:number = 1){
+  loadFromFlowData(flowData: string | object, centerModel:boolean = true,centerModelId:string|null = null,ratio:number = 1){
     if (flowData) {
       let flowDataObj = flowData
       if (typeof (flowData) == 'string') {
         flowDataObj = JSON.parse(flowData);
       }
       if (flowDataObj){
+        
         if (flowDataObj.config){
           for(let key in flowDataObj.config){
             let configObj = flowDataObj.config[key]
@@ -299,6 +300,7 @@ class DDeiFlowAPI {
           
           if (res.status == 200) {
             try {
+              
               let layoutData = eval(res.data);
 
               if (layoutData.state == 'success') {
@@ -322,7 +324,7 @@ class DDeiFlowAPI {
                   }
                   
                   let initJSON = {
-                    id: "task_" + task.id,
+                    id: task.id,
                     model: model,
                     code: task.id,
                     width: task.width,
@@ -346,9 +348,16 @@ class DDeiFlowAPI {
                     initJSON
                   ], true, false)
                   
-                  if (task == layoutData.root || task.id == layoutData.root.id) {
+                  if (!centerModelId){
+                    if (task == layoutData.root || task.id == layoutData.root.id) {
+                      
+                      firstModel = models[0]
+                    }
+                  }else{
                     
-                    firstModel = models[0]
+                    if (task.id == centerModelId){
+                      firstModel = models[0]
+                    }
                   }
                 });
                 //建立连接
@@ -370,6 +379,7 @@ class DDeiFlowAPI {
 
                     }
                     //建立连线
+                    
                     editor.addLines([
                       {
                         model: '1000601',
@@ -380,8 +390,8 @@ class DDeiFlowAPI {
                         endPoint: { x: line.ex, y: line.ey },
                         pvs: line.points,
                         spvs: spvs,
-                        smodel: { id: "task_" + line.startId, x: line.sx, y: line.sy, rate: line.rate, sita: line.startSita },
-                        emodel: { id: "task_" + line.endId, x: line.ex, y: line.ey, rate: line.rate, sita: line.endSita }
+                        smodel: { id: line.startId, x: line.sx, y: line.sy, rate: line.rate, sita: line.startSita },
+                        emodel: { id: line.endId, x: line.ex, y: line.ey, rate: line.rate, sita: line.endSita }
                       },
                     ], false, true, false)
                     resolve(true)
@@ -493,7 +503,11 @@ class DDeiFlowAPI {
                   
                   stage.spv.applyMatrix3(moveMatrix)
 
-                  outRect = DDeiAbstractShape.getOutRectByPV(models);
+                  // if(!centerModelId || !firstModel){
+                    outRect = DDeiAbstractShape.getOutRectByPV(models);
+                  // }else{
+                  //   outRect = DDeiAbstractShape.getOutRectByPV([firstModel]);
+                  // }
                   let ox = -(outRect.x + outRect.width / 2) + stage.width / 2 + outRect.width / 2;
                   let oy = -(outRect.y + outRect.height / 2) + stage.height / 2 + outRect.height / 2;
                   //修正位置根据position和margin属性
@@ -581,6 +595,7 @@ class DDeiFlowAPI {
                   
                   editor.notifyChange();
                   if (firstModel && centerModel){
+                    
                     editor.centerModels(stage,firstModel.id)
                     
                     if (wpvY != Infinity) {
@@ -602,6 +617,61 @@ class DDeiFlowAPI {
         });
       }
     }
+  }
+
+  /**
+   * 在节点后增加新的节点
+   * @param parentNodeId 父节点id
+   * @param nodeData 新增节点
+   * @param centerModel 中心化控件
+   * @param ratio 缩放比率
+   */
+  insertNode(parentNodeId:string,nodeData: object, centerModel: boolean = true, ratio: number = 1):void{
+    //修改flowData
+    let stage = this.editor.ddInstance.stage
+    if (nodeData && stage?.flowDesignData?.data){
+      let flowDesignData = stage.flowDesignData;
+      let flowData = flowDesignData.data;
+      
+      let parentNode = this.getNodeById(parentNodeId,flowData);
+      if (parentNode){
+        //执行插入
+        let oldChildren = parentNode.children;
+        if (!nodeData.id){
+          nodeData.id = nodeData.type + "_" + stage.idIdx
+        }
+        parentNode.children = [nodeData]
+        nodeData.children = oldChildren
+
+        let centerModelId = null;
+        if (centerModel){
+          centerModelId = nodeData.id
+        }
+
+        //重新加载流程
+        this.loadFromFlowData(flowDesignData, centerModel, centerModelId,ratio)
+      }
+    }
+  }
+
+  /**
+   * 根据ID获取Node
+   * @param id 查询ID
+   */
+  getNodeById(id:string,parentNode:Object):object|null{
+    if (parentNode.id == id){
+      return parentNode;
+    }
+    let children = parentNode.children;
+    if (children){
+      for (let i = 0; i < children.length;i++){
+        let findedNode = this.getNodeById(id, children[i]);
+        if (findedNode){
+          return findedNode;
+        }
+      }
+    }
+    return null;
   }
 
 

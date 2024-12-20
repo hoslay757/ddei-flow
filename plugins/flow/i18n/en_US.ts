@@ -42,7 +42,7 @@ export default {
       eventbasedgateway: 'Event',
 
       group: 'Group',
-
+      branch: 'Switch',
       sequence: 'Sequence',
       task:'Task',
       usertask: 'User',
