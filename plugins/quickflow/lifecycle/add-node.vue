@@ -19,45 +19,82 @@ export default {
   },
   mounted() {
     let controlConfig = {
-      "StartEvent": [
+      "start": [
         {
           name: "ddei.flow.task",
           icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
             <use xlink:href="#icon-ddei-flow-user-task"></use>
           </svg>`,
-          type: "UserTask"
+          type: "task"
+        },
+        {
+          name: "ddei.flow.script",
+          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
+            <use xlink:href="#icon-ddei-flow-script-task"></use>
+          </svg>`,
+          type: "script"
         },
         {
           name: "ddei.flow.branch",
           icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
             <use xlink:href="#icon-ddei-flow-gateway-xor"></use>
           </svg>`,
-          type: "ExclusiveGateway"
+          type: "branch"
         }
       ],
-      "UserTask": [
+      "task": [
         {
           name: "ddei.flow.task",
           icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
             <use xlink:href="#icon-ddei-flow-user-task"></use>
           </svg>`,
-          type: "UserTask"
+          type: "task"
+        },
+        {
+          name: "ddei.flow.script",
+          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
+            <use xlink:href="#icon-ddei-flow-script-task"></use>
+          </svg>`,
+          type: "script"
         },
         {
           name: "ddei.flow.branch",
           icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
             <use xlink:href="#icon-ddei-flow-gateway-xor"></use>
           </svg>`,
-          type: "ExclusiveGateway"
+          type: "branch"
         }
       ],
-      "ExclusiveGateway": [
+      "branch": [
         {
           name: "ddei.flow.condition",
           icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
             <use xlink:href="#icon-ddei-flow-user-task"></use>
           </svg>`,
-          type: "ConditionItem"
+          type: "condition"
+        }
+      ],
+      "condition": [
+        {
+          name: "ddei.flow.task",
+          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
+            <use xlink:href="#icon-ddei-flow-user-task"></use>
+          </svg>`,
+          type: "task"
+        },
+        {
+          name: "ddei.flow.script",
+          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
+            <use xlink:href="#icon-ddei-flow-script-task"></use>
+          </svg>`,
+          type: "script"
+        },
+        {
+          name: "ddei.flow.branch",
+          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
+            <use xlink:href="#icon-ddei-flow-gateway-xor"></use>
+          </svg>`,
+          type: "branch"
         }
       ],
     }
@@ -79,11 +116,53 @@ export default {
   methods:{
     createControl(control){
       
+      let stage = this.editor.ddInstance.stage
+      let newIdIdx = stage.idIdx;
+      stage.idIdx++;
       let nodeData = {
+        id:'task_'+newIdIdx,
         type: control.type
       }
       
-      this.editor.flow.insertNode(this.model.smodel.id, nodeData,true)
+      
+      if(nodeData.type == 'branch'){
+        stage.idIdx+=2;
+        nodeData.id = 'branch_' + newIdIdx
+        let t1id = newIdIdx + 1
+        let t2id = newIdIdx + 2
+        nodeData.name = "条件判断"
+        nodeData.children = [
+          {
+            type:'condition',
+            id: 'branch_' + newIdIdx +'_cond_1',
+            name:'条件',
+            children:[
+              {
+                id: 'task_' + t1id,
+                name: '任务1',
+                type:'task'
+              }
+            ]
+          },
+          {
+            type: 'condition',
+            id: 'branch_' + newIdIdx + '_cond_2',
+            name: '条件',
+            children: [
+              {
+                id: 'task_' + t2id,
+                name: '任务2',
+                type: 'task'
+              }
+            ]
+          }
+        ]
+        this.editor.flow.insertNode(this.model.smodel.id, nodeData,false,true, true)
+      }else{
+
+        this.editor.flow.insertNode(this.model.smodel.id, nodeData,false,false, true)
+      }
+      
     }
   }
 };

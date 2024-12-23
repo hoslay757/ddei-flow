@@ -39,7 +39,7 @@
               {{editor.i18n('ddei.flow.busicls')}}
             </div>
             <div :class="{'change-property-text-input':true,'readonly':readonly}">
-              <input v-model="model.customDataType" :readonly="readonly"
+              <input v-model="model.customDataType" :readonly="readonly" @change="changeInput('customDataType')"
                 :placeholder="editor.i18n('ddei.flow.busicls')">
             </div>
           </div>
@@ -66,7 +66,8 @@
               {{ editor.i18n('ddei.flow.time') }}
             </div>
             <div :class="{'change-property-text-input':true,'readonly':readonly}">
-              <input v-model="model.timeValue" :readonly="readonly" placeholder="2011-03-11T12:13:14">
+              <input v-model="model.timeValue" :readonly="readonly" @change="changeInput('timeValue')"
+                placeholder="2011-03-11T12:13:14">
             </div>
           </div>
         </div>
@@ -77,7 +78,8 @@
               {{ editor.i18n('ddei.flow.timeduration') }}
             </div>
             <div :class="{'change-property-text-input':true,'readonly':readonly}">
-              <input v-model="model.timeValue" :readonly="readonly" placeholder="R3/PT10H/${EndDate}">
+              <input v-model="model.timeValue" :readonly="readonly" @change="changeInput('timeValue')"
+                placeholder="R3/PT10H/${EndDate}">
             </div>
           </div>
         </div>
@@ -88,7 +90,8 @@
               {{ editor.i18n('ddei.flow.timecron') }}
             </div>
             <div :class="{'change-property-text-input':true,'readonly':readonly}">
-              <input v-model="model.timeValue" :readonly="readonly" placeholder="0 0/5* * *？">
+              <input v-model="model.timeValue" @change="changeInput('timeValue')" :readonly="readonly"
+                placeholder="0 0/5* * *？">
             </div>
           </div>
         </div>
@@ -99,7 +102,7 @@
               {{ editor.i18n('ddei.flow.message') }}
             </div>
             <div :class="{'change-property-text-input':true,'readonly':readonly}">
-              <input v-model="model.messageName" :readonly="readonly"
+              <input v-model="model.messageName" @change="changeInput('messageName')" :readonly="readonly"
                 :placeholder="editor.i18n('ddei.flow.messagename') ">
             </div>
           </div>
@@ -111,7 +114,8 @@
               {{ editor.i18n('ddei.flow.signal') }}
             </div>
             <div :class="{'change-property-text-input':true,'readonly':readonly}">
-              <input v-model="model.signalName" :readonly="readonly" :placeholder="editor.i18n('ddei.flow.signalname')">
+              <input v-model="model.signalName" @change="changeInput('signalName')" :readonly="readonly"
+                :placeholder="editor.i18n('ddei.flow.signalname')">
             </div>
           </div>
         </div>
@@ -122,7 +126,8 @@
               {{ editor.i18n('ddei.flow.escalation') }}
             </div>
             <div :class="{'change-property-text-input':true,'readonly':readonly}">
-              <input v-model="model.escalName" :readonly="readonly" :placeholder="editor.i18n('ddei.flow.escalname')">
+              <input v-model="model.escalName" @change="changeInput('escalName')" :readonly="readonly"
+                :placeholder="editor.i18n('ddei.flow.escalname')">
             </div>
           </div>
         </div>
@@ -133,7 +138,8 @@
               {{ editor.i18n('ddei.flow.errorcode') }}
             </div>
             <div :class="{'change-property-text-input':true,'readonly':readonly}">
-              <input v-model="model.errorCode" :readonly="readonly" :placeholder="editor.i18n('ddei.flow.errorcode')">
+              <input v-model="model.errorCode" @change="changeInput('errorCode')" :readonly="readonly"
+                :placeholder="editor.i18n('ddei.flow.errorcode')">
             </div>
           </div>
         </div>
@@ -144,7 +150,7 @@
               {{ editor.i18n('ddei.flow.condition') }}
             </div>
             <div :class="{'change-property-text-input':true,'readonly':readonly}">
-              <input v-model="model.condition" :readonly="readonly"
+              <input v-model="model.condition" @change="changeInput('condition')" :readonly="readonly"
                 :placeholder="'${' + editor.i18n('ddei.flow.conditionexpress') +'}'">
             </div>
           </div>
@@ -263,7 +269,7 @@
               {{ editor.i18n('ddei.flow.insnum') }}
             </div>
             <div :class="{'change-property-text-input':true,'readonly':readonly}">
-              <input v-model="model.loopCardinality" :readonly="readonly"
+              <input v-model="model.loopCardinality" :readonly="readonly" @change="changeInput('loopCardinality')"
                 :placeholder="editor.i18n('ddei.flow.insnum')">
             </div>
           </div>
@@ -322,7 +328,7 @@
               {{ editor.i18n(item.label) }}
             </div>
             <div :class="{'change-property-text-input':true,'readonly':readonly}">
-              <input v-model="model[item.property]" @change="modelChangeProperty(model,item.property)"
+              <input v-model="model[item.property]" @change="modelChangeProperty(item.property)"
                 :placeholder="editor.i18n(item.desc)">
             </div>
           </div>
@@ -335,7 +341,7 @@
               {{ editor.i18n(item.label) }}
             </div>
             <div class="change-property-textarea-input">
-              <textarea v-model="model[item.property]" @change="modelChangeProperty(model, item.property)"
+              <textarea v-model="model[item.property]" @change="modelChangeProperty(item.property)"
                 :placeholder="editor.i18n(item.desc) "></textarea>
             </div>
           </div>
@@ -400,11 +406,11 @@ export default {
   },
   methods: {
 
-    modelChangeProperty(model,property){
-      if (!model || !property) {
+    modelChangeProperty(property){
+      if (!property) {
         return;
       }
-      let mds = [model];
+      let mds = [this.model];
       if (
         this.editBefore &&
         !this.editBefore(
@@ -425,9 +431,9 @@ export default {
       this.editor.bus.push(
         DDeiEnumBusCommandType.ModelChangeValue,
         {
-          mids: [model.id],
+          mids: [this.model.id],
           paths: paths,
-          value: model[property]
+          value: this.model[property]
         },
         null,
         true
@@ -440,7 +446,11 @@ export default {
       this.editor.bus.push(DDeiEnumBusCommandType.RefreshShape);
       this.editor.bus.executeAll();
       //编辑完成后的回调函数
-      DDeiUtil.invokeCallbackFunc("EVENT_CONTROL_EDIT_AFTER", DDeiEnumOperateType.EDIT, { models: mds, propName: this.attrDefine?.code }, this.editor.ddInstance, null)
+      DDeiUtil.invokeCallbackFunc("EVENT_CONTROL_EDIT_AFTER", DDeiEnumOperateType.EDIT, { models: mds, propName: property }, this.editor.ddInstance, null)
+    },
+
+    changeInput(property){
+      DDeiUtil.invokeCallbackFunc("EVENT_CONTROL_EDIT_AFTER", DDeiEnumOperateType.EDIT, { models: [this.model], propName: property }, this.editor.ddInstance, null)
     },
     validItemCondition(item){
       if (!item.condition){
@@ -775,6 +785,7 @@ export default {
       this.model.render.enableRefreshShape()
       editor.bus.push(DDeiEnumBusCommandType.RefreshShape);
       editor.bus.executeAll();
+      DDeiUtil.invokeCallbackFunc("EVENT_CONTROL_EDIT_AFTER", DDeiEnumOperateType.EDIT, { models: [this.model], propName: label }, this.editor.ddInstance, null)
       DDeiUtil.invokeCallbackFunc("EVENT_CONTENT_CHANGE_AFTER", "CHANGE", null, this.editor.ddInstance)
     }
   }

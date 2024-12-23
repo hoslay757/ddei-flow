@@ -11,6 +11,7 @@ import DDeiFlowBpmnXmlNode from "./bpmnxmlnode"
 import { merge } from "ddei-editor"
 import { xml2graph, autolayout } from "./request"
 import {Matrix3} from 'ddei-editor'
+import { group } from "console";
 /**
  * DDeiFlow插件的API方法包，提供了API以及工具函数
  * 初始化时挂载到editor的flow属性上
@@ -296,6 +297,22 @@ class DDeiFlowAPI {
             
           }
         }
+
+        let groups = []
+        this.dfsData(flowDataObj.data, (node) => {
+          let group = "";
+          if (node.group){
+            group = node.group
+          }
+          if (groups.indexOf(group) == -1){
+            groups.push(group)
+          }
+        })
+        if (groups.length > 0){
+          flowDataObj.groups = groups
+        }
+      
+
         autolayout(JSON.stringify(flowDataObj), (res) => {
           
           if (res.status == 200) {
@@ -336,13 +353,18 @@ class DDeiFlowAPI {
                     x: task.x,
                     y: task.y
                   }
-                  if (sconfig.fields){
-                    sconfig.fields.forEach(field => {
-                      if (task[field.field] != undefined){
-                        initJSON[field.key] = task[field.field]
-                      }
-                    });
+                  for(let f in task){
+                    if(task[f]){
+                      initJSON[f] = task[f]
+                    }
                   }
+                  // if (sconfig.fields){
+                    // sconfig.fields.forEach(field => {
+                    //   if (task[field.field] != undefined){
+                    //     initJSON[field.key] = task[field.field]
+                    //   }
+                    // });
+                  // }
                   
                   let models = editor.addControls([
                     initJSON
@@ -365,6 +387,9 @@ class DDeiFlowAPI {
                 for (let i = 0; i < layoutData.lines?.length; i++) {
                   promiseArr.push(new Promise((resolve, reject) => {
                     let line = layoutData.lines[i]
+                    if(!line.endId){
+                      debugger
+                    }
 
                     //将points换算为spvs
                     let spvs = null
@@ -623,10 +648,12 @@ class DDeiFlowAPI {
    * 在节点后增加新的节点
    * @param parentNodeId 父节点id
    * @param nodeData 新增节点
+   * @param appendParent 追加在父节点子节点
+   * @param mergeChild 多个末尾节点时，其他节点合并到原有的子节点 
    * @param centerModel 中心化控件
    * @param ratio 缩放比率
    */
-  insertNode(parentNodeId:string,nodeData: object, centerModel: boolean = true, ratio: number = 1):void{
+  insertNode(parentNodeId: string, nodeData: object, appendParent: boolean = false, mergeChild:boolean = false, centerModel: boolean = true, ratio: number = 1):void{
     //修改flowData
     let stage = this.editor.ddInstance.stage
     if (nodeData && stage?.flowDesignData?.data){
@@ -640,17 +667,59 @@ class DDeiFlowAPI {
         if (!nodeData.id){
           nodeData.id = nodeData.type + "_" + stage.idIdx
         }
-        parentNode.children = [nodeData]
-        nodeData.children = oldChildren
+        if (!appendParent || !parentNode.children){
+          parentNode.children = [nodeData]
+        }else{
+          parentNode.children.push(nodeData)
+        }
+
+        if(!nodeData.children){
+          nodeData.children = oldChildren
+        }else{
+          //找到最终末的叶子节点
+          let leafNodes = []
+          this.dfsData(nodeData,(node)=>{
+            if (!node.children || node.children.length == 0){
+              leafNodes.push(node);
+            }
+          })
+          if (leafNodes.length == 1){
+            leafNodes[0].children = oldChildren
+          }else if(leafNodes.length > 1){
+            leafNodes[0].children = oldChildren
+            if (mergeChild){
+              for(let l = 1;l < leafNodes.length;l++){
+                // leafNodes[l].children = [{link:oldChildren[0].id}]
+                leafNodes[l].link = oldChildren[0].id
+              }
+            }
+            
+          }
+        }
+   
+        
 
         let centerModelId = null;
         if (centerModel){
           centerModelId = nodeData.id
         }
-
         //重新加载流程
         this.loadFromFlowData(flowDesignData, centerModel, centerModelId,ratio)
       }
+    }
+  }
+
+  private dfsData(data,beFn,afFn){
+    if (beFn) {
+      beFn(data)
+    }
+    if (data.children){
+      for (let i = 0; i < data.children.length;i++){
+        this.dfsData(data.children[i],beFn,afFn);
+      }
+    }
+    if (afFn){
+      afFn(data)
     }
   }
 

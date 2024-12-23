@@ -45,6 +45,7 @@ export default {
 
       group: '分组',
       branch: '分支',
+      script: '脚本',
 
       sequence:'控制流',
       task:'任务',

@@ -39,7 +39,8 @@
               {{editor.i18n('ddei.flow.busicls')}}
             </div>
             <div class="change-property-text-input">
-              <input v-model="model.customDataType" :placeholder="editor.i18n('ddei.flow.busicls')">
+              <input v-model="model.customDataType" @change="changeInput('customDataType')"
+                :placeholder="editor.i18n('ddei.flow.busicls')">
             </div>
           </div>
         </div>
@@ -65,7 +66,7 @@
               {{ editor.i18n('ddei.flow.time') }}
             </div>
             <div class="change-property-text-input">
-              <input v-model="model.timeValue" placeholder="2011-03-11T12:13:14">
+              <input v-model="model.timeValue" @change="changeInput('timeValue')" placeholder="2011-03-11T12:13:14">
             </div>
           </div>
         </div>
@@ -76,7 +77,7 @@
               {{ editor.i18n('ddei.flow.timeduration') }}
             </div>
             <div class="change-property-text-input">
-              <input v-model="model.timeValue" placeholder="R3/PT10H/${EndDate}">
+              <input v-model="model.timeValue" @change="changeInput('timeValue')" placeholder="R3/PT10H/${EndDate}">
             </div>
           </div>
         </div>
@@ -87,7 +88,7 @@
               {{ editor.i18n('ddei.flow.timecron') }}
             </div>
             <div class="change-property-text-input">
-              <input v-model="model.timeValue" placeholder="0 0/5* * *？">
+              <input v-model="model.timeValue" @change="changeInput('timeValue')" placeholder="0 0/5* * *？">
             </div>
           </div>
         </div>
@@ -98,7 +99,8 @@
               {{ editor.i18n('ddei.flow.message') }}
             </div>
             <div class="change-property-text-input">
-              <input v-model="model.messageName" :placeholder="editor.i18n('ddei.flow.messagename') ">
+              <input v-model="model.messageName" @change="changeInput('messageName')"
+                :placeholder="editor.i18n('ddei.flow.messagename') ">
             </div>
           </div>
         </div>
@@ -109,7 +111,8 @@
               {{ editor.i18n('ddei.flow.signal') }}
             </div>
             <div class="change-property-text-input">
-              <input v-model="model.signalName" :placeholder="editor.i18n('ddei.flow.signalname')">
+              <input v-model="model.signalName" @change="changeInput('signalName')"
+                :placeholder="editor.i18n('ddei.flow.signalname')">
             </div>
           </div>
         </div>
@@ -120,7 +123,8 @@
               {{ editor.i18n('ddei.flow.escalation') }}
             </div>
             <div class="change-property-text-input">
-              <input v-model="model.escalName" :placeholder="editor.i18n('ddei.flow.escalname')">
+              <input v-model="model.escalName" @change="changeInput('escalName')"
+                :placeholder="editor.i18n('ddei.flow.escalname')">
             </div>
           </div>
         </div>
@@ -131,7 +135,8 @@
               {{ editor.i18n('ddei.flow.errorcode') }}
             </div>
             <div class="change-property-text-input">
-              <input v-model="model.errorCode" :placeholder="editor.i18n('ddei.flow.errorcode')">
+              <input v-model="model.errorCode" @change="changeInput('errorCode')"
+                :placeholder="editor.i18n('ddei.flow.errorcode')">
             </div>
           </div>
         </div>
@@ -142,7 +147,8 @@
               {{ editor.i18n('ddei.flow.condition') }}
             </div>
             <div class="change-property-text-input">
-              <input v-model="model.condition" :placeholder="'${' + editor.i18n('ddei.flow.conditionexpress') +'}'">
+              <input v-model="model.condition" @change="changeInput('condition')"
+                :placeholder="'${' + editor.i18n('ddei.flow.conditionexpress') +'}'">
             </div>
           </div>
         </div>
@@ -260,7 +266,8 @@
               {{ editor.i18n('ddei.flow.insnum') }}
             </div>
             <div class="change-property-text-input">
-              <input v-model="model.loopCardinality" :placeholder="editor.i18n('ddei.flow.insnum')">
+              <input v-model="model.loopCardinality" @change="changeInput('loopCardinality')"
+                :placeholder="editor.i18n('ddei.flow.insnum')">
             </div>
           </div>
         </div>
@@ -317,7 +324,7 @@
               {{ editor.i18n(item.label) }}
             </div>
             <div class="change-property-text-input">
-              <input v-model="model[item.property]" @change="modelChangeProperty(model,item.property)"
+              <input v-model="model[item.property]" @change="modelChangeProperty(item.property)"
                 :placeholder="editor.i18n(item.desc)">
             </div>
           </div>
@@ -330,7 +337,7 @@
               {{ editor.i18n(item.label) }}
             </div>
             <div class="change-property-textarea-input">
-              <textarea v-model="model[item.property]" @change="modelChangeProperty(model, item.property)"
+              <textarea v-model="model[item.property]" @change="modelChangeProperty( item.property)"
                 :placeholder="editor.i18n(item.desc) "></textarea>
             </div>
           </div>
@@ -389,11 +396,14 @@ export default {
   },
   methods: {
 
-    modelChangeProperty(model,property){
-      if (!model || !property) {
+    changeInput(property) {
+      DDeiUtil.invokeCallbackFunc("EVENT_CONTROL_EDIT_AFTER", DDeiEnumOperateType.EDIT, { models: [this.model], propName: property }, this.editor.ddInstance, null)
+    },
+    modelChangeProperty(property){
+      if (!property) {
         return;
       }
-      let mds = [model];
+      let mds = [this.model];
       if (
         this.editBefore &&
         !this.editBefore(
@@ -414,9 +424,9 @@ export default {
       this.editor.bus.push(
         DDeiEnumBusCommandType.ModelChangeValue,
         {
-          mids: [model.id],
+          mids: [this.model.id],
           paths: paths,
-          value: model[property]
+          value: this.model[property]
         },
         null,
         true
@@ -756,6 +766,7 @@ export default {
       this.model.render.enableRefreshShape()
       editor.bus.push(DDeiEnumBusCommandType.RefreshShape);
       editor.bus.executeAll();
+      DDeiUtil.invokeCallbackFunc("EVENT_CONTROL_EDIT_AFTER", DDeiEnumOperateType.EDIT, { models: [this.model], propName: label }, this.editor.ddInstance, null)
       DDeiUtil.invokeCallbackFunc("EVENT_CONTENT_CHANGE_AFTER", "CHANGE", null, this.editor.ddInstance)
     }
   }
