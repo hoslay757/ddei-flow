@@ -97,14 +97,38 @@ export default {
           type: "branch"
         }
       ],
+      "converge": [
+        {
+          name: "ddei.flow.task",
+          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
+            <use xlink:href="#icon-ddei-flow-user-task"></use>
+          </svg>`,
+          type: "task"
+        },
+        {
+          name: "ddei.flow.script",
+          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
+            <use xlink:href="#icon-ddei-flow-script-task"></use>
+          </svg>`,
+          type: "script"
+        },
+        {
+          name: "ddei.flow.branch",
+          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
+            <use xlink:href="#icon-ddei-flow-gateway-xor"></use>
+          </svg>`,
+          type: "branch"
+        }
+      ],
     }
 
     let stage = this.editor.ddInstance.stage;
-    if (stage?.flowDesignData?.data) {
-      let flowDesignData = stage.flowDesignData;
+    if (stage && stage.extData && stage.extData.flowDesignData?.data) {
+      let flowDesignData = stage.extData.flowDesignData;
       let flowData = flowDesignData.data;
       let flowAPI = this.editor.flow
-      let parentNode = flowAPI.getNodeById(this.model.smodel.id, flowData);
+      let nResult = flowAPI.getNodeById(this.model.smodel.id, flowData);
+      let parentNode = nResult?.node;
       if (parentNode?.type){
         let controlConfigs = controlConfig[parentNode.type];
         this.controls = controlConfigs;
@@ -126,33 +150,45 @@ export default {
       
       
       if(nodeData.type == 'branch'){
-        stage.idIdx+=2;
+        stage.idIdx+=3;
         nodeData.id = 'branch_' + newIdIdx
+        
         let t1id = newIdIdx + 1
         let t2id = newIdIdx + 2
+        let convid = newIdIdx + 3
+        nodeData.converge = 'conv_' + convid,
         nodeData.name = "条件判断"
         nodeData.children = [
           {
             type:'condition',
             id: 'branch_' + newIdIdx +'_cond_1',
-            name:'条件',
+            text:'条件1',
             children:[
               {
                 id: 'task_' + t1id,
                 name: '任务1',
-                type:'task'
+                type:'task',
+                children:[
+                  {
+                    id: 'conv_' + convid,
+                    name: '汇聚',
+                    type: 'converge',
+                    branch: nodeData.id
+                  }
+                ]
               }
             ]
           },
           {
             type: 'condition',
             id: 'branch_' + newIdIdx + '_cond_2',
-            name: '条件',
+            text: '条件2',
             children: [
               {
                 id: 'task_' + t2id,
                 name: '任务2',
-                type: 'task'
+                type: 'task',
+                link: 'conv_' + convid
               }
             ]
           }

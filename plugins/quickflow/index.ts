@@ -73,7 +73,7 @@ class DDeiQuickFlow extends DDeiPluginBase {
     });
     if(editor.flow){
       editor.flow.getFlowDesignData = ()=>{
-        return editor.ddInstance.stage.flowDesignData;
+        return editor.ddInstance.stage.extData['flowDesignData'];
       }
     }
     removePlugins.forEach(rp=>{

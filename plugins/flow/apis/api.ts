@@ -656,11 +656,11 @@ class DDeiFlowAPI {
   insertNode(parentNodeId: string, nodeData: object, appendParent: boolean = false, mergeChild:boolean = false, centerModel: boolean = true, ratio: number = 1):void{
     //修改flowData
     let stage = this.editor.ddInstance.stage
-    if (nodeData && stage?.flowDesignData?.data){
-      let flowDesignData = stage.flowDesignData;
+    if (nodeData && stage && stage.extData && stage.extData.flowDesignData?.data){
+      let flowDesignData = stage.extData.flowDesignData;
       let flowData = flowDesignData.data;
-      
-      let parentNode = this.getNodeById(parentNodeId,flowData);
+      let nResult = this.getNodeById(parentNodeId, flowData)
+      let parentNode = nResult?.node;
       if (parentNode){
         //执行插入
         let oldChildren = parentNode.children;
@@ -679,7 +679,7 @@ class DDeiFlowAPI {
           //找到最终末的叶子节点
           let leafNodes = []
           this.dfsData(nodeData,(node)=>{
-            if (!node.children || node.children.length == 0){
+            if ((!node.children || node.children.length == 0) && !node.link){
               leafNodes.push(node);
             }
           })
@@ -727,14 +727,14 @@ class DDeiFlowAPI {
    * 根据ID获取Node
    * @param id 查询ID
    */
-  getNodeById(id:string,parentNode:Object):object|null{
-    if (parentNode.id == id){
-      return parentNode;
+  getNodeById(id:string,curNode:object,parentNode:object):object|null{
+    if (curNode.id == id){
+      return { node: curNode, parentNode: parentNode, sibNodes: parentNode?.children, index: parentNode?.children?.indexOf(curNode) };
     }
-    let children = parentNode.children;
+    let children = curNode.children;
     if (children){
       for (let i = 0; i < children.length;i++){
-        let findedNode = this.getNodeById(id, children[i]);
+        let findedNode = this.getNodeById(id, children[i],curNode);
         if (findedNode){
           return findedNode;
         }
