@@ -195,7 +195,6 @@ export default {
         ]
         this.editor.flow.insertNode(this.model.smodel.id, nodeData,false,true, true)
       }else{
-
         this.editor.flow.insertNode(this.model.smodel.id, nodeData,false,false, true)
       }
       

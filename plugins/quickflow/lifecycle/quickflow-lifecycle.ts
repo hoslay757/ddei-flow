@@ -463,7 +463,7 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
                 let model1 = stage.getModelById(sibNodes[sibIdx-1].id)
                 btnEl.style.left = (model.cpv.x + (model.cpv.x-model1.cpv.x)/2) * stageRatio + stage.wpv.x - btnEl.offsetWidth / 2 + "px"
               } else {
-                btnEl.style.left = (model.essBounds.x - model.essBounds.width / 2 + 20) * stageRatio + stage.wpv.x - btnEl.offsetWidth / 2 + "px"
+                btnEl.style.left = (model.essBounds.x + model.essBounds.width *1.5 + 20) * stageRatio + stage.wpv.x - btnEl.offsetWidth / 2 + "px"
               }
               btnEl.style.top = (model.essBounds.y + model.essBounds.height / 2) * stageRatio + stage.wpv.y - (btnEl.offsetHeight) / 2 + 1 + "px"
             }else{

@@ -1,6 +1,8 @@
 import { DDeiPluginBase, DDeiEditor, DDeiUtil, DDeiCoreToolboxSimplePanel, DDeiCoreTopMenuSimplePanel } from "ddei-editor";
 import DDeiQuickFlowLifeCycles from "./lifecycle"
 import { DDeiEditorUtil, DDeiExtSearch, DDeiExtQuickControl, DDeiConfig, DDeiCoreSimpleLayout,DDeiCoreMobileLayout } from "ddei-editor"
+import {DDeiFlowSettingButtonDialog} from "@ddei-flow"
+import removeBtnViewer from "./viewer/remove-btn-viewer.vue"
 
 class DDeiQuickFlow extends DDeiPluginBase {
   type: string = "package"
@@ -23,6 +25,26 @@ class DDeiQuickFlow extends DDeiPluginBase {
             middle: ['ddei-core-panel-canvasview'],
             before: [],
             after: ['ddei-flow-element-setting-panel']
+          }),
+          DDeiFlowSettingButtonDialog.configuration({
+            buttons: [
+              {
+                id: 'ddei-flow-edit-property'
+              },
+              {
+                id: 'ddei-flow-choose-activity'
+              },
+              {
+                id: 'ddei-flow-expand-or-not'
+              },
+              {
+                id: 'ddei-flow-lock-or-unlock'
+              },
+              {
+                viewer: removeBtnViewer,
+                condition:"model.modelType != 'DDeiLine' && model.type != 'start' && model.type != 'end'"
+              }
+            ]
           })
         ]
       }

@@ -3,7 +3,8 @@
     class="ddei-flow-setting-button-dialog" v-if="forceRefresh">
     <div class="content" :style="{ 'flex-direction': model?.bpmnBaseType !='Event' ? 'column' : ''}">
       <div v-for="btn in options?.buttons" style="display:contents">
-        <component v-if="btn.viewer" :is="btn.viewer" :editor="editor" :options="options" :model="model" v-bind="btn">
+        <component v-if="btn.viewer && validItemCondition(btn)" :is="btn.viewer" :editor="editor" :options="options"
+          :model="model" v-bind="btn">
         </component>
         <svg class="icon-ddei-flow"
           v-if="!btn.viewer && btn.id == 'ddei-flow-edit-property' && validItemCondition(btn) && controlDefine?.subject == 'bpmn'"

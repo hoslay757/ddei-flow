@@ -664,16 +664,21 @@ class DDeiFlowAPI {
       if (parentNode){
         //执行插入
         let oldChildren = parentNode.children;
+        let oldLink = parentNode.link;
         if (!nodeData.id){
           nodeData.id = nodeData.type + "_" + stage.idIdx
         }
+        
         if (!appendParent || !parentNode.children){
           parentNode.children = [nodeData]
         }else{
           parentNode.children.push(nodeData)
         }
-
+        delete parentNode.link
+        
+        
         if(!nodeData.children){
+          nodeData.link = oldLink;
           nodeData.children = oldChildren
         }else{
           //找到最终末的叶子节点
@@ -683,14 +688,21 @@ class DDeiFlowAPI {
               leafNodes.push(node);
             }
           })
+          
           if (leafNodes.length == 1){
             leafNodes[0].children = oldChildren
+            leafNodes[0].link = oldLink
           }else if(leafNodes.length > 1){
             leafNodes[0].children = oldChildren
+            leafNodes[0].oldLink = oldLink
             if (mergeChild){
               for(let l = 1;l < leafNodes.length;l++){
                 // leafNodes[l].children = [{link:oldChildren[0].id}]
-                leafNodes[l].link = oldChildren[0].id
+                if (oldChildren?.length > 0 && oldChildren[0].id){
+                  leafNodes[l].link = oldChildren[0].id
+                }else{
+                  leafNodes[l].link = oldLink
+                }
               }
             }
             
