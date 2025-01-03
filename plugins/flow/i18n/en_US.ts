@@ -44,6 +44,8 @@ export default {
       group: 'Group',
       branch: 'Branch',
       script: 'Script',
+      service: 'Service',
+      manual: 'Manual',
       sequence: 'Sequence',
       task:'Task',
       usertask: 'User',

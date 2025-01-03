@@ -1,5 +1,4 @@
 <script lang="ts">
-import { DDeiEditorUtil } from "ddei-editor"
 export default {
   name: "ddei-quickflow-addnode",
   props: {
@@ -10,6 +9,61 @@ export default {
     editor: {
       type: Object,
       default: null
+    },
+    controlConfig: {
+      type: Object,
+      default: {
+        "start": [
+          {
+            group: "taskGroup"
+          }
+        ],
+        "taskGroup": [
+          {
+            group: "taskGroup"
+          }
+        ],
+        "branch": [
+          {
+            name: "ddei.flow.condition",
+            icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
+            <use xlink:href="#icon-ddei-flow-user-task"></use>
+          </svg>`,
+            type: "condition"
+          }
+        ],
+        "condition": [
+          {
+            group: "taskGroup"
+          }
+        ],
+        "converge": [
+          {
+            group: "taskGroup"
+          }
+        ],
+      }
+    },
+    groupConfig: {
+      type: Object,
+      default: {
+        "taskGroup": [
+          {
+            name: "ddei.flow.task",
+            icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
+            <use xlink:href="#icon-ddei-flow-user-task"></use>
+          </svg>`,
+            type: "task"
+          },
+          {
+            name: "ddei.flow.branch",
+            icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
+            <use xlink:href="#icon-ddei-flow-gateway-xor"></use>
+          </svg>`,
+            type: "branch"
+          }
+        ]
+      }
     }
   },
   data(){
@@ -18,110 +72,6 @@ export default {
     }
   },
   mounted() {
-    let controlConfig = {
-      "start": [
-        {
-          name: "ddei.flow.task",
-          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-user-task"></use>
-          </svg>`,
-          type: "task"
-        },
-        {
-          name: "ddei.flow.script",
-          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-script-task"></use>
-          </svg>`,
-          type: "script"
-        },
-        {
-          name: "ddei.flow.branch",
-          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-gateway-xor"></use>
-          </svg>`,
-          type: "branch"
-        }
-      ],
-      "task": [
-        {
-          name: "ddei.flow.task",
-          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-user-task"></use>
-          </svg>`,
-          type: "task"
-        },
-        {
-          name: "ddei.flow.script",
-          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-script-task"></use>
-          </svg>`,
-          type: "script"
-        },
-        {
-          name: "ddei.flow.branch",
-          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-gateway-xor"></use>
-          </svg>`,
-          type: "branch"
-        }
-      ],
-      "branch": [
-        {
-          name: "ddei.flow.condition",
-          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-user-task"></use>
-          </svg>`,
-          type: "condition"
-        }
-      ],
-      "condition": [
-        {
-          name: "ddei.flow.task",
-          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-user-task"></use>
-          </svg>`,
-          type: "task"
-        },
-        {
-          name: "ddei.flow.script",
-          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-script-task"></use>
-          </svg>`,
-          type: "script"
-        },
-        {
-          name: "ddei.flow.branch",
-          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-gateway-xor"></use>
-          </svg>`,
-          type: "branch"
-        }
-      ],
-      "converge": [
-        {
-          name: "ddei.flow.task",
-          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-user-task"></use>
-          </svg>`,
-          type: "task"
-        },
-        {
-          name: "ddei.flow.script",
-          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-script-task"></use>
-          </svg>`,
-          type: "script"
-        },
-        {
-          name: "ddei.flow.branch",
-          icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
-            <use xlink:href="#icon-ddei-flow-gateway-xor"></use>
-          </svg>`,
-          type: "branch"
-        }
-      ],
-    }
-
     let stage = this.editor.ddInstance.stage;
     if (stage && stage.extData && stage.extData.flowDesignData?.data) {
       let flowDesignData = stage.extData.flowDesignData;
@@ -129,15 +79,47 @@ export default {
       let flowAPI = this.editor.flow
       let nResult = flowAPI.getNodeById(this.model.smodel.id, flowData);
       let parentNode = nResult?.node;
+      let controlConfig = this.editor.options?.nodeControlConfig ? this.editor.options.nodeControlConfig : this.controlConfig
       if (parentNode?.type){
         let controlConfigs = controlConfig[parentNode.type];
-        this.controls = controlConfigs;
+        if (!controlConfigs){
+          //根据parentNode.type去寻找当前是在哪个分组下
+          let groupName = this.getGroupByNode(parentNode.type)
+          controlConfigs = controlConfig[groupName];
+        }
+        let controls = []
+        controlConfigs.forEach(conf => {
+          if(conf.group){
+            let groupConfig = this.editor.options?.nodeGroupConfig ? this.editor.options.nodeGroupConfig : this.groupConfig
+            let groupControls = groupConfig[conf.group];
+            controls.push(...groupControls)
+          }else{
+            controls.push(conf);
+          }
+        });
+        this.controls = controls;
       }
     }
 
   },
 
   methods:{
+
+    getGroupByNode(nodeName){
+      let groupConfig = this.editor.options?.nodeGroupConfig ? this.editor.options.nodeGroupConfig : this.groupConfig
+
+      for (let groupName in groupConfig){
+        
+        let controls = groupConfig[groupName];
+        for (let i = 0; i < controls.length;i++){
+          if(controls[i]?.type == nodeName){
+            return groupName
+          }
+        }
+        
+      }
+    },
+
     createControl(control){
       
       let stage = this.editor.ddInstance.stage

@@ -1,5 +1,5 @@
 import { DDeiModelArrtibuteValue,DDeiEditor, DDeiUtil, DDeiAbstractShape, DDeiStage, DDeiEnumBusCommandType, DDeiFile, DDeiActiveType, DDeiFileState } from "ddei-editor"
-import { DDeiEditorState, DDeiEditorEnumBusCommandType, DDeiEditorUtil } from "ddei-editor"
+import { DDeiEditorState, DDeiEditorEnumBusCommandType, DDeiEditorUtil ,cloneDeep} from "ddei-editor"
 import {getIncludeModels} from "../controls/util"
 import DDeiFlowFile from "./file"
 import DDeiFlowGraph from "./graph";
@@ -11,7 +11,6 @@ import DDeiFlowBpmnXmlNode from "./bpmnxmlnode"
 import { merge } from "ddei-editor"
 import { xml2graph, autolayout } from "./request"
 import {Matrix3} from 'ddei-editor'
-import { group } from "console";
 /**
  * DDeiFlow插件的API方法包，提供了API以及工具函数
  * 初始化时挂载到editor的flow属性上
@@ -34,6 +33,51 @@ class DDeiFlowAPI {
    * 模型缓存
    */
   modelsCache = {}
+
+  nodeConfig = {
+    start: {
+      model: "1000001",
+      width: 50,
+      height: 50,
+      textField: "name"
+    },
+    task: {
+      model: "1000011",
+      width: 160,
+      height: 80,
+      textField: "name"
+    },
+    script: {
+      model: "1000021",
+      width: 160,
+      height: 80,
+      textField: "name"
+    },
+    branch: {
+      model: "1000202",
+      width: 60,
+      height: 60,
+      textField: "name"
+    },
+    condition: {
+      model: "100001",
+      width: 100,
+      height: 40,
+      textField: "name"
+    },
+    converge: {
+      model: "1000204",
+      width: 60,
+      height: 60,
+      textField: "name"
+    },
+    end: {
+      model: "1000003",
+      width: 50,
+      height: 50,
+      textField: "name"
+    }
+  }
 
   constructor(editor:DDeiEditor){
     this.editor = editor
@@ -278,7 +322,11 @@ class DDeiFlowAPI {
         flowDataObj = JSON.parse(flowData);
       }
       if (flowDataObj){
-        
+        if (this.editor.options?.nodeConfig) {
+          flowDataObj.config = cloneDeep(this.editor.options.nodeConfig);
+        } else {
+          flowDataObj.config = cloneDeep(this.nodeConfig);
+        } 
         if (flowDataObj.config){
           for(let key in flowDataObj.config){
             let configObj = flowDataObj.config[key]

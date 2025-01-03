@@ -33,9 +33,15 @@ export default {
         delete editor.tempQuickFlowAddNode
       }
       if (!editor.tempQuickFlowAddNode) {
-        let opts = { editor: editor, model: this.model }
+        
         let addNodePlugin = this.getPluginInsByClass(editor, DDeiQuickFlowAddNodePanel)
-
+        let opts = { editor: editor, model: this.model }
+        if (addNodePlugin.options?.controlConfig) {
+          opts.controlConfig = addNodePlugin.options.controlConfig
+        }
+        if (addNodePlugin.options?.groupConfig) {
+          opts.groupConfig = addNodePlugin.options.groupConfig
+        }
         let addNodeView = addNodePlugin.options.viewer
 
         let btnVNode = createVNode(addNodeView, opts);

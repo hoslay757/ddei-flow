@@ -1,4 +1,4 @@
-import { DDeiAbstractShape,DDeiLifeCycle, DDeiFuncData, DDeiEditorUtil, DDeiUtil, DDeiFuncCallResult, DDeiEditorEnumBusCommandType, DDeiEnumBusCommandType } from "ddei-editor";
+import { DDeiAbstractShape, DDeiLifeCycle, DDeiFuncData, DDeiEditorUtil, DDeiUtil, DDeiFuncCallResult, DDeiEditorEnumBusCommandType, DDeiEnumBusCommandType, cloneDeep } from "ddei-editor";
 import { clone, merge } from "ddei-editor";
 import { getIncludeModels, showSettingButton, changeSettingButtonPos, updateCallActivityView } from "../controls/util"
 import { getCurrentInstance, render, createVNode } from "vue"
@@ -16,6 +16,8 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
    */
   static defaultIns: DDeiQuickFlowLifeCycle = new DDeiQuickFlowLifeCycle();
   
+  
+
   /**
    * 鼠标移动进入控件的钩子，该插件由它来进行整体分发
    */
@@ -135,6 +137,7 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
       if (operateType == 'LOAD_FILE') {
         
         if (flowDesignData) {
+         
           flowAPI.loadFromFlowData(flowDesignData, true);
           editor.ddInstance["AC_DESIGN_DRAG"] = false
           editor.ddInstance["AC_DESIGN_LINK"] = false
@@ -151,50 +154,6 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
 "marginY":20,
 "spaceHeight":40,
 "print":1,
-"config":{
-  "start": {
-    "model":"1000001",
-    "width":50,
-    "height":50,
-    "textField": "name"
-  },
-  "task": {
-    "model":"1000011",
-    "width":160,
-    "height":80,
-    "textField": "name"
-  },
-  "script": {
-    "model":"1000021",
-    "width":160,
-    "height":80,
-    "textField": "name"
-  },
-  "branch": {
-    "model":"1000202",
-    "width":60,
-    "height":60,
-    "textField": "name"
-  },
-  "condition": {
-    "model":"100001",
-    "width":100,
-    "height":40,
-    "textField": "name"
-  },
-  "converge": {
-    "model":"1000204",
-    "width":60,
-    "height":60,
-    "textField": "name"
-  },
-  "end": {
-    "model":"1000003",
-    "width":50,
-    "height":50,
-    "textField": "name"
-  }
-},
 "data":
     {
       "id": "begin",
@@ -217,6 +176,8 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
     }
 }`;
           flowDesignData = JSON.parse(flowData);
+          
+          
           stage.extData['flowDesignData'] = flowDesignData
         }
 
