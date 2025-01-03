@@ -153,7 +153,7 @@ export default {
             }
             if (reload){
               //重新加载流程
-              flowAPI.loadFromFlowData(flowDesignData, false, nResult.parentNode.id)
+              flowAPI.loadFromFlowData(flowDesignData, true, nResult.parentNode.id)
             }
           }
         }

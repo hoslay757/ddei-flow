@@ -219,7 +219,7 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
           stage.extData['flowDesignData'] = flowDesignData
         }
 
-        flowAPI.loadFromFlowData(flowDesignData, true);
+        flowAPI.loadFromFlowData(flowDesignData, true,null,1,true);
         editor.ddInstance["AC_DESIGN_DRAG"] = false
         editor.ddInstance["AC_DESIGN_LINK"] = false
         editor.ddInstance["AC_DESIGN_ROTATE"] = false

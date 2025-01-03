@@ -52,12 +52,12 @@ export default {
             insertNode.children[0].link = parentNode.converge
             parentNode.children.splice(sibIndex, 0, insertNode);
             //重新加载流程
-            flowAPI.loadFromFlowData(flowDesignData, false, parentNode.id + '_cond_' + conditionIdx)
+            flowAPI.loadFromFlowData(flowDesignData, true, parentNode.id + '_cond_' + conditionIdx)
           }else if (this.direct == 2) {
             insertNode.children[0].link = parentNode.converge
             parentNode.children.splice(sibIndex+1, 0, insertNode);
             //重新加载流程
-            flowAPI.loadFromFlowData(flowDesignData, false, parentNode.id + '_cond_' + conditionIdx)
+            flowAPI.loadFromFlowData(flowDesignData, true, parentNode.id + '_cond_' + conditionIdx)
           }
           
         }

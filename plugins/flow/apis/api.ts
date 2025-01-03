@@ -271,7 +271,7 @@ class DDeiFlowAPI {
    * 通过flowData加载流程图
    * @param flowData 流程流转数据
    */
-  loadFromFlowData(flowData: string | object, centerModel:boolean = true,centerModelId:string|null = null,ratio:number = 1){
+  loadFromFlowData(flowData: string | object, centerModel:boolean = true,centerModelId:string|null = null,ratio:number = 1,changeWPV:boolean = false){
     if (flowData) {
       let flowDataObj = flowData
       if (typeof (flowData) == 'string') {
@@ -387,10 +387,6 @@ class DDeiFlowAPI {
                 for (let i = 0; i < layoutData.lines?.length; i++) {
                   promiseArr.push(new Promise((resolve, reject) => {
                     let line = layoutData.lines[i]
-                    if(!line.endId){
-                      debugger
-                    }
-
                     //将points换算为spvs
                     let spvs = null
                     if (line.points.length > 2) {
@@ -528,11 +524,11 @@ class DDeiFlowAPI {
                   
                   stage.spv.applyMatrix3(moveMatrix)
 
-                  // if(!centerModelId || !firstModel){
+                  if(!centerModelId || !firstModel){
                     outRect = DDeiAbstractShape.getOutRectByPV(models);
-                  // }else{
-                  //   outRect = DDeiAbstractShape.getOutRectByPV([firstModel]);
-                  // }
+                  }else{
+                    outRect = DDeiAbstractShape.getOutRectByPV([firstModel]);
+                  }
                   let ox = -(outRect.x + outRect.width / 2) + stage.width / 2 + outRect.width / 2;
                   let oy = -(outRect.y + outRect.height / 2) + stage.height / 2 + outRect.height / 2;
                   //修正位置根据position和margin属性
@@ -622,12 +618,13 @@ class DDeiFlowAPI {
                   if (firstModel && centerModel){
                     
                     editor.centerModels(stage,firstModel.id)
-                    
-                    if (wpvY != Infinity) {
-                      stage.wpv.y = -wpvY;
-                    }
-                    if (wpvX != Infinity) {
-                      stage.wpv.x = -wpvX;
+                    if (changeWPV){
+                      if (wpvY != Infinity) {
+                        stage.wpv.y = -wpvY;
+                      }
+                      if (wpvX != Infinity) {
+                        stage.wpv.x = -wpvX;
+                      }
                     }
                     
                   }
