@@ -3,6 +3,11 @@ import DDeiQuickFlowLifeCycles from "./lifecycle"
 import { DDeiEditorUtil, DDeiExtSearch, DDeiExtQuickControl, DDeiConfig, DDeiCoreSimpleLayout,DDeiCoreMobileLayout } from "ddei-editor"
 import {DDeiFlowSettingButtonDialog} from "@ddei-flow"
 import removeBtnViewer from "./viewer/remove-btn-viewer.vue"
+import DDeiQuickFlowOperatePanel from "./viewer/operate"
+import DDeiQuickFlowAddConditionPanel from "./viewer/add-condition"
+import DDeiQuickFlowAddNodePanel from "./viewer/add-node"
+import DDeiQuickFlowLeftMovePanel from "./viewer/left-move"
+import DDeiQuickFlowRightMovePanel from "./viewer/right-move"
 
 class DDeiQuickFlow extends DDeiPluginBase {
   type: string = "package"
@@ -45,7 +50,12 @@ class DDeiQuickFlow extends DDeiPluginBase {
                 condition:"model.modelType != 'DDeiLine' && model.type != 'start' && model.type != 'end'"
               }
             ]
-          })
+          }),
+          DDeiQuickFlowOperatePanel,
+          DDeiQuickFlowAddConditionPanel,
+          DDeiQuickFlowAddNodePanel,
+          DDeiQuickFlowLeftMovePanel,
+          DDeiQuickFlowRightMovePanel
         ]
       }
     }
@@ -115,5 +125,6 @@ class DDeiQuickFlow extends DDeiPluginBase {
 }
 
 export * from "./lifecycle"
+export * from "./viewer"
 export { DDeiQuickFlow }
 export default DDeiQuickFlow;

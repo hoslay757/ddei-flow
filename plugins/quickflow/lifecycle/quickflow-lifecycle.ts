@@ -2,10 +2,11 @@ import { DDeiAbstractShape,DDeiLifeCycle, DDeiFuncData, DDeiEditorUtil, DDeiUtil
 import { clone, merge } from "ddei-editor";
 import { getIncludeModels, showSettingButton, changeSettingButtonPos, updateCallActivityView } from "../controls/util"
 import { getCurrentInstance, render, createVNode } from "vue"
-import defaultOperateView from "./operate-view.vue"
-import defaultConditionLeftOperateView from "./condition-left-operate-view.vue"
-import defaultConditionRightOperateView from "./condition-right-operate-view.vue"
-import defaultAddConditionOperateView from "./add-condition.vue"
+import DDeiQuickFlowOperatePanel from "../viewer/operate"
+import DDeiQuickFlowLeftMovePanel from "../viewer/left-move"
+import DDeiQuickFlowRightMovePanel from "../viewer/right-move"
+import DDeiQuickFlowAddConditionPanel from "../viewer/add-condition"
+
 
 class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
   
@@ -285,7 +286,12 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
   refreshOperateBtnRenderViewer(model,operate, editor) {
     if (operate == 'VIEW') {
       let stage = editor.ddInstance.stage;
+  
         if (stage && stage.extData && stage.extData.flowDesignData?.data) {
+          
+          let operateViewPlugin = this.getPluginInsByClass(editor,DDeiQuickFlowOperatePanel)
+          
+          let defaultOperateView = operateViewPlugin.options.viewer
           let flowDesignData = stage.extData.flowDesignData;
           let flowData = flowDesignData.data;
           let nResult =  editor.flow.getNodeById(model.smodel.id, flowData);
@@ -338,6 +344,15 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
 
   }
 
+  getPluginInsByClass(editor,cls){
+    for(let i = 0;i < editor.plugins.length;i++){
+      if (editor.plugins[i] ==  cls || editor.plugins[i] instanceof cls){
+        
+        return editor.plugins[i]
+      }
+    }
+  }
+
   refreshConditionBtnRenderViewer(model, operate, editor) {
     if (operate == 'VIEW') {
       let stage = editor.ddInstance.stage;
@@ -351,6 +366,9 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
           let sibNodes = nResult?.sibNodes;
           if (!model.render.operateLBtn) {
             let opts = { editor: editor, model: model }
+            let defaultConditionLeftOperatePlugin = this.getPluginInsByClass(editor, DDeiQuickFlowLeftMovePanel)
+
+            let defaultConditionLeftOperateView = defaultConditionLeftOperatePlugin.options.viewer
             let btnVNode = createVNode(defaultConditionLeftOperateView, opts);
             let appContext = editor.appContext;
             //挂载
@@ -366,6 +384,9 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
           }
           if (!model.render.operateRBtn) {
             let opts = { editor: editor, model: model }
+            let defaultConditionRightOperatePlugin = this.getPluginInsByClass(editor, DDeiQuickFlowRightMovePanel)
+
+            let defaultConditionRightOperateView = defaultConditionRightOperatePlugin.options.viewer
             let btnVNode = createVNode(defaultConditionRightOperateView, opts);
             let appContext = editor.appContext;
             //挂载
@@ -379,8 +400,13 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
             //渲染并挂载组件
             render(btnVNode, div);
           }
+          let defaultAddConditionOperatePlugin = this.getPluginInsByClass(editor, DDeiQuickFlowAddConditionPanel)
+
+          let defaultAddConditionOperateView = defaultAddConditionOperatePlugin.options.viewer
           if (!model.render.operateLAddBtn) {
             let opts = { editor: editor, model: model,direct:1 }
+            
+           
             let btnVNode = createVNode(defaultAddConditionOperateView, opts);
             let appContext = editor.appContext;
             //挂载
@@ -396,6 +422,7 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
           }
           if (!model.render.operateRAddBtn) {
             let opts = { editor: editor, model: model, direct: 2 }
+            
             let btnVNode = createVNode(defaultAddConditionOperateView, opts);
             let appContext = editor.appContext;
             //挂载

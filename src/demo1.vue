@@ -4,6 +4,8 @@ import { DDeiCoreTopMenuSimplePanel, DDeiExtQuickStyle } from "ddei-editor";
 import { getCurrentInstance, markRaw } from "vue";
 import DDeiFlow from "@ddei-flow";
 import DDeiQuickFlow from "@ddei-quickflow";
+import { DDeiQuickFlowOperatePanel } from "@ddei-quickflow";
+import operateViewDemo from "./operate-view-demo.vue";
 //获取主对象实例，代替this获取$refs
 const { proxy } = getCurrentInstance()
 const options = markRaw({
@@ -11,7 +13,10 @@ const options = markRaw({
   extensions: [
 
     DDeiFlow,
-    DDeiQuickFlow
+    DDeiQuickFlow,
+    DDeiQuickFlowOperatePanel.configuration({
+      viewer: operateViewDemo
+    })
   ]
 })
 

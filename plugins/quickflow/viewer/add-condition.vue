@@ -1,6 +1,5 @@
 <script lang="ts">
 import { getCurrentInstance, render, createVNode } from "vue"
-import DefaultAddNodeView from "./add-node.vue"
 export default {
   name: "ddei-quickflow-add-condition-view",
   props: {

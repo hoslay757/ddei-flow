@@ -1,6 +1,6 @@
 <script lang="ts">
 import { getCurrentInstance, render, createVNode } from "vue"
-import DefaultAddNodeView from "./add-node.vue"
+import { DDeiQuickFlowAddNodePanel } from "@ddei-quickflow";
 export default {
   name: "ddei-quickflow-operate-view",
   props: {
@@ -15,6 +15,14 @@ export default {
   },
 
   methods:{
+    getPluginInsByClass(editor, cls) {
+      for (let i = 0; i < editor.plugins.length; i++) {
+        if (editor.plugins[i] == cls || editor.plugins[i] instanceof cls) {
+
+          return editor.plugins[i]
+        }
+      }
+    },
     mouseEnter(el){
       let editor = this.editor;
       if (editor.tempQuickFlowAddNode) {
@@ -26,7 +34,11 @@ export default {
       }
       if (!editor.tempQuickFlowAddNode) {
         let opts = { editor: editor, model: this.model }
-        let btnVNode = createVNode(DefaultAddNodeView, opts);
+        let addNodePlugin = this.getPluginInsByClass(editor, DDeiQuickFlowAddNodePanel)
+
+        let addNodeView = addNodePlugin.options.viewer
+
+        let btnVNode = createVNode(addNodeView, opts);
         let appContext = editor.appContext;
         //挂载
         btnVNode.appContext = appContext;
@@ -68,7 +80,7 @@ export default {
   position: fixed;
   z-index: 99999;
   .icon{
-      fill: var(--dot);
+      fill: red;
   }
   svg{
     pointer-events: initial;
