@@ -6,9 +6,23 @@ import DDeiFlow from "@ddei-flow";
 import DDeiQuickFlow from "@ddei-quickflow";
 import { DDeiQuickFlowOperatePanel } from "@ddei-quickflow";
 import operateViewDemo from "./operate-view-demo.vue";
+import custUserTaskDemo from "./user-task-demo.vue"
 //获取主对象实例，代替this获取$refs
 const { proxy } = getCurrentInstance()
 const options = markRaw({
+  config:{
+    controlDefines: [
+      {
+        'id': '1000011',
+        define: {
+          border: {
+            color: "red"
+          }
+        },
+        viewer: custUserTaskDemo
+      }
+    ],
+  },
   //配置扩展插件
   extensions: [
 

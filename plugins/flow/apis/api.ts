@@ -322,17 +322,22 @@ class DDeiFlowAPI {
         flowDataObj = JSON.parse(flowData);
       }
       if (flowDataObj){
-        if (this.editor.options?.nodeConfig) {
-          flowDataObj.config = cloneDeep(this.editor.options.nodeConfig);
-        } else {
-          flowDataObj.config = cloneDeep(this.nodeConfig);
-        } 
+        if(!(flowDataObj.ignoreSysConfig && flowDataObj.config)){
+          if (this.editor.options?.nodeConfig) {
+            flowDataObj.config = cloneDeep(this.editor.options.nodeConfig);
+          } else {
+            flowDataObj.config = cloneDeep(this.nodeConfig);
+          } 
+        }
+        
         if (flowDataObj.config){
           for(let key in flowDataObj.config){
             let configObj = flowDataObj.config[key]
+            
             if (configObj.model && (!configObj.width || !configObj.height)){
               
               let controlDefine = DDeiEditorUtil.getControlDefine({modelCode:configObj.model});
+              
               if (controlDefine?.define){
                 if (!configObj.width) {
                   configObj.width = controlDefine.define.width;
@@ -387,7 +392,6 @@ class DDeiFlowAPI {
                   if(sconfig.model){
                     model = sconfig.model;
                   }
-                  
                   let initJSON = {
                     id: task.id,
                     model: model,
@@ -406,13 +410,13 @@ class DDeiFlowAPI {
                       initJSON[f] = task[f]
                     }
                   }
-                  // if (sconfig.fields){
-                    // sconfig.fields.forEach(field => {
-                    //   if (task[field.field] != undefined){
-                    //     initJSON[field.key] = task[field.field]
-                    //   }
-                    // });
-                  // }
+                  if (sconfig.fields){
+                    sconfig.fields.forEach(field => {
+                      if (task[field.field] != undefined){
+                        initJSON[field.key] = task[field.field]
+                      }
+                    });
+                  }
                   
                   let models = editor.addControls([
                     initJSON

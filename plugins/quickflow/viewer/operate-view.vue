@@ -83,7 +83,7 @@ export default {
   user-select: none;
   pointer-events: none;
   display: block;
-  position: fixed;
+  position: absolute;
   z-index: 99999;
   .icon{
       fill: var(--dot);

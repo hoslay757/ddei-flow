@@ -729,6 +729,7 @@ const options = markRaw({
 "groups":[
   "登记","初审","办理","处室办理"
 ],
+"ignoreSysConfig":1,
 "config":{
   "root": {
     "width": 150,

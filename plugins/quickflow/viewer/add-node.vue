@@ -206,7 +206,7 @@ export default {
   height:78px;
   user-select: none;
   display: none;
-  position: fixed;
+  position: absolute;
   z-index: 99999;
   border: 1px solid var(--panel-border);
   box-shadow: 0px 2px 24px 0px hsl(0deg 0% 0% /0.25); 

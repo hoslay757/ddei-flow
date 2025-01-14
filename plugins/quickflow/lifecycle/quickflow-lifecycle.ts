@@ -1,4 +1,4 @@
-import { DDeiAbstractShape, DDeiLifeCycle, DDeiFuncData, DDeiEditorUtil, DDeiUtil, DDeiFuncCallResult, DDeiEditorEnumBusCommandType, DDeiEnumBusCommandType, cloneDeep } from "ddei-editor";
+import { DDeiAbstractShape, DDeiLifeCycle, DDeiFuncData, DDeiEditorUtil, DDeiUtil, DDeiFuncCallResult, DDeiEditorEnumBusCommandType, DDeiEnumBusCommandType, DDeiModelArrtibuteValue } from "ddei-editor";
 import { clone, merge } from "ddei-editor";
 import { getIncludeModels, showSettingButton, changeSettingButtonPos, updateCallActivityView } from "../controls/util"
 import { getCurrentInstance, render, createVNode } from "vue"
@@ -224,16 +224,15 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
       let vNode = editor.tempQuickFlowAddNode;
       let el = vNode?.el;
       
-      let ex = evt.pageX;
+      let ex = evt.pageX ;
       let ey = evt.pageY;
       
       let lw = -50;
       let rw = 0;
       let tw = 0;
       let bw = 0;
-
-
-      if (!(el && ex >= el.offsetLeft + lw && ex <= (el.offsetLeft + el.offsetWidth + rw) && ey >= el.offsetTop - tw && ey <= (el.offsetTop + el.offsetHeight + bw) )){
+      let elePos = DDeiUtil.getDomAbsPosition(el)
+      if (!(el && ex >= elePos.left + lw && ex <= (elePos.left + el.offsetWidth + rw) && ey >= elePos.top - tw && ey <= (elePos.top + el.offsetHeight + bw) )){
         
         vNode.component.isUnmounted = true
         vNode.component.update()
@@ -249,7 +248,22 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
       let stage = editor.ddInstance.stage;
   
         if (stage && stage.extData && stage.extData.flowDesignData?.data) {
-          
+          let ruleDisplay
+          if (stage.ruler?.display) {
+            ruleDisplay = stage.ruler.display;
+          } else if (stage.ddInstance.ruler != null && stage.ddInstance.ruler != undefined) {
+            if (typeof (stage.ddInstance.ruler) == 'boolean') {
+              ruleDisplay = stage.ddInstance.ruler ? 1 : 0;
+            } else {
+              ruleDisplay = stage.ddInstance.ruler.display;
+            }
+          } else {
+            ruleDisplay = DDeiModelArrtibuteValue.getAttrValueByState(stage, "ruler.display", true);
+          }
+          let ruleWeight = 0;
+          if (ruleDisplay == 1 || ruleDisplay == "1") {
+            ruleWeight = 15;
+          }
           let operateViewPlugin = this.getPluginInsByClass(editor,DDeiQuickFlowOperatePanel)
           
           let defaultOperateView = operateViewPlugin.options.viewer
@@ -284,8 +298,8 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
               }
 
               btnEl.style.transform = transform
-              btnEl.style.left = (model.pvs[0].x + model.pvs[1].x) / 2 * stageRatio + stage.wpv.x - (btnEl.offsetWidth ) / 2  + "px"
-              btnEl.style.top = (model.pvs[0].y + model.pvs[1].y) / 2 * stageRatio + stage.wpv.y - (btnEl.offsetHeight ) / 2 +1 + "px"
+              btnEl.style.left = (model.pvs[0].x + model.pvs[1].x) / 2 * stageRatio + stage.wpv.x - (btnEl.offsetWidth) / 2 - ruleWeight  + "px"
+              btnEl.style.top = (model.pvs[0].y + model.pvs[1].y) / 2 * stageRatio + stage.wpv.y - (btnEl.offsetHeight) / 2 + 1 - ruleWeight + "px"
               btnEl.style.display = "block"
               
             }
@@ -399,6 +413,22 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
           }
           let transform = ""
           let stage = model.stage
+          let ruleDisplay
+          if (stage.ruler?.display) {
+            ruleDisplay = stage.ruler.display;
+          } else if (stage.ddInstance.ruler != null && stage.ddInstance.ruler != undefined) {
+            if (typeof (stage.ddInstance.ruler) == 'boolean') {
+              ruleDisplay = stage.ddInstance.ruler ? 1 : 0;
+            } else {
+              ruleDisplay = stage.ddInstance.ruler.display;
+            }
+          } else {
+            ruleDisplay = DDeiModelArrtibuteValue.getAttrValueByState(stage, "ruler.display", true);
+          }
+          let ruleWeight = 0;
+          if (ruleDisplay == 1 || ruleDisplay == "1") {
+            ruleWeight = 15;
+          }
           let stageRatio = stage.getStageRatio()
           if (stageRatio > 0 && stageRatio != 1) {
             transform += " scale(" + stageRatio + ")"
@@ -406,16 +436,16 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
           if (model.render.operateLBtn) {
             let btnEl = model.render.operateLBtn.el;
             btnEl.style.transform = transform
-            btnEl.style.left = model.essBounds.x * stageRatio + stage.wpv.x - btnEl.offsetWidth + "px"
-            btnEl.style.top = (model.essBounds.y + model.essBounds.height / 2) * stageRatio + stage.wpv.y - (btnEl.offsetHeight) / 2 + 1 + "px"
+            btnEl.style.left = model.essBounds.x * stageRatio + stage.wpv.x - btnEl.offsetWidth - ruleWeight + "px"
+            btnEl.style.top = (model.essBounds.y + model.essBounds.height / 2) * stageRatio + stage.wpv.y - (btnEl.offsetHeight) / 2 + 1 - ruleWeight + "px"
             btnEl.style.display = "block"
 
           }
           if (model.render.operateRBtn) {
             let btnEl = model.render.operateRBtn.el;
             btnEl.style.transform = transform
-            btnEl.style.left = (model.essBounds.x + model.essBounds.width) * stageRatio + stage.wpv.x + "px"
-            btnEl.style.top = (model.essBounds.y + model.essBounds.height / 2) * stageRatio + stage.wpv.y - (btnEl.offsetHeight) / 2 + 1 + "px"
+            btnEl.style.left = (model.essBounds.x + model.essBounds.width) * stageRatio + stage.wpv.x - ruleWeight + "px"
+            btnEl.style.top = (model.essBounds.y + model.essBounds.height / 2) * stageRatio + stage.wpv.y - (btnEl.offsetHeight) / 2 + 1 - ruleWeight + "px"
             btnEl.style.display = "block"
           }
           
@@ -428,16 +458,16 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
               //与前一个相邻元素的中心点的中间
               if (sibNodes.length > 1) {
                 let model1 = stage.getModelById(sibNodes[1].id)
-                btnEl.style.left = (model.cpv.x - (model1.cpv.x - model.cpv.x)/2) * stageRatio + stage.wpv.x - btnEl.offsetWidth / 2 + "px"
+                btnEl.style.left = (model.cpv.x - (model1.cpv.x - model.cpv.x) / 2) * stageRatio + stage.wpv.x - btnEl.offsetWidth / 2 - ruleWeight + "px"
               } else {
-                btnEl.style.left = (model.essBounds.x - model.essBounds.width / 2 - 20) * stageRatio + stage.wpv.x - btnEl.offsetWidth / 2 + "px"
+                btnEl.style.left = (model.essBounds.x - model.essBounds.width / 2 - 20) * stageRatio + stage.wpv.x - btnEl.offsetWidth / 2 - ruleWeight + "px"
               }
             } else {
               //与前一个相邻元素的中心点的中间
               let model1 = stage.getModelById(sibNodes[sibIdx - 1].id)
-              btnEl.style.left = (model.cpv.x + model1.cpv.x) / 2 * stageRatio + stage.wpv.x - btnEl.offsetWidth / 2 + "px"
+              btnEl.style.left = (model.cpv.x + model1.cpv.x) / 2 * stageRatio + stage.wpv.x - btnEl.offsetWidth / 2 - ruleWeight + "px"
             }
-            btnEl.style.top = (model.essBounds.y + model.essBounds.height / 2) * stageRatio + stage.wpv.y - (btnEl.offsetHeight) / 2 + 1 + "px"
+            btnEl.style.top = (model.essBounds.y + model.essBounds.height / 2) * stageRatio + stage.wpv.y - (btnEl.offsetHeight) / 2 + 1 - ruleWeight + "px"
             btnEl.style.display = "block"
 
           }
@@ -449,11 +479,11 @@ class DDeiQuickFlowLifeCycle extends DDeiLifeCycle {
             if (sibIdx == sibNodes.length-1){
               if (sibNodes.length > 1) {
                 let model1 = stage.getModelById(sibNodes[sibIdx-1].id)
-                btnEl.style.left = (model.cpv.x + (model.cpv.x-model1.cpv.x)/2) * stageRatio + stage.wpv.x - btnEl.offsetWidth / 2 + "px"
+                btnEl.style.left = (model.cpv.x + (model.cpv.x - model1.cpv.x) / 2) * stageRatio + stage.wpv.x - btnEl.offsetWidth / 2 - ruleWeight + "px"
               } else {
-                btnEl.style.left = (model.essBounds.x + model.essBounds.width *1.5 + 20) * stageRatio + stage.wpv.x - btnEl.offsetWidth / 2 + "px"
+                btnEl.style.left = (model.essBounds.x + model.essBounds.width * 1.5 + 20) * stageRatio + stage.wpv.x - btnEl.offsetWidth / 2 - ruleWeight + "px"
               }
-              btnEl.style.top = (model.essBounds.y + model.essBounds.height / 2) * stageRatio + stage.wpv.y - (btnEl.offsetHeight) / 2 + 1 + "px"
+              btnEl.style.top = (model.essBounds.y + model.essBounds.height / 2) * stageRatio + stage.wpv.y - (btnEl.offsetHeight) / 2 + 1 - ruleWeight + "px"
             }else{
               btnEl.style.display = "none"
             }
