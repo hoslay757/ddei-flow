@@ -1,18 +1,70 @@
+import { showSettingButton, lineObiCheck } from "../util"
 import BpmnSendTaskViewer from "../views/bpmn-send-task-viewer.vue"
 
 
 export default {
   id: '1000041',
-  name: '发送任务',
+  name: 'ddei.flow.sendtask',
   code: 'send_task',
   desc: 'bpmn中的SendTask',
-  from: '100002',
+  from: '1000011',
+  subject: 'bpmn',
   define: {
+    bpmnBaseType: 'Activity',
+    bpmnType: 'SendTask',
     width: 110,
     height: 70,
     border:{
       round:5
+    },
+    ext: {
+      attrs: [
+        {
+          'code': 'code',
+          'name': 'ddei.code',
+          'desc': '用于业务标识',
+          'controlType': 'text',
+          'dataType': 'string',
+          'defaultValue': "send_task",
+          'type': [1, 2] //类别，1图形，2业务，3事件
+        },
+        {
+          'code': 'name',
+          'name': 'ddei.name',
+          'desc': '任务的名称',
+          'controlType': 'text',
+          'dataType': 'string',
+          'defaultValue': "ddei.flow.sendtask",
+          'type': [1, 2] //类别，1图形，2业务，3事件
+        },
+        {
+          'code': 'desc',
+          'name': 'ddei.description',
+          'desc': '备注说明',
+          'controlType': 'textarea',
+          'dataType': 'string',
+          'defaultValue': "ddei.flow.sendtask",
+          'type': [1, 2] //类别，1图形，2业务，3事件
+        },
+        {
+          'code': 'border.color',
+          'name': 'ddei.color',
+          'desc': '图形的边框显示颜色，在高级设置中，可以分别设置不同方向边框的样式',
+          'controlType': 'color-combo',
+          'dataType': 'string',
+          'defaultValue': 'black',
+        },
+
+      ]
     }
+  
   },
-  viewer: BpmnSendTaskViewer
+  filters: {
+    LINE_OBI_FILTER: lineObiCheck
+  },
+  viewer: BpmnSendTaskViewer,
+  icon: `<svg class="icon-ddei-flow" style="width:34px;height:34px;" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-send-task"></use>
+      </svg>`,
+  EVENT_MOUSE_MOVE_IN_CONTROL: showSettingButton
 }

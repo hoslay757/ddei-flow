@@ -15,12 +15,7 @@ export default {
     }
   },
 
-  mounted() {
-    this.editor.renderViewerIns[this.model.id] = this
-    this.editor.renderViewerElements[this.model.id] = this.$refs['divElement']
-    this.editor.bus.push("refresh-shape");
-    this.editor.bus.executeAll();
-  }
+  
 };
 </script>
 <template>
@@ -36,11 +31,11 @@ export default {
   position: absolute;
   pointer-events:none;
   user-select: none;
+  display: none;
   .icon-ddei-flow {
-    margin-left: 2px;
-    margin-top: 2px;
-    width: calc(100% - 1px);
-    height:calc(100% - 1px);
+    width: 100%;
+    height:100%;
+    fill: var(--borderColor);
   }
   
 }

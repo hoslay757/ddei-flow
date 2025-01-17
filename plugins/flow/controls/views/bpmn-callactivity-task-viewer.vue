@@ -14,27 +14,81 @@ export default {
       default: null
     }
   },
+  methods:{
+    refreshView(model, vNode, tempShape, composeRender){
+      if (this.model.activityId){
+        if (this.model.upActivityId != this.model.activityId){
+          this.model.upActivityId = this.model.activityId
+          //获取另一个元素的控件
+          let viewModel = this.model.stage.getModelById(this.model.activityId)
+          if (viewModel){
+            viewModel = this.getCallActivityTask(viewModel)
+            if (this.model.displayView){
+              
+              this.$refs['viewDiv'].innerHTML = this.editor.i18n('ddei.flow.loading')
+              setTimeout(() => {
+                this.editor.flow.toImage([viewModel]).then(html => {
+                  if (html) {
+                    this.$refs['viewDiv'].innerHTML = ""
+                    this.$refs['viewDiv'].style.backgroundImage = 'url(' + html + ')'
+                  }
+                })
+              }, 30);
+            }else{
+              this.$refs['viewDiv'].style.backgroundImage = ""
+              this.$refs['viewDiv'].innerHTML = "<div style='flex:1'>"+(viewModel.name ? viewModel.name : viewModel.code ? viewModel.code : viewModel.id)+"</div>"
+            }
+            
+          }
+        }
+      }
+    },
 
-  mounted() {
-    this.editor.renderViewerIns[this.model.id] = this
-    this.editor.renderViewerElements[this.model.id] = this.$refs['divElement']
-    this.editor.bus.push("refresh-shape");
-    this.editor.bus.executeAll();
+    getCallActivityTask(model){
+      if (model.bpmnType == 'CallActivityTask') {
+        if (model.activityId){
+          let viewModel = this.model.stage.getModelById(model.activityId)
+          if (viewModel) {
+            model = this.getCallActivityTask(viewModel)
+          }
+        }
+      }
+      return model
+    },
+    refreshDragState(type) {
+      if (type == 1) {
+        this.$refs['divElement'].style.borderColor = "green"
+      } else {
+        this.$refs['divElement'].style.borderColor = ""
+      }
+    }
   }
+
+  
 };
 </script>
 <template>
   <div ref="divElement" class="ddei-flow-bpmn-viewer-callactivity-task">
-    <div class="title">
-      <svg class="icon-ddei-flow" aria-hidden="true">
-        <use xlink:href="#icon-ddei-flow-call-activity"></use>
-      </svg>
+    <div v-if="!model || !model.activityId" class="title">
       <div class="text">
-        {{ model.name ? model.name : "调用活动" }}
+        {{ editor.i18n("ddei.flow.calltask") }}
       </div>
     </div>
-    <div class="desc">
-      {{ model.text }}
+    <div v-if="model?.activityId" ref="viewDiv" class="view">
+    </div>
+    <div class="markers">
+      <svg class="icon-ddei-flow" v-if="model.isLoop == 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-loop-marker"></use>
+      </svg>
+      <svg class="icon-ddei-flow" v-if="model.multiInstance == 1 && model.isParallel != 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-sequential-mi-marker"></use>
+      </svg>
+      <svg class="icon-ddei-flow" v-if="model.multiInstance == 1 && model.isParallel == 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-parallel-mi-marker"></use>
+      </svg>
+      <svg class="icon-ddei-flow" v-if="model.isCompensation == 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-compensation-marker"></use>
+      </svg>
     </div>
   </div>
 </template>
@@ -50,18 +104,20 @@ export default {
   border-radius: var(--borderRound);
   pointer-events:none;
   user-select: none;
-
+  display: none;
   .title{
-    height:24px;
+    height:100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    
     .icon-ddei-flow {
       position: absolute;
       left:0px;
       top:0px;
       width: 24px;
       height:24px;
+      fill: var(--borderColor);
     }
 
     .text {
@@ -70,20 +126,53 @@ export default {
       padding:2px;
       overflow: hidden;
       text-overflow: ellipsis;
+      color: var(--fontColor);
+      font-family: var(--fontFamily);
+      font-size: var(--fontSize);
+      font-style: var(--fontStyle);
+      font-weight: var(--fontWeight);
+      text-decoration: var(--textDecoration);
     }
 
   }
-  .desc {
-    font-size: 13px;
-    height:calc(100% - 24px);
-    display:flex;
-    border-top: var(--borderWidth) var(--borderType) var(--borderColor);
+  .view {
+    display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
-    padding:0 2px;
-    word-break: break-word;
-    text-overflow: ellipsis;
+    
+    height: calc(100% - 20px);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    .text {
+      flex: 1;
+      white-space: nowrap;
+      padding: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--fontColor);
+      font-family: var(--fontFamily);
+      font-size: var(--fontSize);
+      font-style: var(--fontStyle);
+      font-weight: var(--fontWeight);
+      text-decoration: var(--textDecoration);
+    }
+  }
+  .markers {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    width: 100%;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .icon-ddei-flow {
+      width: 14px;
+      height: 14px;
+      fill: var(--borderColor);
+    }
   }
 }
 </style>

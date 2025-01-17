@@ -14,13 +14,17 @@ export default {
       default: null
     }
   },
-
-  mounted() {
-    this.editor.renderViewerIns[this.model.id] = this
-    this.editor.renderViewerElements[this.model.id] = this.$refs['divElement']
-    this.editor.bus.push("refresh-shape");
-    this.editor.bus.executeAll();
+  methods: {
+    refreshDragState(type) {
+      if (type == 1) {
+        this.$refs['divElement'].style.borderColor = "green"
+      } else {
+        this.$refs['divElement'].style.borderColor = ""
+      }
+    }
   }
+
+  
 };
 </script>
 <template>
@@ -30,11 +34,22 @@ export default {
         <use xlink:href="#icon-ddei-flow-manual"></use>
       </svg>
       <div class="text">
-        {{ model.name ? model.name : "手工任务" }}
+        {{ editor.i18n(model.name ? model.name : "ddei.flow.manualtask") }}
       </div>
     </div>
-    <div class="desc">
-      {{ model.text }}
+    <div class="markers">
+      <svg class="icon-ddei-flow" v-if="model.isLoop == 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-loop-marker"></use>
+      </svg>
+      <svg class="icon-ddei-flow" v-if="model.multiInstance == 1 && model.isParallel != 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-sequential-mi-marker"></use>
+      </svg>
+      <svg class="icon-ddei-flow" v-if="model.multiInstance == 1 && model.isParallel == 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-parallel-mi-marker"></use>
+      </svg>
+      <svg class="icon-ddei-flow" v-if="model.isCompensation == 1" aria-hidden="true">
+        <use xlink:href="#icon-ddei-flow-compensation-marker"></use>
+      </svg>
     </div>
   </div>
 </template>
@@ -50,40 +65,54 @@ export default {
   border-radius: var(--borderRound);
   pointer-events:none;
   user-select: none;
-
+  display: none;
   .title{
-    height:24px;
+    height:100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    
     .icon-ddei-flow {
       position: absolute;
       left:0px;
       top:0px;
       width: 24px;
       height:24px;
+      fill: var(--borderColor);
     }
 
     .text {
       flex: 1;
+      text-align: center;
       white-space: nowrap;
       padding:2px;
       overflow: hidden;
       text-overflow: ellipsis;
+      color: var(--fontColor);
+      font-family: var(--fontFamily);
+      font-size: var(--fontSize);
+      font-style: var(--fontStyle);
+      font-weight: var(--fontWeight);
+      text-decoration: var(--textDecoration);
     }
 
   }
-  .desc {
-    font-size: 13px;
-    height:calc(100% - 24px);
-    display:flex;
-    border-top: var(--borderWidth) var(--borderType) var(--borderColor);
+
+  .markers {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    width: 100%;
+    height: 20px;
+    display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
-    padding:0 2px;
-    word-break: break-word;
-    text-overflow: ellipsis;
+
+    .icon-ddei-flow {
+      width: 14px;
+      height: 14px;
+      fill: var(--borderColor);
+    }
   }
 }
 </style>

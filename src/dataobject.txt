@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             targetNamespace="http://example.com/data-elements">
+
+    <!-- 1. 数据对象定义 -->
+    <itemDefinition id="OrderItem" structureRef="Order"/>
+    <itemDefinition id="InvoiceItem" structureRef="Invoice"/>
+    
+    <process id="ProcessWithDataElements" isExecutable="true">
+        <!-- 2. 数据对象 -->
+        <dataObject id="DO_Order" name="订单" itemSubjectRef="OrderItem">
+            <extensionElements>
+                <myns:metadata>
+                    <myns:version>1.0</myns:version>
+                </myns:metadata>
+            </extensionElements>
+            <!-- 数据对象的初始状态 -->
+            <dataState name="created"/>
+        </dataObject>
+
+        <!-- 3. 数据对象引用 -->
+        <dataObjectReference id="Order_Ref" name="订单引用" 
+                           dataObjectRef="DO_Order" dataState="processed"/>
+
+        <!-- 4. 全局数据存储 -->
+        <dataStore id="DS_OrderArchive" name="订单存档" 
+                  capacity="1000" isUnlimited="false"/>
+        
+        <!-- 5. 数据存储引用 -->
+        <dataStoreReference id="OrderArchive_Ref" name="订单存档引用" 
+                          dataStoreRef="DS_OrderArchive"/>
+
+        <!-- 流程开始 -->
+        <startEvent id="Start_1">
+            <!-- 6. 数据输入 -->
+            <dataInput id="Input_1" name="初始订单数据"/>
+            <dataInputAssociation id="DataInput_1">
+                <sourceRef>Order_Ref</sourceRef>
+                <targetRef>Input_1</targetRef>
+            </dataInputAssociation>
+        </startEvent>
+
+        <!-- 服务任务 -->
+        <serviceTask id="Task_1" name="处理订单">
+            <!-- 7. 数据输入输出规范 -->
+            <ioSpecification>
+                <dataInput id="TaskInput_1" name="输入订单"/>
+                <dataOutput id="TaskOutput_1" name="处理后订单"/>
+                <inputSet>
+                    <dataInputRefs>TaskInput_1</dataInputRefs>
+                </inputSet>
+                <outputSet>
+                    <dataOutputRefs>TaskOutput_1</dataOutputRefs>
+                </outputSet>
+            </ioSpecification>
+            
+            <!-- 8. 数据关联 -->
+            <dataInputAssociation id="DataAssoc_1">
+                <sourceRef>Order_Ref</sourceRef>
+                <targetRef>TaskInput_1</targetRef>
+                <!-- 9. 数据转换 -->
+                <transformation>
+                    ${order.setStatus('processing')}
+                </transformation>
+            </dataInputAssociation>
+            
+            <dataOutputAssociation id="DataAssoc_2">
+                <sourceRef>TaskOutput_1</sourceRef>
+                <targetRef>OrderArchive_Ref</targetRef>
+            </dataOutputAssociation>
+        </serviceTask>
+
+        <!-- 10. 数据对象集合 -->
+        <dataObject id="DO_OrderList" isCollection="true" 
+                   itemSubjectRef="OrderItem"/>
+
+        <!-- 子流程 -->
+        <subProcess id="SubProcess_1">
+            <!-- 11. 属性 -->
+            <property id="Prop_1" name="totalAmount" itemSubjectRef="xsd:decimal"/>
+            
+            <!-- 12. 数据输入输出 -->
+            <dataInput id="SubProcessInput_1"/>
+            <dataOutput id="SubProcessOutput_1"/>
+        </subProcess>
+
+        <endEvent id="End_1">
+            <!-- 13. 数据输出 -->
+            <dataOutput id="Output_1" name="最终订单数据"/>
+            <dataOutputAssociation id="DataOutput_1">
+                <sourceRef>Output_1</sourceRef>
+                <targetRef>OrderArchive_Ref</targetRef>
+            </dataOutputAssociation>
+        </endEvent>
+    </process>
+</definitions>
+
+
+数据元素类型及其约束说明：
+ItemDefinition（项目定义）
+<itemDefinition id="OrderItem" structureRef="Order"/>
+约束：
+必须有唯一的id
+structureRef指向实际的数据结构
+可以定义isCollection属性
+
+
+DataObject（数据对象）
+ <dataObject id="DO_Order" name="订单" itemSubjectRef="OrderItem">
+ - 约束：
+必须有唯一的id
+itemSubjectRef必须引用有效的ItemDefinition
+可以定义状态(dataState)
+作用域限于所在流程或子流程
+
+3. DataStore（数据存储）
+<dataStore id="DS_OrderArchive" capacity="1000" isUnlimited="false"/>
+约束：
+必须有唯一的id
+capacity必须是正整数
+全局可访问
+持久化存储
+
+DataInput/DataOutput（数据输入输出）
+<dataInput id="Input_1" name="初始订单数据"/>
+约束：
+必须有唯一的id
+必须在ioSpecification中定义
+必须有关联的数据映射
+
+
+DataAssociation（数据关联）
+ <dataInputAssociation>
+       <sourceRef>Source_Ref</sourceRef>
+       <targetRef>Target_Ref</targetRef>
+   </dataInputAssociation>
+约束：
+必须指定源和目标
+可以包含转换规则
+方向必须正确
+
+6. Property（属性）
+<property id="Prop_1" name="totalAmount" itemSubjectRef="xsd:decimal"/>
+ 约束：
+作用域限于所在元素
+必须有唯一的id
+可以指定数据类型
+
+重要使用规则：
+  数据访问规则:
+    数据对象仅在流程实例内可见
+    数据存储可跨流程实例访问
+    属性仅在所属元素内可见
+  数据流规则:
+    输入关联必须指向任务的输入
+    输出关联必须来自任务的输出
+    数据转换必须保持类型兼容
+  状态管理:
+    <dataState name="created"/>
+    - 可以跟踪数据对象的生命周期
+    状态变化必须有效
+    可以用于条件判断
+  集合处理:
+    <dataObject id="DO_OrderList" isCollection="true"/>
+  - 支持多实例数据
+    可以定义集合操作
+    需要考虑并发访问
+  数据映射建议:
+    使用明确的数据类型
+    定义清晰的转换规则
+    处理异常情况
+  最佳实践:
+    合理使用数据作用域
+    避免过度使用全局数据存储
+    注意数据一致性
+    考虑性能影响
+    这些数据元素提供了完整的数据管理能力，可以根据具体需求选择合适的组合使用。注意要遵循BPMN规范的约束，确保数据流的正确性和可维护性。
+

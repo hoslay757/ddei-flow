@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             targetNamespace="http://example.com/messages">
+
+    <!-- 消息定义 -->
+    <message id="MSG_Order" name="订单消息"/> <!-- 默认消息 -->
+    <message id="MSG_Confirmation" name="确认消息"/> <!-- 默认消息 -->
+    <message id="MSG_Rejection" name="拒绝消息"/> <!-- 默认消息 -->
+    <message id="MSG_Uninitialized" name="未初始化消息"/> <!-- 未初始化消息 -->
+    
+    <!-- 协作定义 -->
+    <collaboration id="Collaboration_1">
+        <participant id="Customer" name="客户" processRef="CustomerProcess"/>
+        <participant id="Supplier" name="供应商" processRef="SupplierProcess"/>
+        
+        <!-- 消息流定义 -->
+        <messageFlow id="MessageFlow_1" 
+                    sourceRef="Send_Order" 
+                    targetRef="Receive_Order" 
+                    messageRef="MSG_Order"/>
+        <messageFlow id="MessageFlow_2" 
+                    sourceRef="Send_Confirmation" 
+                    targetRef="Receive_Confirmation" 
+                    messageRef="MSG_Confirmation"/>
+        <messageFlow id="MessageFlow_3" 
+                    sourceRef="Send_Rejection" 
+                    targetRef="Receive_Rejection" 
+                    messageRef="MSG_Rejection"/>
+        <messageFlow id="MessageFlow_4" 
+                    sourceRef="Send_Uninitialized" 
+                    targetRef="Receive_Uninitialized" 
+                    messageRef="MSG_Uninitialized"/>
+    </collaboration>
+
+    <!-- 客户流程 -->
+    <process id="CustomerProcess" isExecutable="true">
+        <startEvent id="Start_Customer"/>
+        
+        <!-- 1. 发送消息任务 -->
+        <sendTask id="Send_Order" 
+                 name="发送订单" 
+                 messageRef="MSG_Order">
+            <incoming>Flow_1</incoming>
+            <outgoing>Flow_2</outgoing>
+        </sendTask>
+        
+        <!-- 2. 接收消息事件 -->
+        <intermediateCatchEvent id="Receive_Confirmation">
+            <messageEventDefinition messageRef="MSG_Confirmation"/>
+            <incoming>Flow_2</incoming>
+            <outgoing>Flow_3</outgoing>
+        </intermediateCatchEvent>
+        
+        <!-- 3. 消息边界事件 -->
+        <boundaryEvent id="Boundary_Timeout" attachedToRef="Receive_Confirmation">
+            <timerEventDefinition>
+                <timeDuration>PT1H</timeDuration>
+            </timerEventDefinition>
+        </boundaryEvent>
+        
+        <!-- 4. 发送拒绝消息 -->
+        <sendTask id="Send_Rejection" 
+                 name="发送拒绝消息" 
+                 messageRef="MSG_Rejection">
+            <incoming>Flow_3</incoming>
+            <outgoing>Flow_4</outgoing>
+        </sendTask>
+        
+        <!-- 5. 接收未初始化消息 -->
+        <intermediateCatchEvent id="Receive_Uninitialized">
+            <messageEventDefinition messageRef="MSG_Uninitialized"/>
+            <incoming>Flow_4</incoming>
+            <outgoing>Flow_5</outgoing>
+        </intermediateCatchEvent>
+        
+        <endEvent id="End_Customer"/>
+        
+        <sequenceFlow id="Flow_1" sourceRef="Start_Customer" targetRef="Send_Order"/>
+        <sequenceFlow id="Flow_2" sourceRef="Send_Order" targetRef="Receive_Confirmation"/>
+        <sequenceFlow id="Flow_3" sourceRef="Receive_Confirmation" targetRef="Send_Rejection"/>
+        <sequenceFlow id="Flow_4" sourceRef="Send_Rejection" targetRef="Receive_Uninitialized"/>
+        <sequenceFlow id="Flow_5" sourceRef="Receive_Uninitialized" targetRef="End_Customer"/>
+    </process>
+
+    <!-- 供应商流程 -->
+    <process id="SupplierProcess" isExecutable="true">
+        <!-- 6. 消息启动事件 -->
+        <startEvent id="Start_Supplier">
+            <messageEventDefinition messageRef="MSG_Order"/>
+        </startEvent>
+        
+        <!-- 7. 接收消息任务 -->
+        <receiveTask id="Receive_Order" 
+                    name="接收订单" 
+                    messageRef="MSG_Order">
+            <incoming>Flow_6</incoming>
+            <outgoing>Flow_7</outgoing>
+        </receiveTask>
+        
+        <!-- 8. 发送确认消息 -->
+        <sendTask id="Send_Confirmation" 
+                 name="发送确认">
+            <incoming>Flow_7</incoming>
+            <outgoing>Flow_8</outgoing>
+        </sendTask>
+        
+        <!-- 9. 发送拒绝消息 -->
+        <sendTask id="Send_Rejection" 
+                 name="发送拒绝消息">
+            <incoming>Flow_8</incoming>
+            <outgoing>Flow_9</outgoing>
+        </sendTask>
+        
+        <endEvent id="End_Supplier"/>
+        
+        <sequenceFlow id="Flow_6" sourceRef="Start_Supplier" targetRef="Receive_Order"/>
+        <sequenceFlow id="Flow_7" sourceRef="Receive_Order" targetRef="Send_Confirmation"/>
+        <sequenceFlow id="Flow_8" sourceRef="Send_Confirmation" targetRef="Send_Rejection"/>
+        <sequenceFlow id="Flow_9" sourceRef="Send_Rejection" targetRef="End_Supplier"/>
+    </process>
+
+    <!-- 10. 消息事件子流程 -->
+    <subProcess id="MessageEventSubProcess" triggeredByEvent="true">
+        <startEvent id="Start_MessageEvent">
+            <messageEventDefinition messageRef="MSG_Uninitialized"/>
+        </startEvent>
+        <task id="Handle_Emergency" name="处理紧急订单"/>
+        <endEvent id="End_MessageEvent"/>
+    </subProcess>
+</definitions>

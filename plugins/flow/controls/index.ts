@@ -1,6 +1,6 @@
 import {DDeiPluginBase} from "ddei-editor";
 import { loadControlByFrom, loadAndSortGroup } from "ddei-editor"
-import { cloneDeep } from "lodash"
+import { cloneDeep } from "ddei-editor"
 const control_ctx = import.meta.glob('./bpmn/**', { eager: true })
 const group_ctx = import.meta.glob('./groups/**', { eager: true })
 
@@ -56,6 +56,10 @@ class DDeiFlowControls extends DDeiPluginBase{
     loadAndSortGroup(groups, this.controls)
     return groups;
   } 
+
+  static modify(fn) {
+    return DDeiFlowControls.defaultIns.modify(fn)
+  }
 
   static configuration(options) {
     if (options){
